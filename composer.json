@@ -1,0 +1,12 @@
+{
+    "name": "blesta/pricing",
+    "require": {
+        "php": ">=5.1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.6"
+    },
+    "autoload": {
+        "classmap": ["src/"]
+    }
+}
