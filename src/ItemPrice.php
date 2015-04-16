@@ -74,7 +74,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
         foreach ($this->taxes as $taxes) {
             $all_taxes = array_merge($all_taxes, array_values($taxes));
         }
-        return array_unique($all_taxes);
+        return $all_taxes;
     }
     /**
      * Fetch all unique discounts set
