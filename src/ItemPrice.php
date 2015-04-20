@@ -8,15 +8,22 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     protected $discounts = array();
     protected $taxes = array();
 
-    // discard duplicates
+    /**
+     * Assigns a discount to the item
+     *
+     * @param DiscountPrice $discount A discount object to set for the item
+     */
     public function setDiscount(DiscountPrice $discount)
     {
+        // Disallow duplicates from being set
         if (!in_array($discount, $this->discounts, true)) {
             $this->discounts[] = $discount;
         }
     }
 
     /**
+     * Assigns a TaxPrice to the item
+     * Passing multiple TaxPrice arguments will set them to be compounded
      *
      * @throws InvalidArgumentException If something other than a TaxPrice was given
      */
@@ -24,6 +31,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     {
         $taxes = func_get_args();
         foreach ($taxes as $tax) {
+            // Only a TaxPrice instance is accepted
             if (!($tax instanceof TaxPrice)) {
                 throw new InvalidArgumentException(sprintf(
                     '%s requires an instance of %s, %s given.',
@@ -33,9 +41,28 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
                 ));
             }
         }
-        $this->taxes[] = $taxes;
-    }
 
+        // Remove duplicate TaxPrice's from the given arguments
+        foreach ($taxes as $i => $tax_price_i) {
+            foreach ($taxes as $j => $tax_price_j) {
+                // Remove all later instances of the same TaxPrice
+                if ($j > $i && $tax_price_i === $tax_price_j) {
+                    unset($taxes[$j]);
+                }
+            }
+        }
+
+        // Remove duplicate TaxPrice's that already exist
+        foreach ($taxes as $index => $tax_price) {
+            foreach ($this->taxes as $tax_row) {
+                if (in_array($tax_price, $tax_row, true)) {
+                    unset($taxes[$index]);
+                }
+            }
+        }
+
+        $this->taxes[] = array_values($taxes);
+    }
 
     // PriceTotalInterface
     public function totalAfterTax()

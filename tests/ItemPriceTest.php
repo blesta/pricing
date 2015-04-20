@@ -50,17 +50,34 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @covers ::taxes
      * @dataProvider taxProvider
      */
-    public function testSetTax($item, $tax)
+    public function testSetTax($item, array $taxes)
     {
-        $item->setTax($tax);
-        $this->assertContains($tax, $item->taxes());
+        // Add all given taxes
+        call_user_func_array(array($item, "setTax"), $taxes);
+        foreach ($taxes as $tax) {
+            $this->assertContains($tax, $item->taxes());
+        }
 
-        $item->setTax($tax);
+        // At most, each tax should be added, but may be less if duplicates set
+        $num_set_taxes = count($item->taxes());
+        $this->assertLessThanOrEqual(count($taxes), $num_set_taxes);
+
+        // The same tax should not be added again
+        $item->setTax($taxes[0]);
         $this->assertCount(
-            1,
+            $num_set_taxes,
             $item->taxes(),
             'Only one instance of each tax may exist.'
         );
+    }
+
+    /**
+     * @covers ::setTax
+     * @expectedException InvalidArgumentException
+     */
+    public function testSetTaxException() {
+        $item = new ItemPrice(10);
+        $item->setTax(new stdClass());
     }
 
     /**
@@ -70,9 +87,14 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function taxProvider()
     {
+        $tax_price1 = new TaxPrice(10, 'exclusive');
+        $tax_price2 = new TaxPrice(10, 'exclusive');
+
         return array(
-            array(new ItemPrice(10, 0), new TaxPrice(10, 'exclusive')),
-            array(new ItemPrice(10), new TaxPrice(25, 'exclusive'))
+            array(new ItemPrice(10, 0), array($tax_price1)),
+            array(new ItemPrice(10), array($tax_price1)),
+            array(new ItemPrice(10, 1), array($tax_price1, $tax_price2)),
+            array(new ItemPrice(10, 1), array($tax_price1, $tax_price1)),
         );
     }
 }
