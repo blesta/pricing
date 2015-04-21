@@ -45,9 +45,13 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
         // Remove duplicate TaxPrice's from the given arguments
         foreach ($taxes as $i => $tax_price_i) {
             foreach ($taxes as $j => $tax_price_j) {
-                // Remove all later instances of the same TaxPrice
+                // Throw exception if the same instance of a TaxPrice was given multiple times
                 if ($j > $i && $tax_price_i === $tax_price_j) {
-                    unset($taxes[$j]);
+                    throw new InvalidArgumentException(sprintf(
+                        '%s requires unique instances of %s, but identical instances were given.',
+                        'setTax',
+                        'TaxPrice'
+                    ));
                 }
             }
         }
@@ -156,7 +160,11 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
         }
 
         // Total discount not to exceed the subtotal amount, neither positive nor negative
-        return ($subtotal >= 0 ? min($subtotal, $total_discount) : max($subtotal, $total_discount));
+        return (
+            $subtotal >= 0
+            ? min($subtotal, $total_discount)
+            : max($subtotal, $total_discount)
+        );
     }
 
     /**

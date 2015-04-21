@@ -77,8 +77,13 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function testSetTaxException()
     {
+        // Invalid argument: not TaxPrice
         $item = new ItemPrice(10);
         $item->setTax(new stdClass());
+
+        // Invalid argument: Multiple TaxPrice's of the same instance
+        $tax_price = new TaxPrice(10, 'exclusive');
+        $item->setTax($tax_price, $tax_price);
     }
 
     /**
@@ -88,14 +93,10 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function taxProvider()
     {
-        $tax_price1 = new TaxPrice(10, 'exclusive');
-        $tax_price2 = new TaxPrice(10, 'exclusive');
-
         return array(
-            array(new ItemPrice(10, 0), array($tax_price1)),
-            array(new ItemPrice(10), array($tax_price1)),
-            array(new ItemPrice(10, 1), array($tax_price1, $tax_price2)),
-            array(new ItemPrice(10, 1), array($tax_price1, $tax_price1)),
+            array(new ItemPrice(10, 0), array(new TaxPrice(10, 'exclusive'))),
+            array(new ItemPrice(10), array(new TaxPrice(10, 'exclusive'))),
+            array(new ItemPrice(10, 1), array(new TaxPrice(10, 'exclusive'), new TaxPrice(10, 'exclusive'))),
         );
     }
 
@@ -347,6 +348,23 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Creates a stub of DiscountPrice
+     *
+     * @param mixed $value The value to mock from DiscountPrice::on
+     * @return stub
+     */
+    protected function discountPriceMock($value)
+    {
+        $dp = $this->getMockBuilder("DiscountPrice")
+            ->disableOriginalConstructor()
+            ->getMock();
+        $dp->method("on")
+            ->willReturn($value);
+
+        return $dp;
+    }
+
+    /**
      * Discount amount provider
      *
      * @return array
@@ -355,17 +373,59 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     {
         return array(
             array(new ItemPrice(100, 2), array(), 0),
-            array(new ItemPrice(100, 2), array(new DiscountPrice(10, 'percent')), 20),
-            array(new ItemPrice(100, 2), array(new DiscountPrice(10, 'percent'), new DiscountPrice(20, 'percent')), 60),
-            array(new ItemPrice(100, 2), array(new DiscountPrice(100, 'percent')), 200),
-            array(new ItemPrice(100, 2), array(new DiscountPrice(2, 'amount'), new DiscountPrice(3.75, 'amount')), 5.75),
-            array(new ItemPrice(100, 2), array(new DiscountPrice(20, 'percent'), new DiscountPrice(2, 'amount')), 42),
+            array(new ItemPrice(100, 2), array($this->discountPriceMock(20)), 20),
+            array(
+                new ItemPrice(100, 2),
+                array(
+                    $this->discountPriceMock(20),
+                    $this->discountPriceMock(40)
+                ),
+                60
+            ),
+            array(new ItemPrice(100, 2), array($this->discountPriceMock(200)), 200),
+            array(
+                new ItemPrice(100, 2),
+                array(
+                    $this->discountPriceMock(2),
+                    $this->discountPriceMock(3.75)
+                ),
+                5.75
+            ),
+            array(
+                new ItemPrice(100, 2),
+                array(
+                    $this->discountPriceMock(40),
+                    $this->discountPriceMock(2)
+                ),
+                42
+            ),
 
-            array(new ItemPrice(-100, 2), array(new DiscountPrice(10, 'percent')), -20),
-            array(new ItemPrice(-100, 2), array(new DiscountPrice(10, 'percent'), new DiscountPrice(20, 'percent')), -60),
-            array(new ItemPrice(-100, 2), array(new DiscountPrice(100, 'percent')), -200),
-            array(new ItemPrice(-100, 2), array(new DiscountPrice(2, 'amount'), new DiscountPrice(3.75, 'amount')), -5.75),
-            array(new ItemPrice(-100, 2), array(new DiscountPrice(20, 'percent'), new DiscountPrice(2, 'amount')), -42),
+            array(new ItemPrice(-100, 2), array($this->discountPriceMock(-20)), -20),
+            array(
+                new ItemPrice(-100, 2),
+                array(
+                    $this->discountPriceMock(-20),
+                    $this->discountPriceMock(-40)
+                ),
+                -60
+            ),
+            array(new ItemPrice(-100, 2), array($this->discountPriceMock(-200)), -200),
+            array(
+                new ItemPrice(-100, 2),
+                array(
+                    $this->discountPriceMock(-2),
+                    $this->discountPriceMock(-3.75)
+                ),
+                -5.75
+            ),
+            array(
+                new ItemPrice(-100, 2),
+                array(
+                    $this->discountPriceMock(-40),
+                    $this->discountPriceMock(-2)
+                ),
+                -42
+            ),
         );
     }
 
