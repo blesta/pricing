@@ -75,7 +75,8 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @covers ::setTax
      * @expectedException InvalidArgumentException
      */
-    public function testSetTaxException() {
+    public function testSetTaxException()
+    {
         $item = new ItemPrice(10);
         $item->setTax(new stdClass());
     }
@@ -115,11 +116,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         // Total will be larger or smaller than the subtotal if it's positive or negative
         if ($item->subtotal() > 0) {
             $this->assertGreaterThan($item->subtotal(), $item->totalAfterTax());
-        }
-        elseif ($item->subtotal() < 0) {
+        } elseif ($item->subtotal() < 0) {
             $this->assertLessThan($item->subtotal(), $item->totalAfterTax());
-        }
-        else {
+        } else {
             $this->assertEquals(0, $item->totalAfterTax());
         }
     }
@@ -158,8 +157,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         // Total will be larger or smaller than the subtotal if it's positive or negative
         if ($item->subtotal() > 0) {
             $this->assertLessThanOrEqual($item->subtotal(), $item->totalAfterDiscount());
-        }
-        else {
+        } else {
             $this->assertGreaterThanOrEqual($item->subtotal(), $item->totalAfterDiscount());
         }
     }
@@ -196,7 +194,8 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      *
      * @return array
      */
-    public function subtotalProvider() {
+    public function subtotalProvider()
+    {
         return array(
             array(10.00, 2),
             array(10.00, 1),
@@ -282,8 +281,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         $tax_amount = $item->taxAmount();
         if ($subtotal >= 0) {
             $this->assertGreaterThanOrEqual(0, $tax_amount);
-        }
-        else {
+        } else {
             $this->assertLessThanOrEqual(0, $tax_amount);
         }
 
@@ -337,8 +335,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         // Test with all discounts applied
         if ($subtotal >= 0) {
             $this->assertLessThanOrEqual($subtotal, $item->discountAmount());
-        }
-        else {
+        } else {
             $this->assertGreaterThanOrEqual($subtotal, $item->discountAmount());
         }
     }

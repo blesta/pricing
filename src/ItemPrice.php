@@ -108,7 +108,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      * @return float The total tax amount for all taxes set for this item, or the total tax amount
      *  for the given tax price if given
      */
-    public function taxAmount(TaxPrice $tax =  null)
+    public function taxAmount(TaxPrice $tax = null)
     {
         $tax_amount = 0;
         $taxable_price = $this->totalAfterDiscount();
@@ -116,8 +116,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
         // Determine the tax set on this item's price
         if ($tax) {
             $tax_amount = $tax->on($taxable_price);
-        }
-        else {
+        } else {
             // Determine all taxes set on this item's price, compounded accordingly
             foreach ($this->taxes as $tax_group) {
                 $compound_tax = 0;
@@ -141,7 +140,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      * @return float The total discount amount for all discounts set for this item, or the
      *  total discount amount for the given discount price if given
      */
-    public function discountAmount(DiscountPrice $discount =  null)
+    public function discountAmount(DiscountPrice $discount = null)
     {
         $total_discount = 0;
         $subtotal = $this->subtotal();
@@ -149,8 +148,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
         // Determine the discount set on this item's price
         if ($discount) {
             $total_discount = $discount->on($subtotal);
-        }
-        else {
+        } else {
             // Determine all the discounts set on this item's price
             foreach ($this->discounts as $discount) {
                 $total_discount += $discount->on($subtotal);
