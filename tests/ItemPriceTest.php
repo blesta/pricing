@@ -265,7 +265,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses TaxPrice::on
      * @dataProvider taxAmountProvider
      */
-    public function testTaxAmount($item, array $taxes)
+    public function testTaxAmount($item, array $taxes, $expected_amount)
     {
         // No taxes set. No tax amount
         $subtotal = $item->subtotal();
@@ -295,6 +295,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
             $this->assertGreaterThan($tax_sum, $item->taxAmount());
         }
+
+        // The given expected amount should be the end result with all taxes applied
+        $this->assertEquals($expected_amount, $item->taxAmount());
     }
 
     /**
@@ -305,10 +308,10 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     public function taxAmountProvider()
     {
         return array(
-            array(new ItemPrice(100, 2), array(new TaxPrice(10, 'exclusive'))),
-            array(new ItemPrice(100, 2), array(new TaxPrice(10, 'exclusive'), new TaxPrice(7.75, 'exclusive'))),
-            array(new ItemPrice(0, 2), array(new TaxPrice(10, 'exclusive'))),
-            array(new ItemPrice(-100, 2), array(new TaxPrice(10, 'exclusive'))),
+            array(new ItemPrice(100, 2), array(new TaxPrice(10, 'exclusive')), 20),
+            array(new ItemPrice(100, 2), array(new TaxPrice(10, 'exclusive'), new TaxPrice(7.75, 'exclusive')), 37.05),
+            array(new ItemPrice(0, 2), array(new TaxPrice(10, 'exclusive')), 0),
+            array(new ItemPrice(-100, 2), array(new TaxPrice(10, 'exclusive')), -20),
         );
     }
 
@@ -319,7 +322,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses DiscountPrice::on
      * @dataProvider discountAmountProvider
      */
-    public function testDiscountAmount($item, array $discounts)
+    public function testDiscountAmount($item, array $discounts, $expected_amount)
     {
         // No discount set
         $subtotal = $item->subtotal();
@@ -338,6 +341,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         } else {
             $this->assertGreaterThanOrEqual($subtotal, $item->discountAmount());
         }
+
+        // The given expected amount should be the end result with all discounts applied
+        $this->assertEquals($expected_amount, $item->discountAmount());
     }
 
     /**
@@ -348,18 +354,18 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     public function discountAmountProvider()
     {
         return array(
-            array(new ItemPrice(100, 2), array()),
-            array(new ItemPrice(100, 2), array(new DiscountPrice(10, 'percent'))),
-            array(new ItemPrice(100, 2), array(new DiscountPrice(10, 'percent'), new DiscountPrice(20, 'percent'))),
-            array(new ItemPrice(100, 2), array(new DiscountPrice(100, 'percent'))),
-            array(new ItemPrice(100, 2), array(new DiscountPrice(2, 'amount'), new DiscountPrice(3.75, 'amount'))),
-            array(new ItemPrice(100, 2), array(new DiscountPrice(20, 'percent'), new DiscountPrice(2, 'amount'))),
+            array(new ItemPrice(100, 2), array(), 0),
+            array(new ItemPrice(100, 2), array(new DiscountPrice(10, 'percent')), 20),
+            array(new ItemPrice(100, 2), array(new DiscountPrice(10, 'percent'), new DiscountPrice(20, 'percent')), 60),
+            array(new ItemPrice(100, 2), array(new DiscountPrice(100, 'percent')), 200),
+            array(new ItemPrice(100, 2), array(new DiscountPrice(2, 'amount'), new DiscountPrice(3.75, 'amount')), 5.75),
+            array(new ItemPrice(100, 2), array(new DiscountPrice(20, 'percent'), new DiscountPrice(2, 'amount')), 42),
 
-            array(new ItemPrice(-100, 2), array(new DiscountPrice(10, 'percent'))),
-            array(new ItemPrice(-100, 2), array(new DiscountPrice(10, 'percent'), new DiscountPrice(20, 'percent'))),
-            array(new ItemPrice(-100, 2), array(new DiscountPrice(100, 'percent'))),
-            array(new ItemPrice(-100, 2), array(new DiscountPrice(2, 'amount'), new DiscountPrice(3.75, 'amount'))),
-            array(new ItemPrice(-100, 2), array(new DiscountPrice(20, 'percent'), new DiscountPrice(2, 'amount'))),
+            array(new ItemPrice(-100, 2), array(new DiscountPrice(10, 'percent')), -20),
+            array(new ItemPrice(-100, 2), array(new DiscountPrice(10, 'percent'), new DiscountPrice(20, 'percent')), -60),
+            array(new ItemPrice(-100, 2), array(new DiscountPrice(100, 'percent')), -200),
+            array(new ItemPrice(-100, 2), array(new DiscountPrice(2, 'amount'), new DiscountPrice(3.75, 'amount')), -5.75),
+            array(new ItemPrice(-100, 2), array(new DiscountPrice(20, 'percent'), new DiscountPrice(2, 'amount')), -42),
         );
     }
 
