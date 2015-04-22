@@ -132,7 +132,7 @@ $item_price->totalAfterTax(); // 30.30
 With tax and discount:
 
 ```php
-$item_price->totalAfterTaxAndDiscount(); // 31.35
+$item_price->total(); // 31.35
 ```
 
 ### ItemPriceCollection
