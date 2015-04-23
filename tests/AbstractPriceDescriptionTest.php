@@ -14,17 +14,11 @@ class AbstractPriceDescriptionTest extends PHPUnit_Framework_TestCase
         // Initially null
         $description = null;
         $stub = $this->getMockForAbstractClass("AbstractPriceDescription");
-        $stub->expects($this->any())
-            ->method('getDescription')
-            ->willReturn($description);
         $this->assertSame($description, $stub->getDescription());
 
         // Set my own description
         $description = '100x Product 1 - Limited Time Offer';
         $stub = $this->getMockForAbstractClass("AbstractPriceDescription");
-        $stub->expects($this->any())
-            ->method('getDescription')
-            ->willReturn($description);
         $stub->setDescription($description);
         $this->assertSame($description, $stub->getDescription());
     }
