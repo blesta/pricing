@@ -12,6 +12,19 @@ class DiscountPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test InvalidArgumentException is thrown
+     *
+     * @covers DiscountPrice::__construct
+     * @uses AbstractPriceModifier::__construct
+     * @expectedException InvalidArgumentException
+     */
+    public function testConstructException()
+    {
+        // Amount must be non-negative
+        $discount = new DiscountPrice(-1, 'amount');
+    }
+
+    /**
      * @covers DiscountPrice::off
      * @uses DiscountPrice::on
      * @dataProvider offProvider
@@ -30,14 +43,62 @@ class DiscountPriceTest extends PHPUnit_Framework_TestCase
     {
         return array(
             array(new DiscountPrice(0, 'percent'), 10.00, 10.00),
+            array(new DiscountPrice(10, 'percent'), 10.00, 9.00),
             array(new DiscountPrice(50, 'percent'), 10.00, 5.00),
             array(new DiscountPrice(100, 'percent'), 10.00, 0.00),
-            array(new DiscountPrice(-100, 'percent'), 10.00, 10.00),
+            array(new DiscountPrice(200, 'percent'), 10.00, 0.00),
+
+            array(new DiscountPrice(0, 'percent'), -10.00, -10.00),
+            array(new DiscountPrice(10, 'percent'), -10.00, -11.00),
+            array(new DiscountPrice(50, 'percent'), -10.00, -15.00),
+            array(new DiscountPrice(100, 'percent'), -10.00, -20.00),
+            array(new DiscountPrice(200, 'percent'), -10.00, -20.00),
 
             array(new DiscountPrice(0, 'amount'), 10.00, 10.00),
+            array(new DiscountPrice(3, 'amount'), 10.00, 7.00),
             array(new DiscountPrice(50, 'amount'), 10.00, 0.00),
             array(new DiscountPrice(100, 'amount'), 10.00, 0.00),
-            array(new DiscountPrice(-100, 'amount'), 10.00, 10.00)
+            array(new DiscountPrice(3, 'amount'), -10.00, -13.00),
+            array(new DiscountPrice(50, 'amount'), -10.00, -20.00),
+            array(new DiscountPrice(100, 'amount'), -10.00, -20.00),
+        );
+    }
+
+    /**
+     * Test amount discounts for multiple prices, as the discount remaining should
+     * change with each price the discount is applied to
+     *
+     * @covers DiscountPrice::off
+     * @uses DiscountPrice::on
+     * @dataProvider offMultipleProvider
+     */
+    public function testOffMultiple($discount, $prices, $price_after_all)
+    {
+        $price_remaining = 0;
+        foreach ($prices as $price) {
+            $price_remaining += $discount->off($price);
+        }
+
+        $this->assertEquals($price_after_all, $price_remaining);
+    }
+
+    /**
+     * Data provider for testOffMultiple
+     * @return array
+     */
+    public function offMultipleProvider()
+    {
+        return array(
+            array(new DiscountPrice(0, 'amount'), array(4, 10), 14),
+            array(new DiscountPrice(10, 'amount'), array(4, 10), 4),
+            array(new DiscountPrice(20, 'amount'), array(4, 10), 0),
+            array(new DiscountPrice(100, 'amount'), array(4, 10), 0),
+            array(new DiscountPrice(10, 'amount'), array(-4, -10), -24),
+            array(new DiscountPrice(20, 'amount'), array(-4, -10), -28),
+            array(new DiscountPrice(100, 'amount'), array(-4, -10), -28),
+            array(new DiscountPrice(5, 'amount'), array(-4, 10), 1),
+
+            array(new DiscountPrice(10, 'amount'), array(9, 5, 4), 8),
         );
     }
 
@@ -61,12 +122,20 @@ class DiscountPriceTest extends PHPUnit_Framework_TestCase
             array(new DiscountPrice(0, 'percent'), 10.00, 0.00),
             array(new DiscountPrice(50, 'percent'), 10.00, 5.00),
             array(new DiscountPrice(100, 'percent'), 10.00, 10.00),
-            array(new DiscountPrice(-100, 'percent'), 10.00, 0.00),
+            array(new DiscountPrice(200, 'percent'), 10.00, 10.00),
+            array(new DiscountPrice(0, 'percent'), -10.00, 0.00),
+            array(new DiscountPrice(50, 'percent'), -10.00, -5.00),
+            array(new DiscountPrice(100, 'percent'), -10.00, -10.00),
+            array(new DiscountPrice(200, 'percent'), -10.00, -10.00),
 
             array(new DiscountPrice(0, 'amount'), 10.00, 0.00),
-            array(new DiscountPrice(50, 'amount'), 10.00, 10.00),
-            array(new DiscountPrice(100, 'amount'), 10.00, 10.00),
-            array(new DiscountPrice(-100, 'amount'), 10.00, 0.00)
+            array(new DiscountPrice(3, 'amount'), 10.00, 3.00),
+            array(new DiscountPrice(10, 'amount'), 10.00, 10.00),
+            array(new DiscountPrice(20, 'amount'), 10.00, 10.00),
+            array(new DiscountPrice(0, 'amount'), -10.00, 0.00),
+            array(new DiscountPrice(3, 'amount'), -10.00, -3.00),
+            array(new DiscountPrice(10, 'amount'), -10.00, -10.00),
+            array(new DiscountPrice(20, 'amount'), -10.00, -10.00),
         );
     }
 }
