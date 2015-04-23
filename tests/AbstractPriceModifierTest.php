@@ -13,9 +13,6 @@ class AbstractPriceModifierTest extends PHPUnit_Framework_TestCase
     {
         $price = 5.00;
         $stub = $this->getMockForAbstractClass("AbstractPriceModifier", array($price, 'inclusive'));
-        $stub->expects($this->any())
-            ->method('amount')
-            ->willReturn($price);
         $this->assertSame($price, $stub->amount());
     }
 
@@ -27,9 +24,6 @@ class AbstractPriceModifierTest extends PHPUnit_Framework_TestCase
     {
         $type = 'inclusive';
         $stub = $this->getMockForAbstractClass("AbstractPriceModifier", array(10.00, $type));
-        $stub->expects($this->any())
-            ->method('type')
-            ->willReturn($type);
         $this->assertSame($type, $stub->type());
     }
 }
