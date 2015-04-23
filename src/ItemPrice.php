@@ -1,11 +1,17 @@
 <?php
 
 /**
- *
+ * Determine pricing for a single item considering discounts and taxes
  */
 class ItemPrice extends UnitPrice implements PriceTotalInterface
 {
+    /**
+     * @var array A numerically-indexed array of DiscountPrice objects
+     */
     protected $discounts = array();
+    /**
+     * @var array A numerically-indexed array containing an array of TaxPrice objects
+     */
     protected $taxes = array();
 
     /**
@@ -42,7 +48,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
             }
         }
 
-        // Remove duplicate TaxPrice's from the given arguments
+        // Check for duplicate TaxPrice instances from the given arguments
         foreach ($taxes as $i => $tax_price_i) {
             foreach ($taxes as $j => $tax_price_j) {
                 // Throw exception if the same instance of a TaxPrice was given multiple times
@@ -68,7 +74,6 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
         $this->taxes[] = array_values($taxes);
     }
 
-    // PriceTotalInterface
     /**
      * Retrieves the total item price amount considering all taxes without discounts
      */
