@@ -5,7 +5,14 @@
  */
 abstract class AbstractPriceModifier extends AbstractPriceDescription implements PriceModifierInterface
 {
+    /**
+     * @var float The price amount
+     */
     protected $amount;
+
+    /**
+     * @var string The price type
+     */
     protected $type;
 
     /**
