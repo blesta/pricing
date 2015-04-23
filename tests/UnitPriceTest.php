@@ -28,6 +28,11 @@ class UnitPriceTest extends PHPUnit_Framework_TestCase
      */
     public function testQty()
     {
+        // Test default quantity
+        $price = 5.00;
+        $unit_price = new UnitPrice($price);
+        $this->assertEquals(1, $unit_price->qty());
+        
         $price = 5.00;
         $qty = 2;
         $unit_price = new UnitPrice($price, $qty);
