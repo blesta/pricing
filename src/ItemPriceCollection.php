@@ -58,6 +58,10 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     {
 
     }
+    public function next()
+    {
+        
+    }
     public function rewind()
     {
 
