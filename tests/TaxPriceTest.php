@@ -11,6 +11,16 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers TaxPrice::__construct
+     * @expectedException InvalidArgumentException
+     */
+    public function testConstructException()
+    {
+        // Amount must be non-negative
+        $tax = new TaxPrice(-10, 'exclusive');
+    }
+
+    /**
      * @covers TaxPrice::off
      * @uses TaxPrice::on
      * @dataProvider offProvider
@@ -31,12 +41,16 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
             array(new TaxPrice(0, 'exclusive'), 10.00, 10.00),
             array(new TaxPrice(50, 'exclusive'), 10.00, 10.00),
             array(new TaxPrice(100, 'exclusive'), 10.00, 10.00),
-            array(new TaxPrice(-100, 'exclusive'), 10.00, 10.00),
+            array(new TaxPrice(0, 'exclusive'), -10.00, -10.00),
+            array(new TaxPrice(50, 'exclusive'), -10.00, -10.00),
+            array(new TaxPrice(100, 'exclusive'), -10.00, -10.00),
 
             array(new TaxPrice(0, 'inclusive'), 10.00, 10.00),
             array(new TaxPrice(50, 'inclusive'), 10.00, 5.00),
             array(new TaxPrice(100, 'inclusive'), 10.00, 0.00),
-            array(new TaxPrice(-100, 'inclusive'), 10.00, 10.00)
+            array(new TaxPrice(0, 'inclusive'), -10.00, -10.00),
+            array(new TaxPrice(50, 'inclusive'), -10.00, -5.00),
+            array(new TaxPrice(100, 'inclusive'), -10.00, 0.00),
         );
     }
 
@@ -60,12 +74,16 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
             array(new TaxPrice(0, 'exclusive'), 10.00, 0.00),
             array(new TaxPrice(50, 'exclusive'), 10.00, 5.00),
             array(new TaxPrice(100, 'exclusive'), 10.00, 10.00),
-            array(new TaxPrice(-100, 'exclusive'), 10.00, 0.00),
+            array(new TaxPrice(0, 'exclusive'), -10.00, 0.00),
+            array(new TaxPrice(50, 'exclusive'), -10.00, -5.00),
+            array(new TaxPrice(100, 'exclusive'), -10.00, -10.00),
 
             array(new TaxPrice(0, 'inclusive'), 10.00, 0.00),
             array(new TaxPrice(50, 'inclusive'), 10.00, 5.00),
             array(new TaxPrice(100, 'inclusive'), 10.00, 10.00),
-            array(new TaxPrice(-100, 'inclusive'), 10.00, 0.00)
+            array(new TaxPrice(0, 'inclusive'), -10.00, 0.00),
+            array(new TaxPrice(50, 'inclusive'), -10.00, -5.00),
+            array(new TaxPrice(100, 'inclusive'), -10.00, -10.00),
         );
     }
 
@@ -90,12 +108,16 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
             array(new TaxPrice(0, 'exclusive'), 10.00, 10.00),
             array(new TaxPrice(50, 'exclusive'), 10.00, 15.00),
             array(new TaxPrice(100, 'exclusive'), 10.00, 20.00),
-            array(new TaxPrice(-100, 'exclusive'), 10.00, 10.00),
+            array(new TaxPrice(0, 'exclusive'), -10.00, -10.00),
+            array(new TaxPrice(50, 'exclusive'), -10.00, -15.00),
+            array(new TaxPrice(100, 'exclusive'), -10.00, -20.00),
 
             array(new TaxPrice(0, 'inclusive'), 10.00, 10.00),
             array(new TaxPrice(50, 'inclusive'), 10.00, 10.00),
             array(new TaxPrice(100, 'inclusive'), 10.00, 10.00),
-            array(new TaxPrice(-100, 'inclusive'), 10.00, 10.00)
+            array(new TaxPrice(0, 'inclusive'), -10.00, -10.00),
+            array(new TaxPrice(50, 'inclusive'), -10.00, -10.00),
+            array(new TaxPrice(100, 'inclusive'), -10.00, -10.00),
         );
     }
 }
