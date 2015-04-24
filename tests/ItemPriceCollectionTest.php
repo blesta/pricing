@@ -109,6 +109,8 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         # TODO: total is incorrect for discount amounts
         #
         $this->assertEquals($expected_totals['total_with_discount'], $collection->totalAfterDiscount());
+
+        $this->markTestIncomplete('Discount amounts are not considered.');
     }
 
     /**
@@ -131,6 +133,8 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         #
         echo "\nTOTAL:" . $collection->total() . "\n";
         $this->assertEquals($expected_totals['total'], $collection->total());
+
+        $this->markTestIncomplete('Discount amounts are not considered.');
     }
 
     /**
@@ -152,6 +156,7 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         #
         # TODO: consider discounts over multiple items
         #
+        $this->markTestIncomplete('Discount amounts are not considered.');
     }
 
     /**

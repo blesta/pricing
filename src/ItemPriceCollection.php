@@ -124,9 +124,10 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     }
 
     /**
-     * Retrieves the total tax amount for all items within the collection
+     * Retrieves the total tax amount for all ItemPrice's within the collection
      *
-     * @param TaxPrice $tax
+     * @param TaxPrice $tax A TaxPrice to apply to all ItemPrice's in the collection, ignoring
+     *  any TaxPrice's that may already be set on the items within the collection (optional)
      */
     public function taxAmount(TaxPrice $tax = null)
     {
@@ -141,13 +142,23 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     /**
      * Retrieves the total discount amount for all items within the collection
      *
-     * @param DiscountPrice $discount
+     * @param DiscountPrice $discount A DiscountPrice to apply to all ItemPrice's in the
+     *  collection, ignoring any DiscountPrice's that may already be set on the items within
+     *  the collection (optional)
      */
     public function discountAmount(DiscountPrice $discount = null)
     {
         #
         # TODO: decrease and reset discount price if of 'amount' type
         #
+        // Apply the given discount to all items
+        $total = 0;
+        // Calculate the discount amount from each item's own discounts
+        foreach ($this->collection as $item_price) {
+            $total += $item_price->discountAmount($discount);
+        }
+
+        return $total;
     }
 
     /**
