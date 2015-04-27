@@ -78,7 +78,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     public function totalAfterDiscount()
     {
         #
-        # TODO: decrease and reset discount price if of 'amount' type
+        # TODO: reset discount price if of 'amount' type
         #
         $total = 0;
         foreach ($this->collection as $item) {
@@ -112,7 +112,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     public function total()
     {
         #
-        # TODO: decrease and reset discount price if of 'amount' type
+        # TODO: reset discount price if of 'amount' type
         #
         // Sum the totals of each ItemPrice
         $total = 0;
@@ -149,7 +149,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     public function discountAmount(DiscountPrice $discount = null)
     {
         #
-        # TODO: decrease and reset discount price if of 'amount' type
+        # TODO: reset discount price if of 'amount' type
         #
         // Apply the given discount to all items
         $total = 0;
