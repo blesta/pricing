@@ -159,8 +159,12 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
             $total_discount = $discount->on($subtotal);
         } else {
             // Determine all the discounts set on this item's price
+            $temp_subtotal = $subtotal;
             foreach ($this->discounts as $discount) {
-                $total_discount += $discount->on($subtotal);
+                $total_discount += $discount->on($temp_subtotal);
+
+                // Update the subtotal for this item to remove the amount discounted
+                $temp_subtotal = $discount->off($temp_subtotal);
             }
         }
 
