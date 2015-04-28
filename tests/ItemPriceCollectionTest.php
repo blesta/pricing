@@ -8,7 +8,13 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::append
-     * @uses ::count
+     * @uses ItemPriceCollection::count
+     * @uses ItemPriceCollection::key
+     * @uses ItemPriceCollection::next
+     * @uses ItemPriceCollection::valid
+     * @uses ItemPriceCollection::current
+     * @uses ItemPriceCollection::rewind
+     * @uses ItemPrice::__construct
      */
     public function testAppend()
     {
@@ -34,7 +40,13 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     /**
      * @covers ::append
      * @covers ::remove
-     * @uses ::count
+     * @uses ItemPriceCollection::key
+     * @uses ItemPriceCollection::next
+     * @uses ItemPriceCollection::valid
+     * @uses ItemPriceCollection::current
+     * @uses ItemPriceCollection::rewind
+     * @uses ItemPriceCollection::count
+     * @uses ItemPrice::__construct
      */
     public function testRemove()
     {
@@ -64,8 +76,9 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::count
-     * @uses ::append
-     * @uses ::remove
+     * @uses ItemPriceCollection::append
+     * @uses ItemPriceCollection::remove
+     * @uses ItemPrice::__construct
      */
     public function testCount()
     {
@@ -92,6 +105,11 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::totalAfterTax
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testTotalAfterTax(ItemPriceCollection $collection, array $expected_totals)
@@ -101,6 +119,11 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::totalAfterDiscount
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testTotalAfterDiscount(ItemPriceCollection $collection, array $expected_totals)
@@ -110,6 +133,11 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::subtotal
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testSubtotal(ItemPriceCollection $collection, array $expected_totals)
@@ -119,6 +147,12 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::total
+     * @covers ::discountAmount
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testTotal(ItemPriceCollection $collection, array $expected_totals)
@@ -129,6 +163,11 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     /**
      *
      * @covers ::taxAmount
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testTaxAmount(ItemPriceCollection $collection, array $expected_totals)
@@ -138,6 +177,11 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::discountAmount
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testDiscountAmount(ItemPriceCollection $collection, array $expected_totals)
@@ -147,6 +191,11 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::taxes
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testTaxes(ItemPriceCollection $collection, array $expected_totals)
@@ -162,6 +211,11 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::discounts
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testDiscounts(ItemPriceCollection $collection, array $expected_totals)
@@ -177,11 +231,11 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::resetDiscounts
-     * @uses ::append
-     * @uses DiscountPrice::off
-     * @uses ItemPrice::setDiscount
-     * @uses ItemPrice::subtotal
-     * @uses ItemPrice::discountAmount
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      */
     public function testResetDiscounts()
     {
@@ -332,9 +386,11 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @covers ::total
      * @covers ::totalAfterTax
      * @covers ::totalAfterDiscount
-     * @uses ::append
-     * @uses ::remove
-     * @uses ItemPrice::setDiscount
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      */
     public function testMultipleDiscountTotals()
     {
@@ -388,7 +444,9 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::current
-     * @uses ::append
+     * @covers ::valid
+     * @uses ItemPrice::__construct
+     * @uses ItemPriceCollection::append
      */
     public function testCurrent()
     {
@@ -428,8 +486,10 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @covers ::rewind
      * @covers ::current
      * @covers ::key
-     * @uses ::append
-     * @uses ::remove
+     * @covers ::valid
+     * @uses ItemPrice::__construct
+     * @uses ItemPriceCollection::append
+     * @uses ItemPriceCollection::remove
      */
     public function testNext()
     {
@@ -471,7 +531,7 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @covers ::rewind
      * @covers ::key
      * @covers ::next
-     * @uses ::append
+     * @uses ItemPriceCollection::append
      */
     public function testRewind()
     {
@@ -496,7 +556,8 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     /**
      * @covers ::valid
      * @covers ::next
-     * @uses ::append
+     * @uses ItemPriceCollection::append
+     * @uses ItemPrice::__construct
      */
     public function testValid()
     {
