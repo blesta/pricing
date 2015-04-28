@@ -26,4 +26,14 @@ class AbstractPriceModifierTest extends PHPUnit_Framework_TestCase
         $stub = $this->getMockForAbstractClass("AbstractPriceModifier", array(10.00, $type));
         $this->assertSame($type, $stub->type());
     }
+
+    /**
+     * @covers ::__construct
+     * @covers ::reset
+     */
+    public function testReset()
+    {
+        $stub = $this->getMockForAbstractClass("AbstractPriceModifier", array(10.00, 'inclusive'));
+        $this->assertNull($stub->reset());
+    }
 }

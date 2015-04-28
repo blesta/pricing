@@ -46,4 +46,12 @@ abstract class AbstractPriceModifier extends AbstractPriceDescription implements
     {
         return $this->type;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        // Nothing to do
+    }
 }

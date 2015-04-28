@@ -67,6 +67,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
             $total += $item->totalAfterTax();
         }
 
+        // Reset any discount amounts back
+        $this->resetDiscounts();
+
         return $total;
     }
 
@@ -77,13 +80,13 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      */
     public function totalAfterDiscount()
     {
-        #
-        # TODO: reset discount price if of 'amount' type
-        #
         $total = 0;
         foreach ($this->collection as $item) {
             $total += $item->totalAfterDiscount();
         }
+
+        // Reset any discount amounts back
+        $this->resetDiscounts();
 
         return $total;
     }
@@ -111,14 +114,14 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      */
     public function total()
     {
-        #
-        # TODO: reset discount price if of 'amount' type
-        #
         // Sum the totals of each ItemPrice
         $total = 0;
         foreach ($this->collection as $item_price) {
             $total += $item_price->total();
         }
+
+        // Reset any discount amounts back
+        $this->resetDiscounts();
 
         return $total;
     }
@@ -136,6 +139,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
             $total += $item_price->taxAmount($tax);
         }
 
+        // Reset any discount amounts back
+        $this->resetDiscounts();
+
         return $total;
     }
 
@@ -148,15 +154,15 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      */
     public function discountAmount(DiscountPrice $discount = null)
     {
-        #
-        # TODO: reset discount price if of 'amount' type
-        #
         // Apply the given discount to all items
         $total = 0;
         // Calculate the discount amount from each item's own discounts
         foreach ($this->collection as $item_price) {
             $total += $item_price->discountAmount($discount);
         }
+
+        // Reset any discount amounts back
+        $this->resetDiscounts();
 
         return $total;
     }
@@ -199,6 +205,16 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
         }
 
         return $discounts;
+    }
+
+    /**
+     * Resets the applied discount amounts for all DiscountPrice's in the collection
+     */
+    public function resetDiscounts()
+    {
+        foreach ($this->discounts() as $discount) {
+            $discount->reset();
+        }
     }
 
     /**

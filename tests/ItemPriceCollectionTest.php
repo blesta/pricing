@@ -8,7 +8,13 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::append
-     * @uses ::count
+     * @uses ItemPriceCollection::count
+     * @uses ItemPriceCollection::key
+     * @uses ItemPriceCollection::next
+     * @uses ItemPriceCollection::valid
+     * @uses ItemPriceCollection::current
+     * @uses ItemPriceCollection::rewind
+     * @uses ItemPrice::__construct
      */
     public function testAppend()
     {
@@ -34,7 +40,13 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     /**
      * @covers ::append
      * @covers ::remove
-     * @uses ::count
+     * @uses ItemPriceCollection::key
+     * @uses ItemPriceCollection::next
+     * @uses ItemPriceCollection::valid
+     * @uses ItemPriceCollection::current
+     * @uses ItemPriceCollection::rewind
+     * @uses ItemPriceCollection::count
+     * @uses ItemPrice::__construct
      */
     public function testRemove()
     {
@@ -64,8 +76,9 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::count
-     * @uses ::append
-     * @uses ::remove
+     * @uses ItemPriceCollection::append
+     * @uses ItemPriceCollection::remove
+     * @uses ItemPrice::__construct
      */
     public function testCount()
     {
@@ -92,6 +105,11 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::totalAfterTax
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testTotalAfterTax(ItemPriceCollection $collection, array $expected_totals)
@@ -101,20 +119,25 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::totalAfterDiscount
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testTotalAfterDiscount(ItemPriceCollection $collection, array $expected_totals)
     {
-        #
-        # TODO: total is incorrect for discount amounts
-        #
         $this->assertEquals($expected_totals['total_with_discount'], $collection->totalAfterDiscount());
-
-        $this->markTestIncomplete('Discount amounts are not considered.');
     }
 
     /**
      * @covers ::subtotal
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testSubtotal(ItemPriceCollection $collection, array $expected_totals)
@@ -124,22 +147,27 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::total
+     * @covers ::discountAmount
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testTotal(ItemPriceCollection $collection, array $expected_totals)
     {
-        #
-        # TODO: total is incorrect for discount amounts. discount amounts are not decreased per item
-        #
-        echo "\nTOTAL:" . $collection->total() . "\n";
         $this->assertEquals($expected_totals['total'], $collection->total());
-
-        $this->markTestIncomplete('Discount amounts are not considered.');
     }
 
     /**
      *
      * @covers ::taxAmount
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testTaxAmount(ItemPriceCollection $collection, array $expected_totals)
@@ -149,18 +177,25 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::discountAmount
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
-    public function testDiscountAmount()
+    public function testDiscountAmount(ItemPriceCollection $collection, array $expected_totals)
     {
-        #
-        # TODO: consider discounts over multiple items
-        #
-        $this->markTestIncomplete('Discount amounts are not considered.');
+        $this->assertEquals($expected_totals['discount'], $collection->discountAmount());
     }
 
     /**
      * @covers ::taxes
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testTaxes(ItemPriceCollection $collection, array $expected_totals)
@@ -176,6 +211,11 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::discounts
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider totalProvider
      */
     public function testDiscounts(ItemPriceCollection $collection, array $expected_totals)
@@ -190,53 +230,91 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::resetDiscounts
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
+     */
+    public function testResetDiscounts()
+    {
+        // Use the discount before applying it to the items
+        $amount = 30;
+        $discount = new DiscountPrice($amount, 'amount');
+        $this->assertEquals(0, $discount->off($amount));
+        $this->assertEquals($amount, $discount->off($amount));
+
+        $item1 = new ItemPrice(10, 2);
+        $item1->setDiscount($discount);
+
+        $item2 = new ItemPrice(5, 1);
+        $item2->setDiscount($discount);
+
+        $collection = new ItemPriceCollection();
+        $collection->append($item1)->append($item2);
+
+        // Each item has no discount amount because it was already applied
+        foreach ($collection as $item) {
+            $this->assertEquals(0, $item->discountAmount());
+        }
+
+        // Each item has a discount amount equal to its subtotal (applied in full)
+        $collection->resetDiscounts();
+        foreach ($collection as $item) {
+            $this->assertEquals($item->subtotal(), $item->discountAmount());
+        }
+    }
+
+    /**
      * Data provider for subtotal/total
+     *
+     * DO NOT SET DISCOUNT AMOUNTS THAT APPLY TO MULTIPLE ITEMS
+     * DO NET SET AN ITEM TO MULTIPLE COLLECTIONS
+     * Results will be incorrect without resetting item values appropriately
      *
      * @return array
      */
     public function totalProvider()
     {
-        // Item with discounts and tax
+        // Items with discounts and tax
         $tax_price = new TaxPrice(10, 'exclusive');
         $item1 = new ItemPrice(10, 2);
         $item1->setDiscount(new DiscountPrice(20, 'percent'));
         $item1->setDiscount(new DiscountPrice(1, 'amount'));
         $item1->setTax($tax_price);
 
+        $item4 = new ItemPrice(10, 2);
+        $item4->setDiscount(new DiscountPrice(10, 'percent'));
+        $item4->setTax($tax_price);
+
         // Item with tax
-        $item2 = new ItemPrice(5.25, 3);
-        $item2->setTax($tax_price);
+        $item2 = new ItemPrice(6, 4);
+        $item2->setTax(new TaxPrice(5, 'exclusive'));
+        $item3 = new ItemPrice(5, 5);
+
+        $item5 = new ItemPrice(5.25, 3);
+        $item5->setTax($tax_price);
 
         // Item with compound tax and discount
-        $item3 = new ItemPrice(100.00, 1);
-        $item3->setDiscount(new DiscountPrice(1.50, 'amount'));
-        $item3->setTax(new TaxPrice(8, 'exclusive'), new TaxPrice(5, 'exclusive'));
-
-        // Amount discount applied to multiple items
-        $discount_price = new DiscountPrice(18.00, 'amount');
-        $item4 = new ItemPrice(15, 1);
-        $item4->setDiscount($discount_price);
-        $item5 = new ItemPrice(5, 1);
-        $item5->setDiscount($discount_price);
+        $item6 = new ItemPrice(100.00, 1);
+        $item6->setDiscount(new DiscountPrice(1.50, 'amount'));
+        $item6->setTax(new TaxPrice(8, 'exclusive'), new TaxPrice(5, 'exclusive'));
 
         // Set collections of the items
         $collection1 = new ItemPriceCollection();
-        $collection1->append($item1)->append($item1);
+        $collection1->append($item1);
 
         $collection2 = new ItemPriceCollection();
-        $collection2->append($item1)->append($item2);
+        $collection2->append($item2)->append($item3);
 
         $collection3 = new ItemPriceCollection();
-        $collection3->append($item1)->append($item2)->append($item3);
-
-        $collection4 = new ItemPriceCollection();
-        $collection4->append($item4)->append($item5);
+        $collection3->append($item4)->append($item5)->append($item6);
 
         return array(
-            array($collection1, $this->getItemTotals($item1, $item1)),
-            array($collection2, $this->getItemTotals($item1, $item2)),
-            array($collection3, $this->getItemTotals($item1, $item2, $item3)),
-            array($collection4, $this->getItemTotals($item4, $item5)),
+            array($collection1, $this->getItemTotals($item1)),
+            array($collection2, $this->getItemTotals($item2, $item3)),
+            array($collection3, $this->getItemTotals($item4, $item5, $item6)),
         );
     }
 
@@ -266,10 +344,15 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         foreach ($args as $item) {
             $totals['subtotal'] += $item->subtotal();
             $totals['total'] += $item->total();
+            $item->resetDiscounts();
             $totals['total_with_tax'] += $item->totalAfterTax();
+            $item->resetDiscounts();
             $totals['total_with_discount'] += $item->totalAfterDiscount();
+            $item->resetDiscounts();
             $totals['tax'] += $item->taxAmount();
+            $item->resetDiscounts();
             $totals['discount'] += $item->discountAmount();
+            $item->resetDiscounts();
             $totals['taxes'] = $this->getUnique($totals['taxes'], $item->taxes());
             $totals['discounts'] = $this->getUnique($totals['discounts'], $item->discounts());
         }
@@ -296,8 +379,74 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests totals of items that share amount discounts
+     *
+     * @covers ::discountAmount
+     * @covers ::taxAmount
+     * @covers ::total
+     * @covers ::totalAfterTax
+     * @covers ::totalAfterDiscount
+     * @uses ItemPriceCollection
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
+     */
+    public function testMultipleDiscountTotals()
+    {
+        // Test two items with the same discount amounts
+        $collection = new ItemPriceCollection();
+        $discount1 = new DiscountPrice(5, 'amount');
+        $discount2 = new DiscountPrice(10, 'amount');
+
+        $item1 = new ItemPrice(10, 2);
+        $item1->setDiscount($discount1);
+        $item1->setDiscount($discount2);
+
+        $item2 = new ItemPrice(100, 1);
+        $item1->setDiscount($discount1);
+        $item1->setDiscount($discount2);
+
+        $collection->append($item1)->append($item2);
+
+        $this->assertEquals(0, $collection->taxAmount());
+        $this->assertEquals(15, $collection->discountAmount());
+        $this->assertEquals(105, $collection->totalAfterDiscount());
+        $this->assertEquals(120, $collection->totalAfterTax());
+        $this->assertEquals(105, $collection->total());
+
+
+        // Test multiple items with varying taxes/discounts
+        $collection->remove($item1)->remove($item2);
+        $this->assertEquals(0, $collection->count());
+
+        $discount3 = new DiscountPrice(50, 'amount');
+        $tax = new TaxPrice(20, 'exclusive');
+
+        $item3 = new ItemPrice(10, 1);
+        $item3->setDiscount(new DiscountPrice(10, 'percent'));
+        $item3->setDiscount($discount3);
+        $item3->setTax(new TaxPrice(10, 'exclusive'));
+        $item3->setTax($tax);
+
+        $item4 = new ItemPrice(1000, 2);
+        $item4->setDiscount($discount3);
+        $item4->setTax($tax);
+
+        $collection->append($item3)->append($item4);
+
+        $this->assertEquals(391.8, $collection->taxAmount());
+        $this->assertEquals(51, $collection->discountAmount());
+        $this->assertEquals(1959, $collection->totalAfterDiscount());
+        $this->assertEquals(2401.8, $collection->totalAfterTax());
+        $this->assertEquals(2350.8, $collection->total());
+    }
+
+    /**
      * @covers ::current
-     * @uses ::append
+     * @covers ::valid
+     * @uses ItemPrice::__construct
+     * @uses ItemPriceCollection::append
      */
     public function testCurrent()
     {
@@ -337,8 +486,10 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @covers ::rewind
      * @covers ::current
      * @covers ::key
-     * @uses ::append
-     * @uses ::remove
+     * @covers ::valid
+     * @uses ItemPrice::__construct
+     * @uses ItemPriceCollection::append
+     * @uses ItemPriceCollection::remove
      */
     public function testNext()
     {
@@ -380,7 +531,7 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @covers ::rewind
      * @covers ::key
      * @covers ::next
-     * @uses ::append
+     * @uses ItemPriceCollection::append
      */
     public function testRewind()
     {
@@ -405,7 +556,8 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     /**
      * @covers ::valid
      * @covers ::next
-     * @uses ::append
+     * @uses ItemPriceCollection::append
+     * @uses ItemPrice::__construct
      */
     public function testValid()
     {

@@ -42,4 +42,9 @@ interface PriceModifierInterface extends PriceDescriptionInterface
      * @return float The modification price
      */
     public function on($price);
+
+    /**
+     * Reset the state of the price modifier
+     */
+    public function reset();
 }

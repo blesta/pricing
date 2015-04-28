@@ -62,4 +62,9 @@ interface PriceTotalInterface
      * @return array An array containing DiscountPrice objects
      */
     public function discounts();
+
+    /**
+     * Reset discount amounts
+     */
+    public function resetDiscounts();
 }

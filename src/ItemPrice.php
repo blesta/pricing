@@ -6,6 +6,15 @@
 class ItemPrice extends UnitPrice implements PriceTotalInterface
 {
     /**
+     * @var array A cached value of discount subtotals
+     */
+    private $discount_amounts = array();
+    /**
+     * @var boolean Whether or not to cache discount subtotals
+     */
+    private $cache_discount_amounts = false;
+
+    /**
      * @var array A numerically-indexed array of DiscountPrice objects
      */
     protected $discounts = array();
@@ -107,7 +116,18 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     public function total()
     {
-        return $this->totalAfterDiscount() + $this->taxAmount();
+        // discountAmount() is called twice: once by totalAfterDiscount, and once by taxAmount
+        // The discount must be removed only once, so flag it to be ignored the second time
+        $this->discount_amounts = array();
+        $this->cache_discount_amounts = true;
+        $total = $this->totalAfterDiscount();
+
+        // Include tax without taking the discount off again, and reset the flag
+        $this->cache_discount_amounts = false;
+        $total += $this->taxAmount();
+        $this->discount_amounts = array();
+
+        return $total;
     }
 
     /**
@@ -160,11 +180,26 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
         } else {
             // Determine all the discounts set on this item's price
             $temp_subtotal = $subtotal;
-            foreach ($this->discounts as $discount) {
-                $total_discount += $discount->on($temp_subtotal);
+            foreach ($this->discounts as $key => $discount) {
+                // Fetch the discount amount and remove it from the DiscountPrice,
+                // or use the values previously cached
+                if ($this->cache_discount_amounts || empty($this->discount_amounts)) {
+                    // Get the discount on the subtotal
+                    $discount_amount = $discount->on($temp_subtotal);
+                    $total_discount += $discount_amount;
 
-                // Update the subtotal for this item to remove the amount discounted
-                $temp_subtotal = $discount->off($temp_subtotal);
+                    // Cache the discount set for this DiscountPrice
+                    if ($this->cache_discount_amounts) {
+                        $this->discount_amounts[$key] = $discount_amount;
+                    }
+
+                    // Update the subtotal for this item to remove the amount discounted
+                    $temp_subtotal = $discount->off($temp_subtotal);
+                } else {
+                    // Use the cached discount amount for this DiscountPrice
+                    $total_discount += $this->discount_amounts[$key];
+                }
+
             }
         }
 
@@ -198,5 +233,15 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     public function discounts()
     {
         return $this->discounts;
+    }
+
+    /**
+     * Resets the applied discount amounts for all assigned DiscountPrice's
+     */
+    public function resetDiscounts()
+    {
+        foreach ($this->discounts as $discount) {
+            $discount->reset();
+        }
     }
 }
