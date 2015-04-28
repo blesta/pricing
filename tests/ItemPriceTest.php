@@ -73,15 +73,31 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::setTax
+     * @uses ItemPrice
+     * @uses UnitPrice
+     * @uses TaxPrice
+     * @uses AbstractPriceModifier
      * @expectedException InvalidArgumentException
      */
-    public function testSetTaxException()
+    public function testSetTaxInvalidException()
     {
         // Invalid argument: not TaxPrice
         $item = new ItemPrice(10);
         $item->setTax(new stdClass());
+    }
 
+    /**
+     * @covers ::setTax
+     * @uses ItemPrice
+     * @uses UnitPrice
+     * @uses TaxPrice
+     * @uses AbstractPriceModifier
+     * @expectedException InvalidArgumentException
+     */
+    public function testSetTaxMultipleException()
+    {
         // Invalid argument: Multiple TaxPrice's of the same instance
+        $item = new ItemPrice(10);
         $tax_price = new TaxPrice(10, 'exclusive');
         $item->setTax($tax_price, $tax_price);
     }
@@ -102,8 +118,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::totalAfterTax
-     * @uses ItemPrice::subtotal
-     * @uses ItemPrice::setTax
+     * @uses ItemPrice
+     * @uses UnitPrice
+     * @uses TaxPrice
      * @dataProvider totalAfterTaxProvider
      */
     public function testTotalAfterTax($item, $taxes)
@@ -143,7 +160,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::totalAfterDiscount
-     * @uses ItemPrice::subtotal
+     * @uses ItemPrice
+     * @uses UnitPrice
+     * @uses DiscountPrice
      * @dataProvider totalAfterDiscountProvider
      */
     public function testTotalAfterDiscount($item, $discounts)
@@ -182,6 +201,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::subtotal
+     * @uses UnitPrice
      * @dataProvider subtotalProvider
      */
     public function testSubtotal($price, $qty)
@@ -209,35 +229,34 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::total
-     * @uses ItemPrice::subTotal
-     * @uses ItemPrice::setDiscount
-     * @uses ItemPrice::setTax
-     * @uses ItemPrice::totalAfterTax
-     * @uses ItemPrice::totalAfterDiscount
-     * @uses ItemPrice::taxAmount
+     * @uses ItemPrice
+     * @uses AbstractPriceModifier
+     * @uses TaxPrice
+     * @uses DiscountPrice
+     * @uses UnitPrice
      */
     public function testTotal()
     {
         $item = new ItemPrice(10, 2);
-        $tax = new TaxPrice(5.25, 'exclusive');
-        $discount = new DiscountPrice(50, 'percent');
 
         // Total is the subtotal when no taxes or discounts exist
         $this->assertEquals($item->subtotal(), $item->total());
 
         // Total is the total after tax when no discount exists
-        $item->setTax($tax);
+        $item->setTax(new TaxPrice(5.25, 'exclusive'));
         $this->assertEquals($item->totalAfterTax(), $item->total());
 
         // Total is the total after discount and tax
-        $item->setDiscount($discount);
+        $item->setDiscount(new DiscountPrice(50, 'percent'));
         $this->assertEquals($item->totalAfterDiscount() + $item->taxAmount(), $item->total());
     }
 
     /**
      * @covers ::discounts
-     * @uses DiscountPrice::__construct
-     * @uses ItemPrice::setDiscount
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses UnitPrice
+     * @uses AbstractPriceModifier
      */
     public function testDiscounts()
     {
@@ -262,8 +281,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::taxAmount
-     * @uses ItemPrice::setTax
-     * @uses TaxPrice::on
+     * @uses ItemPrice
+     * @uses TaxPrice
+     * @uses UnitPrice
      * @dataProvider taxAmountProvider
      */
     public function testTaxAmount($item, array $taxes, $expected_amount)
@@ -318,9 +338,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::discountAmount
-     * @uses ItemPrice::setDiscount
-     * @uses ItemPrice::subtotal
-     * @uses DiscountPrice::on
+     * @uses ItemPrice
+     * @uses DiscountPrice
+     * @uses UnitPrice
      * @dataProvider discountAmountProvider
      */
     public function testDiscountAmount($item, array $discounts, $expected_amount)
@@ -431,6 +451,10 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::taxes
+     * @uses ItemPrice
+     * @uses UnitPrice
+     * @uses TaxPrice
+     * @uses AbstractPriceModifier
      */
     public function testTaxes()
     {
