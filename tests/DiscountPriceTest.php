@@ -9,6 +9,7 @@ class DiscountPriceTest extends PHPUnit_Framework_TestCase
     public function testConstruct()
     {
         $this->assertInstanceOf("DiscountPrice", new DiscountPrice(5.00, 'percent'));
+        $this->assertInstanceOf("DiscountPrice", new DiscountPrice(5.00, 'amount'));
     }
 
     /**
