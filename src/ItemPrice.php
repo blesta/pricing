@@ -199,4 +199,14 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     {
         return $this->discounts;
     }
+
+    /**
+     * Resets the applied discount amounts for all assigned DiscountPrice's
+     */
+    public function resetDiscounts()
+    {
+        foreach ($this->discounts as $discount) {
+            $discount->reset();
+        }
+    }
 }

@@ -138,4 +138,30 @@ class DiscountPriceTest extends PHPUnit_Framework_TestCase
             array(new DiscountPrice(20, 'amount'), -10.00, -10.00),
         );
     }
+
+    /**
+     * @covers DiscountPrice::reset
+     * @uses DiscountPrice::off
+     * @uses DiscountPrice::on
+     */
+    public function testReset()
+    {
+        // Use the full discount price
+        $amount = 10;
+        $discount = new DiscountPrice($amount, 'amount');
+        $this->assertEquals(0, $discount->off($amount));
+
+        // Discount on any other amount is zero because the discount has been used
+        $this->assertEquals(0, $discount->on($amount));
+        // Discount off of the used discount is the given amount
+        $this->assertEquals($amount, $discount->off($amount));
+
+        // Resetting the discount allows for discounts to be calculated again
+        $discount->reset();
+
+        // Discount is non-zero because it has not been taken off yet
+        $this->assertEquals($amount, $discount->on($amount));
+        // Discount off is now zero
+        $this->assertEquals(0, $discount->off($amount));
+    }
 }

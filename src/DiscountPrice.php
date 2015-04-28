@@ -75,8 +75,16 @@ class DiscountPrice extends AbstractPriceModifier
         if ('percent' === $this->type) {
             return ($this->amount > 100 ? $price : $price * $this->amount / 100);
         } else {
-            $discount = min(abs($price), $this->amount);
+            $discount = min(abs($price), $this->discount_remaining);
             return ($price >= 0 ? $discount : -$discount);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->discount_remaining = $this->amount;
     }
 }
