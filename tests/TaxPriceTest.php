@@ -4,7 +4,7 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @covers TaxPrice::__construct
-     * @uses AbstractPriceModifier
+     * @uses AbstractPriceModifier::__construct
      */
     public function testConstruct()
     {
