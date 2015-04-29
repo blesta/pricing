@@ -1,9 +1,12 @@
 <?php
 
+/**
+ * @coversDefaultClass DiscountPrice
+ */
 class DiscountPriceTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @covers DiscountPrice::__construct
+     * @covers ::__construct
      * @uses AbstractPriceModifier::__construct
      */
     public function testConstruct()
@@ -15,7 +18,7 @@ class DiscountPriceTest extends PHPUnit_Framework_TestCase
     /**
      * Test InvalidArgumentException is thrown
      *
-     * @covers DiscountPrice::__construct
+     * @covers ::__construct
      * @uses AbstractPriceModifier::__construct
      * @expectedException InvalidArgumentException
      */
@@ -26,7 +29,7 @@ class DiscountPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers DiscountPrice::off
+     * @covers ::off
      * @uses DiscountPrice::on
      * @dataProvider offProvider
      */
@@ -69,7 +72,7 @@ class DiscountPriceTest extends PHPUnit_Framework_TestCase
      * Test amount discounts for multiple prices, as the discount remaining should
      * change with each price the discount is applied to
      *
-     * @covers DiscountPrice::off
+     * @covers ::off
      * @uses DiscountPrice::on
      * @dataProvider offMultipleProvider
      */
@@ -104,7 +107,7 @@ class DiscountPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers DiscountPrice::on
+     * @covers ::on
      * @dataProvider onProvider
      */
     public function testOn($discount, $price, $discount_price)
@@ -141,28 +144,19 @@ class DiscountPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers DiscountPrice::reset
+     * @covers ::reset
+     * @uses DiscountPrice::__construct
+     * @uses AbstractPriceModifier::__construct
      * @uses DiscountPrice::off
      * @uses DiscountPrice::on
      */
     public function testReset()
     {
-        // Use the full discount price
-        $amount = 10;
-        $discount = new DiscountPrice($amount, 'amount');
-        $this->assertEquals(0, $discount->off($amount));
+        $discount = new DiscountPrice(10, 'amount');
+        $this->assertEquals(0, $discount->off(10));
+        $this->assertEquals(10, $discount->off(10));
 
-        // Discount on any other amount is zero because the discount has been used
-        $this->assertEquals(0, $discount->on($amount));
-        // Discount off of the used discount is the given amount
-        $this->assertEquals($amount, $discount->off($amount));
-
-        // Resetting the discount allows for discounts to be calculated again
         $discount->reset();
-
-        // Discount is non-zero because it has not been taken off yet
-        $this->assertEquals($amount, $discount->on($amount));
-        // Discount off is now zero
-        $this->assertEquals(0, $discount->off($amount));
+        $this->assertEquals(0, $discount->off(10));
     }
 }

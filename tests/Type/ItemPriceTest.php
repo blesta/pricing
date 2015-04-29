@@ -480,38 +480,27 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::reset
-     * @uses ::discountAmount
+     * @covers ::resetDiscounts
+     * @uses ItemPrice::__construct
+     * @uses ItemPrice::setDiscount
      */
-    public function testReset()
+    public function testResetDiscounts()
     {
-        // Set a item with discounts
+        $discountMock = $this->getMockBuilder('DiscountPrice')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $discountMock->expects($this->once())
+            ->method('reset');
+
         $item = new ItemPrice(10);
-        $item->setDiscount(new DiscountPrice(3, 'amount'));
-        $item->setDiscount(new DiscountPrice(5, 'amount'));
-
-        // The discount amount is 8
-        $this->assertEquals(8, $item->discountAmount());
-        // Subsequent calls return different results because the discount has not been reset
-        $this->assertEquals(0, $item->discountAmount());
-
-        // The discount amount can be recalculated
+        $item->setDiscount($discountMock);
         $item->resetDiscounts();
-        $this->assertEquals(8, $item->discountAmount());
-
-        // Applying an amount discount greater than the total item amount, the discount
-        // amount is the full amount on the first call, and the remainder on subsequent calls
-        $item->resetDiscounts();
-        $item->setDiscount(new DiscountPrice(3, 'amount'));
-        $this->assertEquals(10, $item->discountAmount());
-        // Total discount is 11. Item price is 10. Remainder 1
-        $this->assertEquals(1, $item->discountAmount());
     }
 
     /**
      * @covers ::taxes
      * @uses ItemPrice::setTax
-     * @uses UnitPrice::__construct
+     * @uses ItemPrice::__construct
      * @uses TaxPrice::__construct
      * @uses AbstractPriceModifier::__construct
      */

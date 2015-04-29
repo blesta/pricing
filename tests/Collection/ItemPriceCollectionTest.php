@@ -8,99 +8,54 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::append
+     * @covers ::count
      * @uses ItemPriceCollection::count
-     * @uses ItemPriceCollection::key
-     * @uses ItemPriceCollection::next
-     * @uses ItemPriceCollection::valid
-     * @uses ItemPriceCollection::current
-     * @uses ItemPriceCollection::rewind
-     * @uses ItemPrice::__construct
      */
     public function testAppend()
     {
+        $itemMock[] = $this->getMockBuilder('ItemPrice')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $itemMock[] = $this->getMockBuilder('ItemPrice')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $collection = new ItemPriceCollection();
-        $items = array(new ItemPrice(10, 2), new ItemPrice(5, 1));
 
         // Add 1 item
-        $collection->append($items[0]);
-        foreach ($collection as $item_price) {
-            $this->assertSame($items[0], $item_price);
-        }
+        $collection->append($itemMock[0]);
         $this->assertEquals(1, $collection->count());
 
         // Add a second item
-        $collection->append($items[1]);
-        $i = 0;
-        foreach ($collection as $item_price) {
-            $this->assertSame($items[$i++], $item_price);
-        }
+        $collection->append($itemMock[1]);
         $this->assertEquals(2, $collection->count());
     }
 
     /**
-     * @covers ::append
      * @covers ::remove
-     * @uses ItemPriceCollection::key
-     * @uses ItemPriceCollection::next
-     * @uses ItemPriceCollection::valid
-     * @uses ItemPriceCollection::current
-     * @uses ItemPriceCollection::rewind
+     * @covers ::count
      * @uses ItemPriceCollection::count
-     * @uses ItemPrice::__construct
+     * @uses ItemPriceCollection::append
      */
     public function testRemove()
     {
-        $collection = new ItemPriceCollection();
+        $itemMock[] = $this->getMockBuilder('ItemPrice')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $itemMock[] = $this->getMockBuilder('ItemPrice')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        // Add 4 items to the collection
-        $item1 = new ItemPrice(2, 1);
-        $items = array(new ItemPrice(1, 2), $item1, new ItemPrice(3, 1), $item1);
-        foreach ($items as $item) {
-            $collection->append($item);
-        }
-
-        // Remove an item, leaving 3 remaining
-        $collection->remove($items[0]);
-        foreach ($collection as $item_price) {
-            $this->assertNotSame($items[0], $item_price);
-        }
-        $this->assertEquals(3, $collection->count());
-
-        // Remove an item that exists multiple times
-        $collection->remove($item1);
-        foreach ($collection as $item_price) {
-            $this->assertNotSame($item1, $item_price);
-        }
-        $this->assertEquals(1, $collection->count());
-    }
-
-    /**
-     * @covers ::count
-     * @uses ItemPriceCollection::append
-     * @uses ItemPriceCollection::remove
-     * @uses ItemPrice::__construct
-     */
-    public function testCount()
-    {
-        // No items, count is zero
         $collection = new ItemPriceCollection();
         $this->assertEquals(0, $collection->count());
 
-        // One item, count is one
-        $item = new ItemPrice(10, 1);
-        $collection->append($item);
-        $count = 1;
-        $this->assertEquals($count, $collection->count());
-
-        // Multiple items, count increasing by one each time
-        for ($i=0; $i<10; $i++) {
-            $collection->append(new ItemPrice($i, 1));
-            $this->assertEquals(++$count, $collection->count());
+        foreach ($itemMock as $item) {
+            $collection->append($item);
         }
 
-        // Removing an item, the count decreases by one
-        $collection->remove($item);
-        $this->assertEquals(--$count, $collection->count());
+        $this->assertEquals(count($itemMock), $collection->count());
+        $collection->remove($itemMock[0]);
+        $this->assertEquals(count($itemMock)-1, $collection->count());
     }
 
     /**
@@ -231,39 +186,26 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::resetDiscounts
-     * @uses ItemPriceCollection
-     * @uses ItemPrice
-     * @uses DiscountPrice
-     * @uses TaxPrice
-     * @uses UnitPrice
+     * @uses ItemPriceCollection::append
+     * @uses ItemPriceCollection::discounts
      */
     public function testResetDiscounts()
     {
-        // Use the discount before applying it to the items
-        $amount = 30;
-        $discount = new DiscountPrice($amount, 'amount');
-        $this->assertEquals(0, $discount->off($amount));
-        $this->assertEquals($amount, $discount->off($amount));
+        $discountMock = $this->getMockBuilder('DiscountPrice')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $discountMock->expects($this->once())
+            ->method('reset');
 
-        $item1 = new ItemPrice(10, 2);
-        $item1->setDiscount($discount);
-
-        $item2 = new ItemPrice(5, 1);
-        $item2->setDiscount($discount);
+        $itemMock = $this->getMockBuilder('ItemPrice')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $itemMock->method('discounts')
+            ->will($this->returnValue(array($discountMock)));
 
         $collection = new ItemPriceCollection();
-        $collection->append($item1)->append($item2);
-
-        // Each item has no discount amount because it was already applied
-        foreach ($collection as $item) {
-            $this->assertEquals(0, $item->discountAmount());
-        }
-
-        // Each item has a discount amount equal to its subtotal (applied in full)
+        $collection->append($itemMock);
         $collection->resetDiscounts();
-        foreach ($collection as $item) {
-            $this->assertEquals($item->subtotal(), $item->discountAmount());
-        }
     }
 
     /**
@@ -391,6 +333,7 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @uses DiscountPrice
      * @uses TaxPrice
      * @uses UnitPrice
+     * @uses AbstractPriceModifier::__construct
      */
     public function testMultipleDiscountTotals()
     {
