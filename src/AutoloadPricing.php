@@ -13,19 +13,24 @@ class AutoloadPricing
     public static function load($class)
     {
         $baseDir = dirname(__FILE__) . DIRECTORY_SEPARATOR;
+        $collectionDir = $baseDir . 'Collection' . DIRECTORY_SEPARATOR;
+        $descriptionDir = $baseDir . 'Description' . DIRECTORY_SEPARATOR;
+        $modifierDir = $baseDir . 'Modifier' . DIRECTORY_SEPARATOR;
+        $totalDir = $baseDir . 'Total' . DIRECTORY_SEPARATOR;
+        $typeDir = $baseDir . 'Type' . DIRECTORY_SEPARATOR;
 
         $classes = array(
-            'AbstractPriceDescription' => $baseDir . 'AbstractPriceDescription.php',
-            'AbstractPriceModifier' => $baseDir . 'AbstractPriceModifier.php',
-            'DiscountPrice' => $baseDir . 'DiscountPrice.php',
-            'ItemPrice' => $baseDir . 'ItemPrice.php',
-            'ItemPriceCollection' => $baseDir . 'ItemPriceCollection.php',
-            'PriceDescriptionInterface' => $baseDir . 'PriceDescriptionInterface.php',
-            'PriceModifierInterface' => $baseDir . 'PriceModifierInterface.php',
-            'PriceTotalInterface' => $baseDir . 'PriceTotalInterface.php',
+            'AbstractPriceDescription' => $descriptionDir . 'AbstractPriceDescription.php',
+            'AbstractPriceModifier' => $modifierDir . 'AbstractPriceModifier.php',
+            'DiscountPrice' => $modifierDir . 'DiscountPrice.php',
+            'ItemPrice' => $typeDir . 'ItemPrice.php',
+            'ItemPriceCollection' => $collectionDir . 'ItemPriceCollection.php',
+            'PriceDescriptionInterface' => $descriptionDir . 'PriceDescriptionInterface.php',
+            'PriceModifierInterface' => $modifierDir . 'PriceModifierInterface.php',
+            'PriceTotalInterface' => $totalDir . 'PriceTotalInterface.php',
             'PricingFactory' => $baseDir . 'PricingFactory.php',
-            'TaxPrice' => $baseDir . 'TaxPrice.php',
-            'UnitPrice' => $baseDir . 'UnitPrice.php'
+            'TaxPrice' => $typeDir . 'TaxPrice.php',
+            'UnitPrice' => $typeDir . 'UnitPrice.php'
         );
 
         if (isset($classes[$class])) {
