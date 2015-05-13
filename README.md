@@ -117,6 +117,20 @@ $item_price->setDiscount($discount);
 $item_price->totalAfterDiscount(); // 28.50
 ```
 
+Amount applied for a specific discount:
+
+```php
+$discount1 = new Discount(5.00, "percent");
+$discount2 = new Discount(25.00, "percent");
+
+// NOTE: Order matters here
+$item_price->setDiscount($discount1);
+$item_price->setDiscount($discount2);
+
+$item_price->discountAmount($discount1); // 1.50
+$item_price->discountAmount($discount2); // 7.125 ((30.00 - 1.50) * 0.25)
+```
+
 With tax applied:
 
 ```php
@@ -133,6 +147,20 @@ With tax and discount:
 
 ```php
 $item_price->total(); // 31.35
+```
+
+Amount applied for a specific tax:
+
+```php
+$tax1 = new Discount(10.00, "exclusive");
+$tax2 = new Discount(5.00, "exclusive");
+
+// NOTE: order *DOES NOT* matter
+$item_price->setTax($tax1);
+$item_price->setTax($tax2);
+
+$item_price->taxAmount($tax1); // 3.00
+$item_price->taxAmount($tax2); // 1.50
 ```
 
 ### ItemPriceCollection
