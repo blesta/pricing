@@ -10,7 +10,7 @@ A library for handling pricing. Supports:
     - Fixed amounts
 - Taxes (inclusive, exclusive)
     - Inclusive and Exclusive
-    - Applied in sequence of compounded
+    - Applied in sequence or compounded
 - Item Collection
     - Iterate over Item Prices
     - Aggregate totals over Item Prices
