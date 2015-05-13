@@ -120,8 +120,13 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses ItemPrice::subtotal
      * @uses ItemPrice::setTax
      * @uses ItemPrice::taxAmount
+     * @uses ItemPrice::amountTax
+     * @uses ItemPrice::amountTaxAll
+     * @uses ItemPrice::compoundTaxAmount
      * @uses ItemPrice::totalAfterDiscount
      * @uses ItemPrice::discountAmount
+     * @uses ItemPrice::amountDiscount
+     * @uses ItemPrice::amountDiscountAll
      * @uses UnitPrice::__construct
      * @uses UnitPrice::total
      * @uses TaxPrice::__construct
@@ -169,6 +174,8 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses ItemPrice::subtotal
      * @uses ItemPrice::setDiscount
      * @uses ItemPrice::discountAmount
+     * @uses ItemPrice::amountDiscount
+     * @uses ItemPrice::amountDiscountAll
      * @uses UnitPrice::__construct
      * @uses UnitPrice::total
      * @uses DiscountPrice::__construct
@@ -246,7 +253,12 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses ItemPrice::totalAfterTax
      * @uses ItemPrice::totalAfterDiscount
      * @uses ItemPrice::taxAmount
+     * @uses ItemPrice::amountTax
+     * @uses ItemPrice::amountTaxAll
+     * @uses ItemPrice::compoundTaxAmount
      * @uses ItemPrice::discountAmount
+     * @uses ItemPrice::amountDiscount
+     * @uses ItemPrice::amountDiscountAll
      * @uses ItemPrice::subtotal
      * @uses AbstractPriceModifier::__construct
      * @uses TaxPrice::__construct
@@ -303,11 +315,16 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::taxAmount
+     * @covers ::amountTax
+     * @covers ::amountTaxALl
+     * @covers ::compoundTaxAmount
      * @uses ItemPrice::setTax
      * @uses ItemPrice::setDiscount
      * @uses ItemPrice::totalAfterTax
      * @uses ItemPrice::totalAfterDiscount
      * @uses ItemPrice::discountAmount
+     * @uses ItemPrice::amountDiscount
+     * @uses ItemPrice::amountDiscountAll
      * @uses ItemPrice::subtotal
      * @uses TaxPrice::__construct
      * @uses TaxPrice::on
@@ -335,17 +352,6 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             $this->assertLessThanOrEqual(0, $tax_amount);
         }
 
-        // Test compound tax specifically
-        if (count($taxes) > 1) {
-            // Compound tax is greater than the sum of each tax individually
-            $tax_sum = 0;
-            foreach ($taxes as $tax) {
-                $tax_sum += $item->taxAmount($tax);
-            }
-
-            $this->assertGreaterThan($tax_sum, $item->taxAmount());
-        }
-
         // The given expected amount should be the end result with all taxes applied
         $this->assertEquals($expected_amount, $item->taxAmount());
     }
@@ -359,14 +365,67 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     {
         return array(
             array(new ItemPrice(100, 2), array(new TaxPrice(10, 'exclusive')), 20),
-            array(new ItemPrice(100, 2), array(new TaxPrice(10, 'exclusive'), new TaxPrice(7.75, 'exclusive')), 37.05),
             array(new ItemPrice(0, 2), array(new TaxPrice(10, 'exclusive')), 0),
             array(new ItemPrice(-100, 2), array(new TaxPrice(10, 'exclusive')), -20),
         );
     }
 
     /**
+     * @covers ::taxAmount
+     * @covers ::amountTax
+     * @covers ::amountTaxALl
+     * @covers ::compoundTaxAmount
+     * @uses ItemPrice::setTax
+     * @uses ItemPrice::setDiscount
+     * @uses ItemPrice::totalAfterTax
+     * @uses ItemPrice::totalAfterDiscount
+     * @uses ItemPrice::discountAmount
+     * @uses ItemPrice::amountDiscount
+     * @uses ItemPrice::amountDiscountAll
+     * @uses ItemPrice::subtotal
+     * @uses TaxPrice::__construct
+     * @uses TaxPrice::on
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
+     * @dataProvider taxAmountCompoundProvider
+     */
+    public function testTaxAmountCompound($item, array $taxes, $expected_amount)
+    {
+        // Set all taxes
+        call_user_func_array(array($item, "setTax"), $taxes);
+
+        // Compound tax is greater than the sum of each tax individually
+        $tax_sum = 0;
+        foreach ($taxes as $tax) {
+            $tax_amount = $item->taxAmount($tax);
+            $tax_sum += $tax_amount;
+            $this->assertGreaterThanOrEqual($tax_amount, $item->taxAmount());
+        }
+
+        // Sum of individual tax calculations are greater than the total
+        // i.e. Tax1 + (Tax1 + Tax2) > (Tax1 + Tax2)
+        $this->assertLessThan($tax_sum, $item->taxAmount());
+
+        // Total tax amount is the expected amount
+        $this->assertEquals($expected_amount, $item->taxAmount());
+    }
+
+    /**
+     * Compound Tax Amount provider
+     *
+     * @return array
+     */
+    public function taxAmountCompoundProvider()
+    {
+        return array(
+            array(new ItemPrice(100, 2), array(new TaxPrice(10, 'exclusive'), new TaxPrice(7.75, 'exclusive')), 37.05),
+        );
+    }
+
+    /**
      * @covers ::discountAmount
+     * @covers ::amountDiscount
+     * @covers ::amountDiscountAll
      * @uses ItemPrice::setDiscount
      * @uses ItemPrice::subtotal
      * @uses UnitPrice::__construct

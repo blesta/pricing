@@ -139,26 +139,78 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     public function taxAmount(TaxPrice $tax = null)
     {
-        $tax_amount = 0;
-        $taxable_price = $this->totalAfterDiscount();
-
         // Determine the tax set on this item's price
         if ($tax) {
-            $tax_amount = $tax->on($taxable_price);
+            $tax_amount = $this->amountTax($tax);
         } else {
-            // Determine all taxes set on this item's price, compounded accordingly
-            foreach ($this->taxes as $tax_group) {
-                $compound_tax = 0;
-                foreach ($tax_group as $tax) {
-                    $compound_tax += $tax->on($taxable_price + $compound_tax);
-                }
+            $tax_amount = $this->amountTaxAll();
+        }
 
-                // Sum all taxes
-                $tax_amount += $compound_tax;
+        return $tax_amount;
+    }
+
+    /**
+     * Retrieves the tax amount for the given TaxPrice
+     *
+     * @param TaxPrice $tax A specific tax price whose tax to calculate for this item
+     * @return float The total tax amount for the given TaxPrice
+     */
+    private function amountTax(TaxPrice $tax)
+    {
+        $taxable_price = $this->totalAfterDiscount();
+        $tax_amount = 0;
+
+        foreach ($this->taxes as $tax_group) {
+            // Only calculate the tax amount if the tax exists in a tax group
+            if (in_array($tax, $tax_group, true)) {
+                $tax_amount = $this->compoundTaxAmount($tax_group, $taxable_price, $tax);
             }
         }
 
         return $tax_amount;
+    }
+
+    /**
+     * Retrieves the total tax amount considering all item taxes
+     *
+     * @return float The total tax amount for all taxes set for this item
+     */
+    private function amountTaxAll()
+    {
+        $taxable_price = $this->totalAfterDiscount();
+        $tax_amount = 0;
+
+        // Determine all taxes set on this item's price, compounded accordingly
+        foreach ($this->taxes as $tax_group) {
+            // Sum all taxes
+            $tax_amount += $this->compoundTaxAmount($tax_group, $taxable_price);
+        }
+
+        return $tax_amount;
+    }
+
+    /**
+     * Retrieves the tax amount for a specific tax group
+     *
+     * @param array $tax_group A subset of the taxes array
+     * @param float $taxable_price The total amount from which to calculate tax
+     * @param TaxPrice $tax A specific tax from the group to tax up to (optional)
+     * @return float The total tax amount for all taxes set for this item in this group
+     */
+    private function compoundTaxAmount(array $tax_group, $taxable_price, TaxPrice $tax = null)
+    {
+        $compound_tax = 0;
+
+        foreach ($tax_group as $tax_price) {
+            $compound_tax += $tax_price->on($taxable_price + $compound_tax);
+
+            // Skip any other taxes that may follow in this group
+            if ($tax && $tax === $tax_price) {
+                break;
+            }
+        }
+
+        return $compound_tax;
     }
 
     /**
@@ -176,31 +228,9 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
 
         // Determine the discount set on this item's price
         if ($discount) {
-            $total_discount = $discount->on($subtotal);
+            $total_discount = $this->amountDiscount($discount);
         } else {
-            // Determine all the discounts set on this item's price
-            $temp_subtotal = $subtotal;
-            foreach ($this->discounts as $key => $discount) {
-                // Fetch the discount amount and remove it from the DiscountPrice,
-                // or use the values previously cached
-                if ($this->cache_discount_amounts || empty($this->discount_amounts)) {
-                    // Get the discount on the subtotal
-                    $discount_amount = $discount->on($temp_subtotal);
-                    $total_discount += $discount_amount;
-
-                    // Cache the discount set for this DiscountPrice
-                    if ($this->cache_discount_amounts) {
-                        $this->discount_amounts[$key] = $discount_amount;
-                    }
-
-                    // Update the subtotal for this item to remove the amount discounted
-                    $temp_subtotal = $discount->off($temp_subtotal);
-                } else {
-                    // Use the cached discount amount for this DiscountPrice
-                    $total_discount += $this->discount_amounts[$key];
-                }
-
-            }
+            $total_discount = $this->amountDiscountAll();
         }
 
         // Total discount not to exceed the subtotal amount, neither positive nor negative
@@ -209,6 +239,56 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
             ? min($subtotal, $total_discount)
             : max($subtotal, $total_discount)
         );
+    }
+
+    /**
+     * Retrieves the total discount amount considering the given discount
+     *
+     * @param DiscountPrice $discount A specific discount price whose discount to calculate
+     *  for this item
+     * @return float The total discount amount for the given discount price
+     */
+    private function amountDiscount(DiscountPrice $discount)
+    {
+        $subtotal = $this->subtotal();
+        $total_discount = $discount->on($subtotal);
+
+        return $total_discount;
+    }
+
+    /**
+     * Retrieves the total discount amount considering all item discounts
+     *
+     * @return float The total discount amount for all discounts set for this item
+     */
+    private function amountDiscountAll()
+    {
+        $subtotal = $this->subtotal();
+        $total_discount = 0;
+
+        // Determine all the discounts set on this item's price
+        foreach ($this->discounts as $key => $discount) {
+            // Fetch the discount amount and remove it from the DiscountPrice,
+            // or use the values previously cached
+            if ($this->cache_discount_amounts || empty($this->discount_amounts)) {
+                // Get the discount on the subtotal
+                $discount_amount = $discount->on($subtotal);
+                $total_discount += $discount_amount;
+
+                // Cache the discount set for this DiscountPrice
+                if ($this->cache_discount_amounts) {
+                    $this->discount_amounts[$key] = $discount_amount;
+                }
+
+                // Update the subtotal for this item to remove the amount discounted
+                $subtotal = $discount->off($subtotal);
+            } else {
+                // Use the cached discount amount for this DiscountPrice
+                $total_discount += $this->discount_amounts[$key];
+            }
+        }
+
+        return $total_discount;
     }
 
     /**
