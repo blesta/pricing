@@ -389,6 +389,10 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @covers ::current
      * @covers ::valid
      * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
      * @uses ItemPriceCollection::append
      */
     public function testCurrent()
@@ -431,6 +435,10 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @covers ::key
      * @covers ::valid
      * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
      * @uses ItemPriceCollection::append
      * @uses ItemPriceCollection::remove
      */
@@ -501,6 +509,10 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @covers ::next
      * @uses ItemPriceCollection::append
      * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
      */
     public function testValid()
     {
