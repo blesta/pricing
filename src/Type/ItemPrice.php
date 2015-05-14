@@ -37,7 +37,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     {
         parent::__construct($price, $qty);
 
-        // Reset the interanl discount subtotal
+        // Reset the internal discount subtotal
         $this->resetDiscountSubtotal();
     }
 
