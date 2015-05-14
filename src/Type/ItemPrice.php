@@ -13,6 +13,10 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      * @var boolean Whether or not to cache discount subtotals
      */
     private $cache_discount_amounts = false;
+    /**
+     * @var float The item price subtotal after individual discounts were applied
+     */
+    private $discounted_subtotal = 0;
 
     /**
      * @var array A numerically-indexed array of DiscountPrice objects
@@ -22,6 +26,20 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      * @var array A numerically-indexed array containing an array of TaxPrice objects
      */
     protected $taxes = array();
+
+    /**
+     * Initialize the item price
+     *
+     * @param float $price The unit price
+     * @param int $qty The quantity of unit prices (optional, default 1)
+     */
+    public function __construct($price, $qty = 1)
+    {
+        parent::__construct($price, $qty);
+
+        // Reset the interanl discount subtotal
+        $this->resetDiscountSubtotal();
+    }
 
     /**
      * Assigns a discount to the item
@@ -194,19 +212,22 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      *
      * @param array $tax_group A subset of the taxes array
      * @param float $taxable_price The total amount from which to calculate tax
-     * @param TaxPrice $tax A specific tax from the group to tax up to (optional)
-     * @return float The total tax amount for all taxes set for this item in this group
+     * @param TaxPrice $tax A specific tax from the group whose tax amount to retrieve (optional)
+     * @return float The total tax amount for all taxes set for this item in this group, or
+     *  the tax amount for the given TaxPrice
      */
     private function compoundTaxAmount(array $tax_group, $taxable_price, TaxPrice $tax = null)
     {
         $compound_tax = 0;
 
         foreach ($tax_group as $tax_price) {
-            $compound_tax += $tax_price->on($taxable_price + $compound_tax);
+            // Calculate the compound tax
+            $tax_amount = $tax_price->on($taxable_price + $compound_tax);
+            $compound_tax += $tax_amount;
 
-            // Skip any other taxes that may follow in this group
+            // Ignore any other group taxes, and only return the tax amount for the given TaxPrice
             if ($tax && $tax === $tax_price) {
-                break;
+                return $tax_amount;
             }
         }
 
@@ -250,8 +271,16 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     private function amountDiscount(DiscountPrice $discount)
     {
-        $subtotal = $this->subtotal();
-        $total_discount = $discount->on($subtotal);
+        $total_discount = 0;
+
+        // Only calculate the discount amount if the discount is set for this item
+        if (in_array($discount, $this->discounts, true)) {
+            // Get the discount on the discounted subtotal remaining
+            $total_discount = $discount->on($this->discounted_subtotal);
+
+            // Update the discounted subtotal for this item by removing the amount discounted
+            $this->discounted_subtotal = $discount->off($this->discounted_subtotal);
+        }
 
         return $total_discount;
     }
@@ -320,8 +349,20 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     public function resetDiscounts()
     {
+        // Reset the internal discounted subtotal
+        $this->resetDiscountSubtotal();
+
+        // Reset each discount
         foreach ($this->discounts as $discount) {
             $discount->reset();
         }
+    }
+
+    /**
+     * Resets the discounted subtotal used internally
+     */
+    private function resetDiscountSubtotal()
+    {
+        $this->discounted_subtotal = $this->subtotal();
     }
 }
