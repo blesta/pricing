@@ -208,12 +208,12 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     }
 
     /**
-     * Resets the applied discount amounts for all DiscountPrice's in the collection
+     * Resets the applied discount amounts for all ItemPrice's in the collection
      */
     public function resetDiscounts()
     {
-        foreach ($this->discounts() as $discount) {
-            $discount->reset();
+        foreach ($this->collection as $item_price) {
+            $item_price->resetDiscounts();
         }
     }
 
