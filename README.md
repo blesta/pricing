@@ -1,4 +1,4 @@
-# blesta/Pricing
+# blesta/pricing
 
 A library for handling pricing. Supports:
 
@@ -19,28 +19,8 @@ A library for handling pricing. Supports:
 
 Install via composer:
 
-```js
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "blesta/pricing",
-                "version": "dev-master",
-                "dist": {
-                    "url": "http://git.blestalabs.com/billing/proration/pricing/archive.zip",
-                    "type": "zip"
-                },
-                "source": {
-                    "url": "http://git.blestalabs.com/billing/pricing",
-                    "type": "git",
-                    "reference": "tree/master"
-                }
-            }
-        }
-    ]
-```
 ```sh
-composer require blesta/pricing:dev-master
+composer require blesta/pricing:~1.0
 ```
 
 ## Basic Usage
