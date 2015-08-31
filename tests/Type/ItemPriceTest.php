@@ -7,6 +7,10 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @covers ::__construct
+     * @covers ::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
      */
     public function testConstruct()
     {
@@ -73,7 +77,11 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::setTax
+     * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
      * @uses TaxPrice::__construct
      * @uses AbstractPriceModifier::__construct
      * @expectedException InvalidArgumentException
@@ -87,7 +95,11 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::setTax
+     * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
      * @uses TaxPrice::__construct
      * @uses AbstractPriceModifier::__construct
      * @expectedException InvalidArgumentException
@@ -117,11 +129,17 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     /**
      * @covers ::totalAfterTax
      * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
      * @uses ItemPrice::subtotal
      * @uses ItemPrice::setTax
      * @uses ItemPrice::taxAmount
+     * @uses ItemPrice::amountTax
+     * @uses ItemPrice::amountTaxAll
+     * @uses ItemPrice::compoundTaxAmount
      * @uses ItemPrice::totalAfterDiscount
      * @uses ItemPrice::discountAmount
+     * @uses ItemPrice::amountDiscount
+     * @uses ItemPrice::amountDiscountAll
      * @uses UnitPrice::__construct
      * @uses UnitPrice::total
      * @uses TaxPrice::__construct
@@ -166,9 +184,12 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     /**
      * @covers ::totalAfterDiscount
      * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
      * @uses ItemPrice::subtotal
      * @uses ItemPrice::setDiscount
      * @uses ItemPrice::discountAmount
+     * @uses ItemPrice::amountDiscount
+     * @uses ItemPrice::amountDiscountAll
      * @uses UnitPrice::__construct
      * @uses UnitPrice::total
      * @uses DiscountPrice::__construct
@@ -212,6 +233,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::subtotal
+     * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
      * @uses UnitPrice::__construct
      * @uses UnitPrice::total
      * @dataProvider subtotalProvider
@@ -241,12 +265,19 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::total
+     * @covers ::discountAmount
+     * @covers ::amountDiscount
+     * @covers ::amountDiscountAll
+     * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
      * @uses ItemPrice::setTax
      * @uses ItemPrice::setDiscount
      * @uses ItemPrice::totalAfterTax
      * @uses ItemPrice::totalAfterDiscount
      * @uses ItemPrice::taxAmount
-     * @uses ItemPrice::discountAmount
+     * @uses ItemPrice::amountTax
+     * @uses ItemPrice::amountTaxAll
+     * @uses ItemPrice::compoundTaxAmount
      * @uses ItemPrice::subtotal
      * @uses AbstractPriceModifier::__construct
      * @uses TaxPrice::__construct
@@ -275,9 +306,13 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::discounts
+     * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
      * @uses ItemPrice::setDiscount
      * @uses DiscountPrice::__construct
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
      * @uses AbstractPriceModifier::__construct
      */
     public function testDiscounts()
@@ -303,11 +338,16 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::taxAmount
+     * @covers ::amountTax
+     * @covers ::amountTaxALl
+     * @covers ::compoundTaxAmount
      * @uses ItemPrice::setTax
      * @uses ItemPrice::setDiscount
      * @uses ItemPrice::totalAfterTax
      * @uses ItemPrice::totalAfterDiscount
      * @uses ItemPrice::discountAmount
+     * @uses ItemPrice::amountDiscount
+     * @uses ItemPrice::amountDiscountAll
      * @uses ItemPrice::subtotal
      * @uses TaxPrice::__construct
      * @uses TaxPrice::on
@@ -315,17 +355,17 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses UnitPrice::total
      * @dataProvider taxAmountProvider
      */
-    public function testTaxAmount($item, array $taxes, $expected_amount)
+    public function testTaxAmount($item, $tax, $expected_amount)
     {
         // No taxes set. No tax amount
         $subtotal = $item->subtotal();
         $this->assertEquals(0, $item->taxAmount());
 
-        // Set all taxes
-        call_user_func_array(array($item, "setTax"), $taxes);
+        // Set tax price
+        $item->setTax($tax);
 
-        // Test a specific tax amount just for the first tax
-        $this->assertEquals($taxes[0]->on($subtotal), $item->taxAmount($taxes[0]));
+        // Test the tax amount
+        $this->assertEquals($tax->on($subtotal), $item->taxAmount($tax));
 
         // Test with all taxes applied
         $tax_amount = $item->taxAmount();
@@ -335,19 +375,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             $this->assertLessThanOrEqual(0, $tax_amount);
         }
 
-        // Test compound tax specifically
-        if (count($taxes) > 1) {
-            // Compound tax is greater than the sum of each tax individually
-            $tax_sum = 0;
-            foreach ($taxes as $tax) {
-                $tax_sum += $item->taxAmount($tax);
-            }
-
-            $this->assertGreaterThan($tax_sum, $item->taxAmount());
-        }
-
         // The given expected amount should be the end result with all taxes applied
         $this->assertEquals($expected_amount, $item->taxAmount());
+        $this->assertEquals($tax->on($subtotal), $item->taxAmount());
     }
 
     /**
@@ -358,15 +388,89 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     public function taxAmountProvider()
     {
         return array(
-            array(new ItemPrice(100, 2), array(new TaxPrice(10, 'exclusive')), 20),
-            array(new ItemPrice(100, 2), array(new TaxPrice(10, 'exclusive'), new TaxPrice(7.75, 'exclusive')), 37.05),
-            array(new ItemPrice(0, 2), array(new TaxPrice(10, 'exclusive')), 0),
-            array(new ItemPrice(-100, 2), array(new TaxPrice(10, 'exclusive')), -20),
+            array(new ItemPrice(100, 2), new TaxPrice(10, 'exclusive'), 20),
+            array(new ItemPrice(0, 2), new TaxPrice(10, 'exclusive'), 0),
+            array(new ItemPrice(-100, 2), new TaxPrice(10, 'exclusive'), -20),
+        );
+    }
+
+    /**
+     * @covers ::taxAmount
+     * @covers ::amountTax
+     * @covers ::amountTaxALl
+     * @covers ::compoundTaxAmount
+     * @uses ItemPrice::setTax
+     * @uses ItemPrice::setDiscount
+     * @uses ItemPrice::totalAfterTax
+     * @uses ItemPrice::totalAfterDiscount
+     * @uses ItemPrice::discountAmount
+     * @uses ItemPrice::amountDiscount
+     * @uses ItemPrice::amountDiscountAll
+     * @uses ItemPrice::subtotal
+     * @uses TaxPrice::__construct
+     * @uses TaxPrice::on
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
+     * @dataProvider taxAmountCompoundProvider
+     */
+    public function testTaxAmountCompound($item, array $taxes, array $expected_tax_amounts)
+    {
+        // Set all taxes
+        call_user_func_array(array($item, "setTax"), $taxes);
+
+        // The tax amounts should be compounded, and only return the componud amount for that tax
+        foreach ($taxes as $index => $tax) {
+            $tax_amount = $item->taxAmount($tax);
+            $this->assertEquals($expected_tax_amounts[$index], $tax_amount);
+        }
+
+        // Total tax amount is the sum of all expected amounts
+        $expected_amount = 0;
+        foreach ($expected_tax_amounts as $amount) {
+            $expected_amount += $amount;
+        }
+        $this->assertEquals($expected_amount, $item->taxAmount());
+    }
+
+    /**
+     * Compound Tax Amount provider
+     *
+     * @return array
+     */
+    public function taxAmountCompoundProvider()
+    {
+        return array(
+            array(
+                new ItemPrice(100, 2),
+                array(
+                    new TaxPrice(10, 'exclusive'),
+                    new TaxPrice(7.75, 'exclusive')
+                ),
+                array(
+                    20,
+                    17.05
+                )
+            ),
+            array(
+                new ItemPrice(10, 3),
+                array(
+                    new TaxPrice(10, 'exclusive'),
+                    new TaxPrice(5, 'exclusive'),
+                    new TaxPrice(2.5, 'exclusive')
+                ),
+                array(
+                    3,
+                    1.65,
+                    0.86625
+                )
+            ),
         );
     }
 
     /**
      * @covers ::discountAmount
+     * @covers ::amountDiscount
+     * @covers ::amountDiscountAll
      * @uses ItemPrice::setDiscount
      * @uses ItemPrice::subtotal
      * @uses UnitPrice::__construct
@@ -480,9 +584,113 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::discountAmount
+     * @covers ::amountDiscount
+     * @covers ::amountDiscountAll
      * @covers ::resetDiscounts
      * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
      * @uses ItemPrice::setDiscount
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
+     * @uses DiscountPrice::__construct
+     * @uses DiscountPrice::on
+     * @uses DiscountPrice::off
+     * @uses DiscountPrice::reset
+     * @dataProvider discountAmountsProvider
+     */
+    public function testDiscountAmounts($item, array $discounts, array $expected_amounts)
+    {
+        // No discounts set
+        foreach ($discounts as $discount) {
+            $this->assertEquals(0, $item->discountAmount($discount));
+
+            // Set the discount
+            $item->setDiscount($discount);
+        }
+
+        for ($i=0; $i<2; $i++) {
+            // The index of the expected amounts coincide with the index of the discounts
+            foreach ($discounts as $index => $discount) {
+                $this->assertEquals($expected_amounts[$index], $item->discountAmount($discount));
+            }
+
+            // The discounts must be reset before they can be tested again
+            foreach ($discounts as $index => $discount) {
+                // Discounts of zero will be equal, otherwise they should be different
+                if ($expected_amounts[$index] == 0) {
+                    $this->assertEquals($expected_amounts[$index], $item->discountAmount($discount));
+                } else {
+                    $this->assertNotEquals($expected_amounts[$index], $item->discountAmount($discount));
+                }
+            }
+            $item->resetDiscounts();
+        }
+
+        $expected_amount = 0;
+        foreach ($expected_amounts as $amount) {
+            $expected_amount += $amount;
+        }
+        $this->assertEquals($expected_amount, $item->discountAmount());
+    }
+
+    /**
+     * Provider for testDiscountAmounts
+     *
+     * @return array
+     */
+    public function discountAmountsProvider()
+    {
+        return array(
+            array(
+                new ItemPrice(10, 3),
+                array(
+                    new DiscountPrice(5.00, "percent"),
+                    new DiscountPrice(25.00, "percent")
+                ),
+                array(
+                    1.50,
+                    7.125
+                )
+            ),
+            array(
+                new ItemPrice(50, 1),
+                array(
+                    new DiscountPrice(10.00, "percent"),
+                    new DiscountPrice(10.00, "amount"),
+                    new DiscountPrice(50.00, "percent"),
+                    new DiscountPrice(3.00, "amount"),
+                    new DiscountPrice(2.5, "amount"),
+                    new DiscountPrice(50.5, "percent"),
+                    new DiscountPrice(6.25, "amount"),
+                    new DiscountPrice(10, "percent"),
+                    new DiscountPrice(1, "amount"),
+                ),
+                array(
+                    5,
+                    10,
+                    17.5,
+                    3,
+                    2.5,
+                    6.06,
+                    5.94,
+                    0,
+                    0
+                )
+            )
+        );
+    }
+
+    /**
+     * @covers ::resetDiscounts
+     * @covers ::resetDiscountSubtotal
+     * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
+     * @uses ItemPrice::setDiscount
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
      */
     public function testResetDiscounts()
     {
@@ -501,6 +709,10 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @covers ::taxes
      * @uses ItemPrice::setTax
      * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
      * @uses TaxPrice::__construct
      * @uses AbstractPriceModifier::__construct
      */

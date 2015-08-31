@@ -188,24 +188,30 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @covers ::resetDiscounts
      * @uses ItemPriceCollection::append
      * @uses ItemPriceCollection::discounts
+     * @uses ItemPriceCollection::discountAmount
+     * @uses ItemPrice
+     * @uses UnitPrice
+     * @uses AbstractPriceModifier::__construct
+     * @uses DiscountPrice
      */
     public function testResetDiscounts()
     {
-        $discountMock = $this->getMockBuilder('DiscountPrice')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $discountMock->expects($this->once())
-            ->method('reset');
-
-        $itemMock = $this->getMockBuilder('ItemPrice')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $itemMock->method('discounts')
-            ->will($this->returnValue(array($discountMock)));
+        $item = new ItemPrice(10, 1);
+        $discount = new DiscountPrice(1, 'amount');
+        $item->setDiscount($discount);
 
         $collection = new ItemPriceCollection();
-        $collection->append($itemMock);
+        $collection->append($item);
+
+        // 1 discount on 10 is 1
+        $this->assertEquals(1, $item->discountAmount());
+        // Discount already applied. No discount again
+        $this->assertEquals(0, $item->discountAmount());
+
         $collection->resetDiscounts();
+
+        // 1 discount on 10 is 1
+        $this->assertEquals(1, $item->discountAmount());
     }
 
     /**
@@ -389,6 +395,10 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @covers ::current
      * @covers ::valid
      * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
      * @uses ItemPriceCollection::append
      */
     public function testCurrent()
@@ -431,6 +441,10 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @covers ::key
      * @covers ::valid
      * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
      * @uses ItemPriceCollection::append
      * @uses ItemPriceCollection::remove
      */
@@ -501,6 +515,10 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @covers ::next
      * @uses ItemPriceCollection::append
      * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
      */
     public function testValid()
     {

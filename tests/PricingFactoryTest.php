@@ -18,6 +18,10 @@ class PricingFactoryTest extends PHPUnit_Framework_TestCase
     /**
      * @covers ::itemPrice
      * @uses ItemPrice::__construct
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::subtotal
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::total
      */
     public function testItemPrice()
     {

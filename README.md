@@ -10,7 +10,7 @@ A library for handling pricing. Supports:
     - Fixed amounts
 - Taxes (inclusive, exclusive)
     - Inclusive and Exclusive
-    - Applied in sequence of compounded
+    - Applied in sequence or compounded
 - Item Collection
     - Iterate over Item Prices
     - Aggregate totals over Item Prices
@@ -90,17 +90,31 @@ $item_price->total(); // 30.00
 With discount applied:
 
 ```php
-$discount = new Discount(5.00, "percent");
+$discount = new DiscountPrice(5.00, "percent");
 
 // call setDiscount() as many times as needed to apply discounts
 $item_price->setDiscount($discount);
 $item_price->totalAfterDiscount(); // 28.50
 ```
 
+Amount applied for a specific discount:
+
+```php
+$discount1 = new DiscountPrice(5.00, "percent");
+$discount2 = new DiscountPrice(25.00, "percent");
+
+// NOTE: Order matters here
+$item_price->setDiscount($discount1);
+$item_price->setDiscount($discount2);
+
+$item_price->discountAmount($discount1); // 1.50
+$item_price->discountAmount($discount2); // 7.125 ((30.00 - 1.50) * 0.25)
+```
+
 With tax applied:
 
 ```php
-$tax = new Discount(10.00, "exclusive");
+$tax = new TaxPrice(10.00, "exclusive");
 
 // call setTax() as many times as needed to apply multiple levels of taxes
 $item_price->setTax($tax);
@@ -113,6 +127,33 @@ With tax and discount:
 
 ```php
 $item_price->total(); // 31.35
+```
+
+Amount applied for a specific tax:
+
+```php
+$tax1 = new TaxPrice(10.00, "exclusive");
+$tax2 = new TaxPrice(5.00, "exclusive");
+
+// NOTE: order *DOES NOT* matter
+$item_price->setTax($tax1);
+$item_price->setTax($tax2);
+
+$item_price->taxAmount($tax1); // 3.00
+$item_price->taxAmount($tax2); // 1.50
+```
+
+Cascading tax:
+
+```php
+$tax1 = new TaxPrice(10.00, "exclusive");
+$tax2 = new TaxPrice(5.00, "exclusive");
+$tax3 = new TaxPrice(2.50, "exclusive");
+
+$item_price->setTax($tax1, $tax2, $tax3);
+$item_price->taxAmount($tax1); // 3.00
+$item_price->taxAmount($tax2); //  ((30.00 * 0.10) + 30.00) * 0.05 -> 1.65
+$item_price->taxAmount($tax3); //  (((30.00 * 0.10) + 30.00) * 0.05) + 30.00 * 0.025 -> 0.86625
 ```
 
 ### ItemPriceCollection
