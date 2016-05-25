@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of PriceInterface
+ * Interface for pricing
  */
 interface PriceInterface
 {
