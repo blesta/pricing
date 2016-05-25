@@ -218,6 +218,38 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     }
 
     /**
+     * Merges this ItemPriceCollection with the given ItemPriceCollection to produce
+     * a new ItemPriceCollection for ItemPrices that share a key.
+     *
+     * The resulting ItemPriceCollection is composed of ItemPrices as constructed by
+     * the given comparator.
+     *
+     * Multiple items sharing the same key from the same collection are subject to
+     * being merged multiple times in the order in which they appear in the collection.
+     *
+     * @param ItemPriceCollection $collection The collection to be merged
+     * @param ItemPriceComparatorInterface $comparator The
+     */
+    public function merge(ItemPriceCollection $collection, ItemPriceComparatorInterface $comparator)
+    {
+        // Set a new collection for the merged results
+        $price_collection = new self();
+
+        foreach ($collection as $new_item) {
+            foreach ($this as $current_item) {
+                // Only items with matching keys may be merged
+                if ($current_item->key() === $new_item->key()
+                    && ($item = $comparator->merge($current_item, $new_item))
+                ) {
+                    $price_collection->append($item);
+                }
+            }
+        }
+
+        return $price_collection;
+    }
+
+    /**
      * Retrieves the item in the collection at the current pointer
      *
      * @return mixed The ItemPrice in the collection at the current position, otherwise null
