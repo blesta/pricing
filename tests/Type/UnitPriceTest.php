@@ -15,8 +15,8 @@ class UnitPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers UnitPrice::price
+     * @covers UnitPrice::setPrice
      * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
      * @uses UnitPrice::setQty
      * @uses UnitPrice::setKey
      */
@@ -26,13 +26,17 @@ class UnitPriceTest extends PHPUnit_Framework_TestCase
         $qty = 2;
         $unit_price = new UnitPrice($price, $qty);
         $this->assertEquals($price, $unit_price->price());
+
+        $price = 15.00;
+        $unit_price->setPrice($price);
+        $this->assertEquals($price, $unit_price->price());
     }
 
     /**
      * @covers UnitPrice::qty
+     * @covers UnitPrice::setQty
      * @uses UnitPrice::__construct
      * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
      * @uses UnitPrice::setKey
      */
     public function testQty()
@@ -42,9 +46,8 @@ class UnitPriceTest extends PHPUnit_Framework_TestCase
         $unit_price = new UnitPrice($price);
         $this->assertEquals(1, $unit_price->qty());
 
-        $price = 5.00;
-        $qty = 2;
-        $unit_price = new UnitPrice($price, $qty);
+        $qty = 5;
+        $unit_price->setQty($qty);
         $this->assertEquals($qty, $unit_price->qty());
     }
 
