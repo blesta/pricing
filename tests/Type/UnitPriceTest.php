@@ -4,15 +4,21 @@ class UnitPriceTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @covers UnitPrice::__construct
+     * @covers UnitPrice::setPrice
+     * @covers UnitPrice::setQty
+     * @covers UnitPrice::setKey
      */
     public function testConstruct()
     {
-        $this->assertInstanceOf("UnitPrice", new UnitPrice(5.00, 1));
+        $this->assertInstanceOf("UnitPrice", new UnitPrice(5.00, 1, 'id'));
     }
 
     /**
      * @covers UnitPrice::price
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      */
     public function testPrice()
     {
@@ -25,6 +31,9 @@ class UnitPriceTest extends PHPUnit_Framework_TestCase
     /**
      * @covers UnitPrice::qty
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      */
     public function testQty()
     {
@@ -32,7 +41,7 @@ class UnitPriceTest extends PHPUnit_Framework_TestCase
         $price = 5.00;
         $unit_price = new UnitPrice($price);
         $this->assertEquals(1, $unit_price->qty());
-        
+
         $price = 5.00;
         $qty = 2;
         $unit_price = new UnitPrice($price, $qty);
@@ -40,8 +49,31 @@ class UnitPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers UnitPrice::key
+     * @covers UnitPrice::setKey
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     */
+    public function testKey()
+    {
+        // No key is null
+        $price = 5.00;
+        $unit_price = new UnitPrice($price);
+        $this->assertNull($unit_price->key());
+
+        // Set a key
+        $key = 'id';
+        $unit_price->setKey($key);
+        $this->assertEquals($key, $unit_price->key());
+    }
+
+    /**
      * @covers UnitPrice::total
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      */
     public function testTotal()
     {
