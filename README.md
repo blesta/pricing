@@ -28,11 +28,17 @@ composer require blesta/pricing:~1.0
 ### UnitPrice
 
 ```php
-$price = new UnitPrice(5.00, 2);
+$price = new UnitPrice(5.00, 2, "id");
 $price->setDescription("2 X 5.00");
 $unit_price = $price->price(); // 5.00
 $qty = $price->qty(); // 2
 $total = $price->total(); // 10.00
+$key = $price->key(); // id
+
+// Update the unit price, quantity, and key
+$price->setPrice(10.00);
+$price->setQty(3);
+$price->setKey('id2');
 ```
 
 ### DiscountPrice

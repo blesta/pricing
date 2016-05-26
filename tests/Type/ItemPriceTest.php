@@ -10,11 +10,14 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @covers ::resetDiscountSubtotal
      * @uses ItemPrice::subtotal
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      */
     public function testConstruct()
     {
-        $this->assertInstanceOf("ItemPrice", new ItemPrice(5.00, 1));
+        $this->assertInstanceOf('ItemPrice', new ItemPrice(5.00, 1, 'id'));
     }
 
     /**
@@ -81,6 +84,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses ItemPrice::resetDiscountSubtotal
      * @uses ItemPrice::subtotal
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      * @uses TaxPrice::__construct
      * @uses AbstractPriceModifier::__construct
@@ -99,6 +105,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses ItemPrice::resetDiscountSubtotal
      * @uses ItemPrice::subtotal
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      * @uses TaxPrice::__construct
      * @uses AbstractPriceModifier::__construct
@@ -141,6 +150,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses ItemPrice::amountDiscount
      * @uses ItemPrice::amountDiscountAll
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      * @uses TaxPrice::__construct
      * @uses TaxPrice::on
@@ -191,6 +203,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses ItemPrice::amountDiscount
      * @uses ItemPrice::amountDiscountAll
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      * @uses DiscountPrice::__construct
      * @uses DiscountPrice::on
@@ -237,6 +252,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses ItemPrice::resetDiscountSubtotal
      * @uses ItemPrice::subtotal
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      * @dataProvider subtotalProvider
      */
@@ -286,6 +304,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses DiscountPrice::on
      * @uses DiscountPrice::off
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      */
     public function testTotal()
@@ -312,6 +333,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses ItemPrice::setDiscount
      * @uses DiscountPrice::__construct
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      * @uses AbstractPriceModifier::__construct
      */
@@ -352,6 +376,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses TaxPrice::__construct
      * @uses TaxPrice::on
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      * @dataProvider taxAmountProvider
      */
@@ -410,6 +437,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses TaxPrice::__construct
      * @uses TaxPrice::on
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      * @dataProvider taxAmountCompoundProvider
      */
@@ -474,6 +504,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses ItemPrice::setDiscount
      * @uses ItemPrice::subtotal
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      * @dataProvider discountAmountProvider
      */
@@ -593,6 +626,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses ItemPrice::subtotal
      * @uses ItemPrice::setDiscount
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      * @uses DiscountPrice::__construct
      * @uses DiscountPrice::on
@@ -690,6 +726,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses ItemPrice::subtotal
      * @uses ItemPrice::setDiscount
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      */
     public function testResetDiscounts()
@@ -712,6 +751,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses ItemPrice::resetDiscountSubtotal
      * @uses ItemPrice::subtotal
      * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
      * @uses UnitPrice::total
      * @uses TaxPrice::__construct
      * @uses AbstractPriceModifier::__construct
