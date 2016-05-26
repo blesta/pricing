@@ -3,7 +3,7 @@
 /**
  * Builds a unit price
  */
-class UnitPrice extends AbstractPriceDescription
+class UnitPrice extends AbstractPriceDescription implements PriceInterface
 {
     /**
      * @var float The unit price
@@ -16,21 +16,26 @@ class UnitPrice extends AbstractPriceDescription
     protected $qty;
 
     /**
+     * @var string The unique identifier
+     */
+    protected $key;
+
+    /**
      * Initialize the unit price
      *
      * @param float $price The unit price
      * @param int $qty The quantity of unit prices (optional, default 1)
+     * @param string $key A unique identifier (optional, default null)
      */
-    public function __construct($price, $qty = 1)
+    public function __construct($price, $qty = 1, $key = null)
     {
-        $this->price = $price;
-        $this->qty = $qty;
+        $this->setPrice($price);
+        $this->setQty($qty);
+        $this->setKey($key);
     }
 
     /**
-     * Retrieves the set unit price
-     *
-     * @return float The unit price
+     * {@inheritdoc}
      */
     public function price()
     {
@@ -38,13 +43,43 @@ class UnitPrice extends AbstractPriceDescription
     }
 
     /**
-     * Retrieves the set quantity
-     *
-     * @return int The quantity
+     * {@inheritdoc}
+     */
+    public function setPrice($price)
+    {
+        $this->price = $price;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function qty()
     {
         return $this->qty;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setQty($qty)
+    {
+        $this->qty = $qty;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function key()
+    {
+        return $this->key;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setKey($key)
+    {
+        $this->key = $key;
     }
 
     /**

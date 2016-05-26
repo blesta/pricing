@@ -31,6 +31,7 @@ class AutoloadPricing
             'PriceModifierInterface' => $modifierDir . 'PriceModifierInterface.php',
             'PriceTotalInterface' => $totalDir . 'PriceTotalInterface.php',
             'PricingFactory' => $baseDir . 'PricingFactory.php',
+            'PriceInterface' => $typeDir . 'PriceInterface.php',
             'TaxPrice' => $modifierDir . 'TaxPrice.php',
             'UnitPrice' => $typeDir . 'UnitPrice.php'
         );

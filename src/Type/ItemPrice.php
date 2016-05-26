@@ -32,10 +32,11 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      *
      * @param float $price The unit price
      * @param int $qty The quantity of unit prices (optional, default 1)
+     * @param string $key A unique identifier (optional, default null)
      */
-    public function __construct($price, $qty = 1)
+    public function __construct($price, $qty = 1, $key = null)
     {
-        parent::__construct($price, $qty);
+        parent::__construct($price, $qty, $key);
 
         // Reset the internal discount subtotal
         $this->resetDiscountSubtotal();
