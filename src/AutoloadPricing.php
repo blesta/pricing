@@ -18,11 +18,13 @@ class AutoloadPricing
         $modifierDir = $baseDir . 'Modifier' . DIRECTORY_SEPARATOR;
         $totalDir = $baseDir . 'Total' . DIRECTORY_SEPARATOR;
         $typeDir = $baseDir . 'Type' . DIRECTORY_SEPARATOR;
+        $comparatorDir = $baseDir . 'Comparator' . DIRECTORY_SEPARATOR;
 
         $classes = array(
             'AbstractPriceDescription' => $descriptionDir . 'AbstractPriceDescription.php',
             'AbstractPriceModifier' => $modifierDir . 'AbstractPriceModifier.php',
             'DiscountPrice' => $modifierDir . 'DiscountPrice.php',
+            'ItemPriceModifierInterface' => $modifierDir . 'ItemPriceModifierInterface.php',
             'ItemPrice' => $typeDir . 'ItemPrice.php',
             'ItemPriceCollection' => $collectionDir . 'ItemPriceCollection.php',
             'PriceDescriptionInterface' => $descriptionDir . 'PriceDescriptionInterface.php',
