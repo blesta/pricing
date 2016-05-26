@@ -10,11 +10,12 @@ class PricingFactory
      *
      * @param float $amount The unit price
      * @param int $qty The quantity of unit price
+     * @param string $key A unique identifier (optional, default null)
      * @return \UnitPrice An instance of UnitPrice
      */
-    public function unitPrice($amount, $qty)
+    public function unitPrice($amount, $qty, $key = null)
     {
-        return new UnitPrice($amount, $qty);
+        return new UnitPrice($amount, $qty, $key);
     }
 
     /**
@@ -22,11 +23,12 @@ class PricingFactory
      *
      * @param float $amount The unit price
      * @param int $qty The quantity of unit price
+     * @param string $key A unique identifier (optional, default null)
      * @return \ItemPrice An instance of ItemPrice
      */
-    public function itemPrice($amount, $qty)
+    public function itemPrice($amount, $qty, $key = null)
     {
-        return new ItemPrice($amount, $qty);
+        return new ItemPrice($amount, $qty, $key);
     }
 
     /**

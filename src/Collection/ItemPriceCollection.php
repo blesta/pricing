@@ -230,7 +230,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      * @param ItemPriceCollection $collection The collection to be merged
      * @param ItemPriceComparatorInterface $comparator The
      */
-    public function merge(ItemPriceCollection $collection, ItemPriceComparatorInterface $comparator)
+    public function merge(ItemPriceCollection $collection, ItemPriceModifierInterface $comparator)
     {
         // Set a new collection for the merged results
         $price_collection = new self();
