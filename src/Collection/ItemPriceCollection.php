@@ -228,7 +228,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      * being merged multiple times in the order in which they appear in the collection.
      *
      * @param ItemPriceCollection $collection The collection to be merged
-     * @param ItemComparatorInterface $comparator The
+     * @param ItemComparatorInterface $comparator The comparator used to merge item prices
      */
     public function merge(ItemPriceCollection $collection, ItemComparatorInterface $comparator)
     {
