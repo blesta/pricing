@@ -178,6 +178,45 @@ foreach ($item_collection as $item) {
 }
 ```
 
+### ItemComparator
+
+The ItemComparator merges two ItemPrice objects into a single ItemPrice
+object containing the taxes and discounts of the second ItemPrice being merged.
+
+The resulting ItemPrice is given a price and description determined by the
+given callbacks.
+
+```php
+$price_callback = function($old_price, $new_price, $old_meta, $new_meta) {
+    return ($old_price - $new_price);
+}
+$description_callback = function($old_meta, $new_meta) {
+    return '1x Apples';
+}
+
+$comparator = new ItemComparator($price_callback, $description_callback);
+
+$old_item = new ItemPrice(1, 10);
+$new_item = new ItemPrice(15, 2);
+
+// Set custom meta data on the ItemPrice
+// this is passed to the price and description callbacks
+// as a Blesta\Items\Collection\ItemCollection containing the items attached
+$old_meta = new Blesta\Items\Item\Item();
+$new_meta = new Blesta\Items\Item\Item();
+$old_item->attach($old_meta);
+$new_item->attach($new_meta);
+
+// Merge from $old_item to $new_item
+$item = $comparator->merge($old_item, $new_item);
+
+$item->price(); // -20
+$item->qty(); // 1
+$item->description() // 1x Apples
+$item->discounts(); // same as $new_item
+$item->taxes(); // same as $new_item
+```
+
 ### PricingFactory
 
 Using the PricingFactory can streamline usage. Assume you have the following:

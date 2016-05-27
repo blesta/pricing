@@ -10,21 +10,21 @@ interface ItemMetaInterface
     /**
      * Attaches the given item
      *
-     * @param ItemInterface $item The Item to add
+     * @param Blesta\Items\Item\ItemInterface $item The Item to add
      */
     public function attach(ItemInterface $item);
 
     /**
      * Detaches the given item
      *
-     * @param ItemInterface $item The Item to remove
+     * @param Blesta\Items\Item\ItemInterface $item The Item to remove
      */
     public function detach(ItemInterface $item);
 
     /**
      * Retrieves all attached meta items
      *
-     * @return ItemCollection A collection containing the items
+     * @return Blesta\Items\Collection\ItemCollection A collection containing the items
      */
     public function meta();
 }

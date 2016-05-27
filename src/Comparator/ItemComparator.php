@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Compares service data for pricing
+ * Compares item data
  */
-class ServiceComparator extends AbstractItemComparator
+class ItemComparator extends AbstractItemComparator
 {
     /**
      * {@inheritdoc}

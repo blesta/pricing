@@ -18,11 +18,11 @@ abstract class AbstractItemComparator implements ItemComparatorInterface
      * Initializes a set of callbacks
      *
      * @param callable $price_callback The pricing callback that accepts four
-     *  arguments for the old and new price, and the old and new ItemPrice meta data,
-     *  and returns a float
+     *  arguments for the old and new price, and the old and new ItemPrice
+     *  meta data (each a Blesta\Items\Item\ItemCollection), and returns a float
      * @param callable $description_callback The description callback that
-     *  accepts two arguments for the old and new ItemPrice meta data, and
-     *  returns a string
+     *  accepts two arguments for the old and new ItemPrice meta data (each
+     *  a Blesta\Items\Item\ItemCollection), and returns a string
      */
     public function __construct(callable $price_callback, callable $description_callback)
     {

@@ -392,6 +392,129 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test merging items in the collection.
+     * Only tests collections expected to contain 1 ItemPrice
+     *
+     * @covers ::merge
+     * @uses ItemPriceCollection::append
+     * @uses ItemPriceCollection::count
+     * @uses ItemPriceCollection::current
+     * @uses ItemPriceCollection::key
+     * @uses ItemPriceCollection::next
+     * @uses ItemPriceCollection::rewind
+     * @uses ItemPriceCollection::valid
+     * @uses UnitPrice::__construct
+     * @uses UnitPrice::setPrice
+     * @uses UnitPrice::setQty
+     * @uses UnitPrice::setKey
+     * @uses UnitPrice::price
+     * @uses UnitPrice::qty
+     * @uses UnitPrice::key
+     * @uses UnitPrice::total
+     * @uses ItemPrice::__construct
+     * @uses ItemPrice::setDiscount
+     * @uses ItemPrice::setTax
+     * @uses ItemPrice::totalAfterDiscount
+     * @uses ItemPrice::subtotal
+     * @uses ItemPrice::total
+     * @uses ItemPrice::taxAmount
+     * @uses ItemPrice::amountTax
+     * @uses ItemPrice::amountTaxAll
+     * @uses ItemPrice::compoundTaxAmount
+     * @uses ItemPrice::discountAmount
+     * @uses ItemPrice::amountDiscount
+     * @uses ItemPrice::amountDiscountAll
+     * @uses ItemPrice::taxes
+     * @uses ItemPrice::discounts
+     * @uses ItemPrice::resetDiscountSubtotal
+     * @uses ItemPrice::meta
+     * @uses ItemComparator::merge
+     * @uses ItemComparator::price
+     * @uses DiscountPrice::__construct
+     * @uses DiscountPrice::off
+     * @uses DiscountPrice::on
+     * @uses TaxPrice::__construct
+     * @uses TaxPrice::on
+     * @uses AbstractPriceDescription::setDescription
+     * @uses PricingFactory::itemPrice
+     *
+     * @dataProvider mergeProvider
+     */
+    public function testMerge(
+        ItemPriceCollection $collection1,
+        ItemPriceCollection $collection2,
+        ItemComparatorInterface $comparator,
+        $expected_price,
+        $expected_qty,
+        $expected_total
+    ) {
+        // Merge the collections
+        $collection = $collection1->merge($collection2, $comparator);
+        $this->assertInstanceOf('ItemPriceCollection', $collection);
+
+        // Count must be the same
+        $this->assertEquals(1, $collection->count());
+
+        foreach ($collection as $item) {
+            $this->assertEquals($expected_price, $item->price());
+            $this->assertEquals($expected_qty, $item->qty());
+            $this->assertEquals($expected_total, $item->total());
+        }
+    }
+
+    /**
+     * Data provider for merging item collections
+     */
+    public function mergeProvider()
+    {
+        // First collection
+        $item1 = new ItemPrice(10, 3);
+        $item2 = new ItemPrice(7, 2);
+        $item2->setKey('id');
+        $collection1 = new ItemPriceCollection();
+        $collection1->append($item1)->append($item2);
+
+        // Second collection
+        $item3 = new ItemPrice(5, 5);
+        $item4 = new ItemPrice(1, 1);
+        $discount = new DiscountPrice(10, 'percent');
+        $tax = new TaxPrice(20, 'exclusive');
+        $item4->setKey('id');
+        $item4->setDiscount($discount);
+        $item4->setTax($tax);
+        $collection2 = new ItemPriceCollection();
+        $collection2->append($item3)->append($item4);
+
+        // Item Price Comparator
+        $price_cb = function($old_price, $new_price, $old_meta, $new_meta) {
+            return ($old_price - $new_price);
+        };
+        $desc_cb = function($old_meta, $new_meta) {
+            return 'Description';
+        };
+        $comparator = new ItemComparator($price_cb, $desc_cb);
+
+        return array(
+            array(
+                $collection1,
+                $collection2,
+                $comparator,
+                13,
+                1,
+                14.04, // (14 - 1) - 10% discount + 20% tax
+            ),
+            array(
+                $collection2,
+                $collection1,
+                $comparator,
+                -12.92, // (1 - 10% discount + 20% tax) - 14
+                1,
+                -12.92
+            )
+        );
+    }
+
+    /**
      * @covers ::current
      * @covers ::valid
      * @uses ItemPrice::__construct

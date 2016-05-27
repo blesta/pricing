@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @coversDefaultClass ServiceComparator
+ * @coversDefaultClass ItemComparator
  */
-class ServiceComparatorTest extends PHPUnit_Framework_TestCase
+class ItemComparatorTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @covers ::__construct
@@ -55,7 +55,7 @@ class ServiceComparatorTest extends PHPUnit_Framework_TestCase
         TaxPrice $tax = null,
         DiscountPrice $discount = null
     ) {
-        $comparator = new ServiceComparator($price, $desc);
+        $comparator = new ItemComparator($price, $desc);
         $item = $comparator->merge($item1, $item2);
         $this->assertInstanceOf('ItemPrice', $item);
 

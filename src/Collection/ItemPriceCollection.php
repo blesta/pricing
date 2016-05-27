@@ -228,17 +228,18 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      * being merged multiple times in the order in which they appear in the collection.
      *
      * @param ItemPriceCollection $collection The collection to be merged
-     * @param ItemPriceComparatorInterface $comparator The
+     * @param ItemComparatorInterface $comparator The
      */
-    public function merge(ItemPriceCollection $collection, ItemPriceModifierInterface $comparator)
+    public function merge(ItemPriceCollection $collection, ItemComparatorInterface $comparator)
     {
         // Set a new collection for the merged results
         $price_collection = new self();
 
         foreach ($collection as $new_item) {
             foreach ($this as $current_item) {
-                // Only items with matching keys may be merged
-                if ($current_item->key() === $new_item->key()
+                // Only items with matching non-null keys may be merged
+                if ($current_item->key() !== null
+                    && $current_item->key() === $new_item->key()
                     && ($item = $comparator->merge($current_item, $new_item))
                 ) {
                     $price_collection->append($item);

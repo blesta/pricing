@@ -65,4 +65,26 @@ class PricingFactoryTest extends PHPUnit_Framework_TestCase
         $pricing_factory = new PricingFactory();
         $this->assertInstanceOf("ItemPriceCollection", $pricing_factory->itemPriceCollection());
     }
+
+    /**
+     * @covers ::itemComparator
+     * @uses AbstractItemComparator::__construct
+     * @uses AbstractItemComparator::setPriceCallback
+     * @uses AbstractItemComparator::setDescriptionCallback
+     */
+    public function testItemComparator()
+    {
+        $price_callback = function() {
+            return 0;
+        };
+        $desc_callback = function() {
+            return '';
+        };
+
+        $pricing_factory = new PricingFactory();
+        $this->assertInstanceOf(
+            "ItemComparator",
+            $pricing_factory->itemComparator($price_callback, $desc_callback)
+        );
+    }
 }

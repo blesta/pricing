@@ -9,8 +9,8 @@ interface ItemComparatorInterface
      * Sets the pricing callback that expects four arguments:
      * - the old price as a float
      * - the new price as a float
-     * - the old ItemPrice meta data for an item
-     * - the new ItemPrice meta data for an item
+     * - a Blesta\Items\Collection\ItemCollection of the old ItemPrice meta data
+     * - a Blesta\Items\Collection\ItemCollection of the new ItemPrice meta data
      * and returns a float value representing a price.
      *
      * @param callable $callback The callback
@@ -19,8 +19,8 @@ interface ItemComparatorInterface
 
     /**
      * Sets the pricing callback that expects two arguments:
-     * - the old ItemPrice meta data for an item
-     * - the new ItemPrice meta data for an item
+     * - a Blesta\Items\Collection\ItemCollection of the old ItemPrice meta data
+     * - a Blesta\Items\Collection\ItemCollection of the new ItemPrice meta data
      * and returns a string representing the ItemPrice description
      *
      * @param callable $callback The callback
