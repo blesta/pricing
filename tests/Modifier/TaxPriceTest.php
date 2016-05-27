@@ -38,21 +38,21 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
      */
     public function offProvider()
     {
-        return array(
-            array(new TaxPrice(0, 'exclusive'), 10.00, 10.00),
-            array(new TaxPrice(50, 'exclusive'), 10.00, 10.00),
-            array(new TaxPrice(100, 'exclusive'), 10.00, 10.00),
-            array(new TaxPrice(0, 'exclusive'), -10.00, -10.00),
-            array(new TaxPrice(50, 'exclusive'), -10.00, -10.00),
-            array(new TaxPrice(100, 'exclusive'), -10.00, -10.00),
+        return [
+            [new TaxPrice(0, 'exclusive'), 10.00, 10.00],
+            [new TaxPrice(50, 'exclusive'), 10.00, 10.00],
+            [new TaxPrice(100, 'exclusive'), 10.00, 10.00],
+            [new TaxPrice(0, 'exclusive'), -10.00, -10.00],
+            [new TaxPrice(50, 'exclusive'), -10.00, -10.00],
+            [new TaxPrice(100, 'exclusive'), -10.00, -10.00],
 
-            array(new TaxPrice(0, 'inclusive'), 10.00, 10.00),
-            array(new TaxPrice(50, 'inclusive'), 10.00, 5.00),
-            array(new TaxPrice(100, 'inclusive'), 10.00, 0.00),
-            array(new TaxPrice(0, 'inclusive'), -10.00, -10.00),
-            array(new TaxPrice(50, 'inclusive'), -10.00, -5.00),
-            array(new TaxPrice(100, 'inclusive'), -10.00, 0.00),
-        );
+            [new TaxPrice(0, 'inclusive'), 10.00, 10.00],
+            [new TaxPrice(50, 'inclusive'), 10.00, 5.00],
+            [new TaxPrice(100, 'inclusive'), 10.00, 0.00],
+            [new TaxPrice(0, 'inclusive'), -10.00, -10.00],
+            [new TaxPrice(50, 'inclusive'), -10.00, -5.00],
+            [new TaxPrice(100, 'inclusive'), -10.00, 0.00],
+        ];
     }
 
     /**
@@ -71,21 +71,21 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
      */
     public function onProvider()
     {
-        return array(
-            array(new TaxPrice(0, 'exclusive'), 10.00, 0.00),
-            array(new TaxPrice(50, 'exclusive'), 10.00, 5.00),
-            array(new TaxPrice(100, 'exclusive'), 10.00, 10.00),
-            array(new TaxPrice(0, 'exclusive'), -10.00, 0.00),
-            array(new TaxPrice(50, 'exclusive'), -10.00, -5.00),
-            array(new TaxPrice(100, 'exclusive'), -10.00, -10.00),
+        return [
+            [new TaxPrice(0, 'exclusive'), 10.00, 0.00],
+            [new TaxPrice(50, 'exclusive'), 10.00, 5.00],
+            [new TaxPrice(100, 'exclusive'), 10.00, 10.00],
+            [new TaxPrice(0, 'exclusive'), -10.00, 0.00],
+            [new TaxPrice(50, 'exclusive'), -10.00, -5.00],
+            [new TaxPrice(100, 'exclusive'), -10.00, -10.00],
 
-            array(new TaxPrice(0, 'inclusive'), 10.00, 0.00),
-            array(new TaxPrice(50, 'inclusive'), 10.00, 5.00),
-            array(new TaxPrice(100, 'inclusive'), 10.00, 10.00),
-            array(new TaxPrice(0, 'inclusive'), -10.00, 0.00),
-            array(new TaxPrice(50, 'inclusive'), -10.00, -5.00),
-            array(new TaxPrice(100, 'inclusive'), -10.00, -10.00),
-        );
+            [new TaxPrice(0, 'inclusive'), 10.00, 0.00],
+            [new TaxPrice(50, 'inclusive'), 10.00, 5.00],
+            [new TaxPrice(100, 'inclusive'), 10.00, 10.00],
+            [new TaxPrice(0, 'inclusive'), -10.00, 0.00],
+            [new TaxPrice(50, 'inclusive'), -10.00, -5.00],
+            [new TaxPrice(100, 'inclusive'), -10.00, -10.00],
+        ];
     }
 
     /**
@@ -105,20 +105,20 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
      */
     public function includingProvider()
     {
-        return array(
-            array(new TaxPrice(0, 'exclusive'), 10.00, 10.00),
-            array(new TaxPrice(50, 'exclusive'), 10.00, 15.00),
-            array(new TaxPrice(100, 'exclusive'), 10.00, 20.00),
-            array(new TaxPrice(0, 'exclusive'), -10.00, -10.00),
-            array(new TaxPrice(50, 'exclusive'), -10.00, -15.00),
-            array(new TaxPrice(100, 'exclusive'), -10.00, -20.00),
+        return [
+            [new TaxPrice(0, 'exclusive'), 10.00, 10.00],
+            [new TaxPrice(50, 'exclusive'), 10.00, 15.00],
+            [new TaxPrice(100, 'exclusive'), 10.00, 20.00],
+            [new TaxPrice(0, 'exclusive'), -10.00, -10.00],
+            [new TaxPrice(50, 'exclusive'), -10.00, -15.00],
+            [new TaxPrice(100, 'exclusive'), -10.00, -20.00],
 
-            array(new TaxPrice(0, 'inclusive'), 10.00, 10.00),
-            array(new TaxPrice(50, 'inclusive'), 10.00, 10.00),
-            array(new TaxPrice(100, 'inclusive'), 10.00, 10.00),
-            array(new TaxPrice(0, 'inclusive'), -10.00, -10.00),
-            array(new TaxPrice(50, 'inclusive'), -10.00, -10.00),
-            array(new TaxPrice(100, 'inclusive'), -10.00, -10.00),
-        );
+            [new TaxPrice(0, 'inclusive'), 10.00, 10.00],
+            [new TaxPrice(50, 'inclusive'), 10.00, 10.00],
+            [new TaxPrice(100, 'inclusive'), 10.00, 10.00],
+            [new TaxPrice(0, 'inclusive'), -10.00, -10.00],
+            [new TaxPrice(50, 'inclusive'), -10.00, -10.00],
+            [new TaxPrice(100, 'inclusive'), -10.00, -10.00],
+        ];
     }
 }

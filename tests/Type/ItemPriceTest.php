@@ -45,10 +45,10 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function discountProvider()
     {
-        return array(
-            array(new ItemPrice(10, 0), new DiscountPrice(10, 'percent')),
-            array(new ItemPrice(10), new DiscountPrice(10, 'percent'))
-        );
+        return [
+            [new ItemPrice(10, 0), new DiscountPrice(10, 'percent')],
+            [new ItemPrice(10), new DiscountPrice(10, 'percent')]
+        ];
     }
 
 
@@ -60,7 +60,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     public function testSetTax($item, array $taxes)
     {
         // Add all given taxes
-        call_user_func_array(array($item, "setTax"), $taxes);
+        call_user_func_array([$item, 'setTax'], $taxes);
         foreach ($taxes as $tax) {
             $this->assertContains($tax, $item->taxes());
         }
@@ -128,11 +128,11 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function taxProvider()
     {
-        return array(
-            array(new ItemPrice(10, 0), array(new TaxPrice(10, 'exclusive'))),
-            array(new ItemPrice(10), array(new TaxPrice(10, 'exclusive'))),
-            array(new ItemPrice(10, 1), array(new TaxPrice(10, 'exclusive'), new TaxPrice(10, 'exclusive'))),
-        );
+        return [
+            [new ItemPrice(10, 0), [new TaxPrice(10, 'exclusive')]],
+            [new ItemPrice(10), [new TaxPrice(10, 'exclusive')]],
+            [new ItemPrice(10, 1), [new TaxPrice(10, 'exclusive'), new TaxPrice(10, 'exclusive')]],
+        ];
     }
 
     /**
@@ -164,7 +164,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($item->subtotal(), $item->totalAfterTax());
 
         // Set taxes
-        call_user_func_array(array($item, "setTax"), $taxes);
+        call_user_func_array([$item, 'setTax'], $taxes);
 
         // Total will be larger or smaller than the subtotal if it's positive or negative
         if ($item->subtotal() > 0) {
@@ -183,14 +183,14 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function totalAfterTaxProvider()
     {
-        return array(
-            array(new ItemPrice(100.00, 2), array(new TaxPrice(10, 'exclusive'))),
-            array(new ItemPrice(0.00, 2), array(new TaxPrice(10, 'exclusive'))),
-            array(new ItemPrice(-100.00, 2), array(new TaxPrice(10, 'exclusive'))),
+        return [
+            [new ItemPrice(100.00, 2), [new TaxPrice(10, 'exclusive')]],
+            [new ItemPrice(0.00, 2), [new TaxPrice(10, 'exclusive')]],
+            [new ItemPrice(-100.00, 2), [new TaxPrice(10, 'exclusive')]],
 
-            array(new ItemPrice(100.00, 2), array(new TaxPrice(10, 'exclusive'), new TaxPrice(10, 'exclusive'))),
-            array(new ItemPrice(-100.00, 2), array(new TaxPrice(10, 'exclusive'), new TaxPrice(20, 'exclusive'))),
-        );
+            [new ItemPrice(100.00, 2), [new TaxPrice(10, 'exclusive'), new TaxPrice(10, 'exclusive')]],
+            [new ItemPrice(-100.00, 2), [new TaxPrice(10, 'exclusive'), new TaxPrice(20, 'exclusive')]],
+        ];
     }
 
     /**
@@ -236,14 +236,14 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function totalAfterDiscountProvider()
     {
-        return array(
-            array(new ItemPrice(10, 1), array(new DiscountPrice(10, 'percent'))),
-            array(new ItemPrice(0, 1), array(new DiscountPrice(10, 'percent'))),
-            array(new ItemPrice(10, 2), array(new DiscountPrice(10, 'percent'), new DiscountPrice(10, 'percent'))),
-            array(new ItemPrice(-10, 2), array(new DiscountPrice(10, 'percent'))),
-            array(new itemPrice(10, 2), array(new DiscountPrice(3, 'amount'))),
-            array(new itemPrice(-10, 2), array(new DiscountPrice(5, 'amount'))),
-        );
+        return [
+            [new ItemPrice(10, 1), [new DiscountPrice(10, 'percent')]],
+            [new ItemPrice(0, 1), [new DiscountPrice(10, 'percent')]],
+            [new ItemPrice(10, 2), [new DiscountPrice(10, 'percent'), new DiscountPrice(10, 'percent')]],
+            [new ItemPrice(-10, 2), [new DiscountPrice(10, 'percent')]],
+            [new itemPrice(10, 2), [new DiscountPrice(3, 'amount')]],
+            [new itemPrice(-10, 2), [new DiscountPrice(5, 'amount')]],
+        ];
     }
 
     /**
@@ -271,14 +271,14 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function subtotalProvider()
     {
-        return array(
-            array(10.00, 2),
-            array(10.00, 1),
-            array(10.00, 0),
-            array(0, 5),
-            array(-10.00, 1),
-            array(-10.00, 2),
-        );
+        return [
+            [10.00, 2],
+            [10.00, 1],
+            [10.00, 0],
+            [0, 5],
+            [-10.00, 1],
+            [-10.00, 2],
+        ];
     }
 
     /**
@@ -345,10 +345,10 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         $item = new ItemPrice(10, 1);
         $this->assertEmpty($item->discounts());
 
-        $discounts = array(
+        $discounts = [
             new DiscountPrice(10, 'exclusive'),
             new DiscountPrice(5.00, 'exclusive')
-        );
+        ];
 
         foreach ($discounts as $discount) {
             // Check the discount is set
@@ -414,11 +414,11 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function taxAmountProvider()
     {
-        return array(
-            array(new ItemPrice(100, 2), new TaxPrice(10, 'exclusive'), 20),
-            array(new ItemPrice(0, 2), new TaxPrice(10, 'exclusive'), 0),
-            array(new ItemPrice(-100, 2), new TaxPrice(10, 'exclusive'), -20),
-        );
+        return [
+            [new ItemPrice(100, 2), new TaxPrice(10, 'exclusive'), 20],
+            [new ItemPrice(0, 2), new TaxPrice(10, 'exclusive'), 0],
+            [new ItemPrice(-100, 2), new TaxPrice(10, 'exclusive'), -20],
+        ];
     }
 
     /**
@@ -446,7 +446,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     public function testTaxAmountCompound($item, array $taxes, array $expected_tax_amounts)
     {
         // Set all taxes
-        call_user_func_array(array($item, "setTax"), $taxes);
+        call_user_func_array([$item, 'setTax'], $taxes);
 
         // The tax amounts should be compounded, and only return the componud amount for that tax
         foreach ($taxes as $index => $tax) {
@@ -469,32 +469,32 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function taxAmountCompoundProvider()
     {
-        return array(
-            array(
+        return [
+            [
                 new ItemPrice(100, 2),
-                array(
+                [
                     new TaxPrice(10, 'exclusive'),
                     new TaxPrice(7.75, 'exclusive')
-                ),
-                array(
+                ],
+                [
                     20,
                     17.05
-                )
-            ),
-            array(
+                ]
+            ],
+            [
                 new ItemPrice(10, 3),
-                array(
+                [
                     new TaxPrice(10, 'exclusive'),
                     new TaxPrice(5, 'exclusive'),
                     new TaxPrice(2.5, 'exclusive')
-                ),
-                array(
+                ],
+                [
                     3,
                     1.65,
                     0.86625
-                )
-            ),
-        );
+                ]
+            ],
+        ];
     }
 
     /**
@@ -542,10 +542,10 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     protected function discountPriceMock($value)
     {
-        $dp = $this->getMockBuilder("DiscountPrice")
+        $dp = $this->getMockBuilder('DiscountPrice')
             ->disableOriginalConstructor()
             ->getMock();
-        $dp->method("on")
+        $dp->method('on')
             ->willReturn($value);
 
         return $dp;
@@ -558,62 +558,62 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function discountAmountProvider()
     {
-        return array(
-            array(new ItemPrice(100, 2), array(), 0),
-            array(new ItemPrice(100, 2), array($this->discountPriceMock(20)), 20),
-            array(
+        return [
+            [new ItemPrice(100, 2), [], 0],
+            [new ItemPrice(100, 2), [$this->discountPriceMock(20)], 20],
+            [
                 new ItemPrice(100, 2),
-                array(
+                [
                     $this->discountPriceMock(20),
                     $this->discountPriceMock(40)
-                ),
+                ],
                 60
-            ),
-            array(new ItemPrice(100, 2), array($this->discountPriceMock(200)), 200),
-            array(
+            ],
+            [new ItemPrice(100, 2), [$this->discountPriceMock(200)], 200],
+            [
                 new ItemPrice(100, 2),
-                array(
+                [
                     $this->discountPriceMock(2),
                     $this->discountPriceMock(3.75)
-                ),
+                ],
                 5.75
-            ),
-            array(
+            ],
+            [
                 new ItemPrice(100, 2),
-                array(
+                [
                     $this->discountPriceMock(40),
                     $this->discountPriceMock(2)
-                ),
+                ],
                 42
-            ),
+            ],
 
-            array(new ItemPrice(-100, 2), array($this->discountPriceMock(-20)), -20),
-            array(
+            [new ItemPrice(-100, 2), [$this->discountPriceMock(-20)], -20],
+            [
                 new ItemPrice(-100, 2),
-                array(
+                [
                     $this->discountPriceMock(-20),
                     $this->discountPriceMock(-40)
-                ),
+                ],
                 -60
-            ),
-            array(new ItemPrice(-100, 2), array($this->discountPriceMock(-200)), -200),
-            array(
+            ],
+            [new ItemPrice(-100, 2), [$this->discountPriceMock(-200)], -200],
+            [
                 new ItemPrice(-100, 2),
-                array(
+                [
                     $this->discountPriceMock(-2),
                     $this->discountPriceMock(-3.75)
-                ),
+                ],
                 -5.75
-            ),
-            array(
+            ],
+            [
                 new ItemPrice(-100, 2),
-                array(
+                [
                     $this->discountPriceMock(-40),
                     $this->discountPriceMock(-2)
-                ),
+                ],
                 -42
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -678,32 +678,32 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function discountAmountsProvider()
     {
-        return array(
-            array(
+        return [
+            [
                 new ItemPrice(10, 3),
-                array(
-                    new DiscountPrice(5.00, "percent"),
-                    new DiscountPrice(25.00, "percent")
-                ),
-                array(
+                [
+                    new DiscountPrice(5.00, 'percent'),
+                    new DiscountPrice(25.00, 'percent')
+                ],
+                [
                     1.50,
                     7.125
-                )
-            ),
-            array(
+                ]
+            ],
+            [
                 new ItemPrice(50, 1),
-                array(
-                    new DiscountPrice(10.00, "percent"),
-                    new DiscountPrice(10.00, "amount"),
-                    new DiscountPrice(50.00, "percent"),
-                    new DiscountPrice(3.00, "amount"),
-                    new DiscountPrice(2.5, "amount"),
-                    new DiscountPrice(50.5, "percent"),
-                    new DiscountPrice(6.25, "amount"),
-                    new DiscountPrice(10, "percent"),
-                    new DiscountPrice(1, "amount"),
-                ),
-                array(
+                [
+                    new DiscountPrice(10.00, 'percent'),
+                    new DiscountPrice(10.00, 'amount'),
+                    new DiscountPrice(50.00, 'percent'),
+                    new DiscountPrice(3.00, 'amount'),
+                    new DiscountPrice(2.5, 'amount'),
+                    new DiscountPrice(50.5, 'percent'),
+                    new DiscountPrice(6.25, 'amount'),
+                    new DiscountPrice(10, 'percent'),
+                    new DiscountPrice(1, 'amount'),
+                ],
+                [
                     5,
                     10,
                     17.5,
@@ -713,9 +713,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
                     5.94,
                     0,
                     0
-                )
-            )
-        );
+                ]
+            ]
+        ];
     }
 
     /**
@@ -764,7 +764,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         $item = new ItemPrice(10);
 
         foreach ($taxes as $tax_group) {
-            call_user_func_array(array($item, 'setTax'), $tax_group);
+            call_user_func_array([$item, 'setTax'], $tax_group);
         }
 
         // Determine the total tax count based on $unique
@@ -785,56 +785,56 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     {
         $tax = new TaxPrice(50, 'exclusive');
 
-        return array(
-            array(
+        return [
+            [
                 true,
-                array(array()),
+                [[]],
                 0,
                 0
-            ),
-            array(
+            ],
+            [
                 true,
-                array(
-                    array(new TaxPrice(10, 'exclusive'))
-                ),
+                [
+                    [new TaxPrice(10, 'exclusive')]
+                ],
                 1,
                 1
-            ),
-            array(
+            ],
+            [
                 true,
-                array(
-                    array(new TaxPrice(100, 'exclusive'), new TaxPrice(20, 'exclusive')),
-                    array(new TaxPrice(10, 'exclusive'))
-                ),
+                [
+                    [new TaxPrice(100, 'exclusive'), new TaxPrice(20, 'exclusive')],
+                    [new TaxPrice(10, 'exclusive')]
+                ],
                 3,
                 3
-            ),
-            array(
+            ],
+            [
                 true,
-                array(
-                    array($tax, new TaxPrice(15, 'exclusive')),
-                    array($tax)
-                ),
+                [
+                    [$tax, new TaxPrice(15, 'exclusive')],
+                    [$tax]
+                ],
                 2,
                 2
-            ),
-            array(
+            ],
+            [
                 false,
-                array(
-                    array($tax)
-                ),
+                [
+                    [$tax]
+                ],
                 1,
                 1
-            ),
-            array(
+            ],
+            [
                 false,
-                array(
-                    array(new TaxPrice(10, 'exclusive'), new TaxPrice(15, 'exclusive')),
-                    array(new TaxPrice(25, 'exclusive'))
-                ),
+                [
+                    [new TaxPrice(10, 'exclusive'), new TaxPrice(15, 'exclusive')],
+                    [new TaxPrice(25, 'exclusive')]
+                ],
                 2,
                 3
-            )
-        );
+            ]
+        ];
     }
 }

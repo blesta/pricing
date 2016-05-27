@@ -19,7 +19,7 @@ class AutoloadPricing
         $totalDir = $baseDir . 'Total' . DIRECTORY_SEPARATOR;
         $typeDir = $baseDir . 'Type' . DIRECTORY_SEPARATOR;
 
-        $classes = array(
+        $classes = [
             'AbstractPriceDescription' => $descriptionDir . 'AbstractPriceDescription.php',
             'AbstractPriceModifier' => $modifierDir . 'AbstractPriceModifier.php',
             'DiscountPrice' => $modifierDir . 'DiscountPrice.php',
@@ -32,7 +32,7 @@ class AutoloadPricing
             'PriceInterface' => $typeDir . 'PriceInterface.php',
             'TaxPrice' => $modifierDir . 'TaxPrice.php',
             'UnitPrice' => $typeDir . 'UnitPrice.php'
-        );
+        ];
 
         if (isset($classes[$class])) {
             include $classes[$class];
