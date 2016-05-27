@@ -324,10 +324,19 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     /**
      * Fetch all unique taxes set
      *
-     * @return array An array of TaxPrice objects
+     * @param bool $unique True to fetch all unique taxes for the item,
+     *  or false to fetch all groups of taxes (default true)
+     * @return array An array of TaxPrice objects when $unique is true,
+     *  or an array containing arrays of grouped TaxPrice objects
      */
-    public function taxes()
+    public function taxes($unique = true)
     {
+        // Retrieve all taxes within their respective groups
+        if (!$unique) {
+            return $this->taxes;
+        }
+
+        // Retrieve all unique taxes
         $all_taxes = array();
         foreach ($this->taxes as $taxes) {
             $all_taxes = array_merge($all_taxes, array_values($taxes));

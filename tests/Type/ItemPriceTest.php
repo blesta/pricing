@@ -757,20 +757,84 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses UnitPrice::total
      * @uses TaxPrice::__construct
      * @uses AbstractPriceModifier::__construct
+     * @dataProvider taxesProvider
      */
-    public function testTaxes()
+    public function testTaxes($unique, $taxes, $expected_count, $expected_total)
     {
         $item = new ItemPrice(10);
 
-        // No taxes set
-        $this->assertCount(0, $item->taxes());
+        foreach ($taxes as $tax_group) {
+            call_user_func_array(array($item, 'setTax'), $tax_group);
+        }
 
-        // 1 tax set
-        $item->setTax(new TaxPrice(10, 'exclusive'));
-        $this->assertCount(1, $item->taxes());
+        // Determine the total tax count based on $unique
+        $this->assertCount($expected_count, $item->taxes($unique));
 
-        // 3 taxes set
-        $item->setTax(new TaxPrice(100, 'exclusive'), new TaxPrice(20, 'exclusive'));
-        $this->assertCount(3, $item->taxes());
+        // Determine the total count of all taxes
+        $total = 0;
+        foreach ($item->taxes() as $group) {
+            $total++;
+        }
+        $this->assertEquals($expected_total, $total);
+    }
+
+    /**
+     * Data provider for taxes
+     */
+    public function taxesProvider()
+    {
+        $tax = new TaxPrice(50, 'exclusive');
+
+        return array(
+            array(
+                true,
+                array(array()),
+                0,
+                0
+            ),
+            array(
+                true,
+                array(
+                    array(new TaxPrice(10, 'exclusive'))
+                ),
+                1,
+                1
+            ),
+            array(
+                true,
+                array(
+                    array(new TaxPrice(100, 'exclusive'), new TaxPrice(20, 'exclusive')),
+                    array(new TaxPrice(10, 'exclusive'))
+                ),
+                3,
+                3
+            ),
+            array(
+                true,
+                array(
+                    array($tax, new TaxPrice(15, 'exclusive')),
+                    array($tax)
+                ),
+                2,
+                2
+            ),
+            array(
+                false,
+                array(
+                    array($tax)
+                ),
+                1,
+                1
+            ),
+            array(
+                false,
+                array(
+                    array(new TaxPrice(10, 'exclusive'), new TaxPrice(15, 'exclusive')),
+                    array(new TaxPrice(25, 'exclusive'))
+                ),
+                2,
+                3
+            )
+        );
     }
 }

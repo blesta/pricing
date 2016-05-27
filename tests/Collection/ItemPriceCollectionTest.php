@@ -391,6 +391,64 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2350.8, $collection->total());
     }
 
+
+    /**
+     * @covers ::merge
+     * @uses ItemPriceCollection::append
+     * @uses ItemPriceCollection::count
+     * @uses ItemPriceCollection::current
+     * @uses ItemPriceCollection::next
+     * @uses ItemPriceCollection::rewind
+     * @uses ItemPriceCollection::valid
+     * @uses UnitPrice::key
+     * @dataProvider mergeProvider
+     */
+    public function testMerge(ItemPriceCollection $collection1, ItemPriceCollection $collection2, $expected_items)
+    {
+        // Assume the merge will return the second ItemPrice back to us
+        $comparator = $this->getMockBuilder('ItemComparatorInterface')->getMock();
+        $comparator->method('merge')
+            ->will($this->returnArgument(1));
+
+        $collection = $collection1->merge($collection2, $comparator);
+        $this->assertInstanceOf('ItemPriceCollection', $collection);
+
+        $this->assertEquals($expected_items, $collection->count());
+    }
+
+    /**
+     * Data provider for mergeing item prices
+     */
+    public function mergeProvider()
+    {
+        $collection1 = new ItemPriceCollection();
+        $collection2 = new ItemPriceCollection();
+        $collection3 = new ItemPriceCollection();
+        $collection4 = new ItemPriceCollection();
+
+        $item1 = new ItemPrice(10, 1);
+        $item1->setKey('id');
+
+        $item2 = new ItemPrice(20, 2);
+        $item2->setKey('test');
+
+        $item3 = new ItemPrice(15, 1);
+        $item3->setKey('id');
+
+        $collection1->append($item1)->append($item2);
+        $collection2->append($item2)->append($item3);
+        $collection3->append($item3);
+        $collection4->append($item2);
+
+        return array(
+            array($collection1, $collection2, 2),
+            array($collection1, $collection3, 1),
+            array($collection2, $collection3, 1),
+            array($collection3, $collection1, 1),
+            array($collection3, $collection4, 0)
+        );
+    }
+
     /**
      * @covers ::current
      * @covers ::valid
