@@ -68,20 +68,4 @@ class PricingFactory
     {
         return new ItemPriceCollection();
     }
-
-    /**
-     * Retrieves a new instance of ItemComparator
-     *
-     * @param callable $price_callback The pricing callback that accepts four
-     *  arguments for the old and new price, and the old and new ItemPrice
-     *  meta data (each a Blesta\Items\Item\ItemCollection), and returns a float
-     * @param callable $description_callback The description callback that
-     *  accepts two arguments for the old and new ItemPrice meta data (each
-     *  a Blesta\Items\Item\ItemCollection), and returns a string
-     * @return ItemComparator An instance of ItemComparator
-     */
-    public function itemComparator(callable $price_callback, callable $description_callback)
-    {
-        return new ItemComparator($price_callback, $description_callback);
-    }
 }

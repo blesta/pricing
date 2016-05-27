@@ -1,12 +1,9 @@
 <?php
 
-use Blesta\Items\ItemFactory;
-use Blesta\Items\Item\ItemInterface;
-
 /**
  * Determine pricing for a single item considering discounts and taxes
  */
-class ItemPrice extends UnitPrice implements PriceTotalInterface, ItemMetaInterface
+class ItemPrice extends UnitPrice implements PriceTotalInterface
 {
     /**
      * @var array A cached value of discount subtotals
@@ -20,10 +17,6 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface, ItemMetaInterf
      * @var float The item price subtotal after individual discounts were applied
      */
     private $discounted_subtotal = 0;
-    /**
-     * @var ItemCollection A collection of items attached to this object
-     */
-    private $item_collection;
 
     /**
      * @var array A numerically-indexed array of DiscountPrice objects
@@ -47,10 +40,6 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface, ItemMetaInterf
 
         // Reset the internal discount subtotal
         $this->resetDiscountSubtotal();
-
-        // Initialize a new item collection
-        $factory = new ItemFactory();
-        $this->item_collection = $factory->itemCollection();
     }
 
     /**
@@ -385,29 +374,5 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface, ItemMetaInterf
     private function resetDiscountSubtotal()
     {
         $this->discounted_subtotal = $this->subtotal();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attach(ItemInterface $item)
-    {
-        $this->item_collection->append($item);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function detach(ItemInterface $item)
-    {
-        $this->item_collection->remove($item);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function meta()
-    {
-        return $this->item_collection;
     }
 }

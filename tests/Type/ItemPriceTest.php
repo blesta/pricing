@@ -837,44 +837,4 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             )
         );
     }
-
-    /**
-     * @covers ::attach
-     * @covers ::detach
-     * @covers ::meta
-     * @uses ItemPrice::__construct
-     * @uses ItemPrice::resetDiscountSubtotal
-     * @uses ItemPrice::subtotal
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
-     */
-    public function testDetach()
-    {
-        // Mock an item and collection the ItemPrice uses
-        $item = $this->getMockBuilder('\Blesta\Items\Item\ItemInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        // Attach the mocked item to the mocked collection
-        $price = new ItemPrice(10);
-
-        // Check the item has been added
-        $price->attach($item);
-        $total = 0;
-        foreach ($price->meta() as $set) {
-            $total++;
-        }
-        $this->assertEquals(1, $total);
-
-        // Check the item has been removed
-        $price->detach($item);
-        $total = 0;
-        foreach ($price->meta() as $set) {
-            $total++;
-        }
-        $this->assertEquals(0, $total);
-    }
 }
