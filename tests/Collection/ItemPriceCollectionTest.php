@@ -486,10 +486,10 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         $collection2->append($item3)->append($item4);
 
         // Item Price Comparator
-        $price_cb = function($old_price, $new_price, $old_meta, $new_meta) {
+        $price_cb = function ($old_price, $new_price, $old_meta, $new_meta) {
             return ($old_price - $new_price);
         };
-        $desc_cb = function($old_meta, $new_meta) {
+        $desc_cb = function ($old_meta, $new_meta) {
             return 'Description';
         };
         $comparator = new ItemComparator($price_cb, $desc_cb);

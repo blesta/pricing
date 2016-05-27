@@ -74,10 +74,10 @@ class PricingFactoryTest extends PHPUnit_Framework_TestCase
      */
     public function testItemComparator()
     {
-        $price_callback = function() {
+        $price_callback = function () {
             return 0;
         };
-        $desc_callback = function() {
+        $desc_callback = function () {
             return '';
         };
 
