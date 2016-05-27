@@ -5,7 +5,6 @@
  */
 class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 {
-
     /**
      * @covers ::append
      * @covers ::count
@@ -155,7 +154,7 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      */
     public function testTaxes(ItemPriceCollection $collection, array $expected_totals)
     {
-        $this->assertContainsOnlyInstancesOf("TaxPrice", $collection->taxes());
+        $this->assertContainsOnlyInstancesOf('TaxPrice', $collection->taxes());
 
         // Exactly each expected tax should exist
         foreach ($expected_totals['taxes'] as $tax_price) {
@@ -175,7 +174,7 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      */
     public function testDiscounts(ItemPriceCollection $collection, array $expected_totals)
     {
-        $this->assertContainsOnlyInstancesOf("DiscountPrice", $collection->discounts());
+        $this->assertContainsOnlyInstancesOf('DiscountPrice', $collection->discounts());
 
         // Exactly each expected discount should exist
         foreach ($expected_totals['discounts'] as $discount_price) {
@@ -259,11 +258,11 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         $collection3 = new ItemPriceCollection();
         $collection3->append($item4)->append($item5)->append($item6);
 
-        return array(
-            array($collection1, $this->getItemTotals($item1)),
-            array($collection2, $this->getItemTotals($item2, $item3)),
-            array($collection3, $this->getItemTotals($item4, $item5, $item6)),
-        );
+        return [
+            [$collection1, $this->getItemTotals($item1)],
+            [$collection2, $this->getItemTotals($item2, $item3)],
+            [$collection3, $this->getItemTotals($item4, $item5, $item6)],
+        ];
     }
 
     /**
@@ -277,16 +276,16 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     {
         // NOTE: 'total', 'total_with_discount', and 'discount' may be INCORRECT
         // if a DiscountPrice of type 'amount' applies to multiple items!
-        $totals = array(
+        $totals = [
             'subtotal' => 0,
             'total' => 0,
             'total_with_tax' => 0,
             'total_with_discount' => 0,
             'tax' => 0,
             'discount' => 0,
-            'taxes' => array(),
-            'discounts' => array()
-        );
+            'taxes' => [],
+            'discounts' => []
+        ];
 
         $args = func_get_args();
         foreach ($args as $item) {
@@ -319,7 +318,7 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     {
         foreach ($arr2 as $obj) {
             if (!in_array($obj, $arr1, true)) {
-                $arr1 = array_merge($arr1, array($obj));
+                $arr1 = array_merge($arr1, [$obj]);
             }
         }
 
@@ -440,13 +439,13 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         $collection3->append($item3);
         $collection4->append($item2);
 
-        return array(
-            array($collection1, $collection2, 2),
-            array($collection1, $collection3, 1),
-            array($collection2, $collection3, 1),
-            array($collection3, $collection1, 1),
-            array($collection3, $collection4, 0)
-        );
+        return [
+            [$collection1, $collection2, 2],
+            [$collection1, $collection3, 1],
+            [$collection2, $collection3, 1],
+            [$collection3, $collection1, 1],
+            [$collection3, $collection4, 0]
+        ];
     }
 
     /**

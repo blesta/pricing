@@ -15,7 +15,7 @@ class PricingFactoryTest extends PHPUnit_Framework_TestCase
     public function testUnitPrice()
     {
         $pricing_factory = new PricingFactory();
-        $this->assertInstanceOf("UnitPrice", $pricing_factory->unitPrice(5.00, 2));
+        $this->assertInstanceOf('UnitPrice', $pricing_factory->unitPrice(5.00, 2));
     }
 
     /**
@@ -32,7 +32,7 @@ class PricingFactoryTest extends PHPUnit_Framework_TestCase
     public function testItemPrice()
     {
         $pricing_factory = new PricingFactory();
-        $this->assertInstanceOf("ItemPrice", $pricing_factory->itemPrice(5.00, 2));
+        $this->assertInstanceOf('ItemPrice', $pricing_factory->itemPrice(5.00, 2));
     }
 
     /**
@@ -43,7 +43,7 @@ class PricingFactoryTest extends PHPUnit_Framework_TestCase
     public function testDiscountPrice()
     {
         $pricing_factory = new PricingFactory();
-        $this->assertInstanceOf("DiscountPrice", $pricing_factory->discountPrice(20.00, 'percent'));
+        $this->assertInstanceOf('DiscountPrice', $pricing_factory->discountPrice(20.00, 'percent'));
     }
 
     /**
@@ -54,7 +54,7 @@ class PricingFactoryTest extends PHPUnit_Framework_TestCase
     public function testTaxPrice()
     {
         $pricing_factory = new PricingFactory();
-        $this->assertInstanceOf("TaxPrice", $pricing_factory->taxPrice(7.75, 'exclusive'));
+        $this->assertInstanceOf('TaxPrice', $pricing_factory->taxPrice(7.75, 'exclusive'));
     }
 
     /**
@@ -63,6 +63,6 @@ class PricingFactoryTest extends PHPUnit_Framework_TestCase
     public function testItemPriceCollection()
     {
         $pricing_factory = new PricingFactory();
-        $this->assertInstanceOf("ItemPriceCollection", $pricing_factory->itemPriceCollection());
+        $this->assertInstanceOf('ItemPriceCollection', $pricing_factory->itemPriceCollection());
     }
 }

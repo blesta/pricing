@@ -8,9 +8,9 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     /**
      * @var array A cached value of discount subtotals
      */
-    private $discount_amounts = array();
+    private $discount_amounts = [];
     /**
-     * @var boolean Whether or not to cache discount subtotals
+     * @var bool Whether or not to cache discount subtotals
      */
     private $cache_discount_amounts = false;
     /**
@@ -21,11 +21,11 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     /**
      * @var array A numerically-indexed array of DiscountPrice objects
      */
-    protected $discounts = array();
+    protected $discounts = [];
     /**
      * @var array A numerically-indexed array containing an array of TaxPrice objects
      */
-    protected $taxes = array();
+    protected $taxes = [];
 
     /**
      * Initialize the item price
@@ -137,14 +137,14 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     {
         // discountAmount() is called twice: once by totalAfterDiscount, and once by taxAmount
         // The discount must be removed only once, so flag it to be ignored the second time
-        $this->discount_amounts = array();
+        $this->discount_amounts = [];
         $this->cache_discount_amounts = true;
         $total = $this->totalAfterDiscount();
 
         // Include tax without taking the discount off again, and reset the flag
         $this->cache_discount_amounts = false;
         $total += $this->taxAmount();
-        $this->discount_amounts = array();
+        $this->discount_amounts = [];
 
         return $total;
     }
@@ -337,7 +337,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
         }
 
         // Retrieve all unique taxes
-        $all_taxes = array();
+        $all_taxes = [];
         foreach ($this->taxes as $taxes) {
             $all_taxes = array_merge($all_taxes, array_values($taxes));
         }

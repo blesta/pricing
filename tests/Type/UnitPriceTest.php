@@ -10,7 +10,7 @@ class UnitPriceTest extends PHPUnit_Framework_TestCase
      */
     public function testConstruct()
     {
-        $this->assertInstanceOf("UnitPrice", new UnitPrice(5.00, 1, 'id'));
+        $this->assertInstanceOf('UnitPrice', new UnitPrice(5.00, 1, 'id'));
     }
 
     /**

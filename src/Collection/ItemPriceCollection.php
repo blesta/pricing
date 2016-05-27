@@ -8,7 +8,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     /**
      * @var array A collection of ItemPrice objects
      */
-    private $collection = array();
+    private $collection = [];
 
     /**
      * @var int The current index position within the collection
@@ -175,7 +175,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     public function taxes()
     {
         // Include unique instances of TaxPrice
-        $taxes = array();
+        $taxes = [];
         foreach ($this->collection as $item_price) {
             foreach ($item_price->taxes() as $tax_price) {
                 if (!in_array($tax_price, $taxes, true)) {
@@ -195,7 +195,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     public function discounts()
     {
         // Include unique instances of DiscountPrice
-        $discounts = array();
+        $discounts = [];
         foreach ($this->collection as $item_price) {
             foreach ($item_price->discounts() as $discount_price) {
                 if (!in_array($discount_price, $discounts, true)) {
@@ -314,7 +314,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     /**
      * Determines whether the current pointer references a valid item in the collection
      *
-     * @return boolean True if the pointer references a valid item in the collection, false otherwise
+     * @return bool True if the pointer references a valid item in the collection, false otherwise
      */
     public function valid()
     {
