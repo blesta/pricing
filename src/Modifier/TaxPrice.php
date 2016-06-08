@@ -1,4 +1,8 @@
 <?php
+namespace Blesta\Pricing\Modifier;
+
+use Blesta\Pricing\Modifier\AbstractPriceModifier;
+use InvalidArgumentException;
 
 /**
  * Determines tax based on prices

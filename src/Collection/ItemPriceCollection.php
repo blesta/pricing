@@ -1,4 +1,12 @@
 <?php
+namespace Blesta\Pricing\Collection;
+
+use Blesta\Pricing\Modifier\DiscountPrice;
+use Blesta\Pricing\Modifier\ItemComparatorInterface;
+use Blesta\Pricing\Modifier\TaxPrice;
+use Blesta\Pricing\Total\PriceTotalInterface;
+use Blesta\Pricing\Type\ItemPrice;
+use Iterator;
 
 /**
  * Maintains a collection of ItemPrice objects
@@ -304,11 +312,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
 
         // Set the position to the first entry in the collection if there is one
         $first_index = key($this->collection);
-        $this->position = (
-            $first_index === null
+        $this->position = $first_index === null
             ? 0
-            : $first_index
-        );
+            : $first_index;
     }
 
     /**

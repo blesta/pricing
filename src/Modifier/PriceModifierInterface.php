@@ -1,4 +1,7 @@
 <?php
+namespace Blesta\Pricing\Modifier;
+
+use Blesta\Pricing\Description\PriceDescriptionInterface;
 
 /**
  * Interface for price modifications

@@ -1,18 +1,25 @@
 <?php
+namespace Blesta\Pricing\Tests\Unit\Modifier;
 
+use Blesta\Pricing\Modifier\TaxPrice;
+use PHPUnit_Framework_TestCase;
+
+/**
+ * @coversDefaultClass Blesta\Pricing\Modifier\TaxPrice
+ */
 class TaxPriceTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @covers TaxPrice::__construct
-     * @uses AbstractPriceModifier::__construct
+     * @covers ::__construct
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::__construct
      */
     public function testConstruct()
     {
-        $this->assertInstanceOf('TaxPrice', new TaxPrice(10.00, 'exclusive'));
+        $this->assertInstanceOf('Blesta\Pricing\Modifier\TaxPrice', new TaxPrice(10.00, 'exclusive'));
     }
 
     /**
-     * @covers TaxPrice::__construct
+     * @covers ::__construct
      * @expectedException InvalidArgumentException
      */
     public function testConstructException()
@@ -22,8 +29,8 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers TaxPrice::off
-     * @uses TaxPrice::on
+     * @covers ::off
+     * @uses Blesta\Pricing\Modifier\TaxPrice::on
      * @dataProvider offProvider
      */
     public function testOff($tax, $price, $price_after)
@@ -56,7 +63,7 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers TaxPrice::on
+     * @covers ::on
      * @dataProvider onProvider
      */
     public function testOn($tax, $price, $tax_amount)
@@ -89,8 +96,8 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers TaxPrice::including
-     * @uses TaxPrice::on
+     * @covers ::including
+     * @uses Blesta\Pricing\Modifier\TaxPrice::on
      * @dataProvider includingProvider
      */
     public function testIncluding($tax, $price, $result)

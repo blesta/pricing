@@ -1,4 +1,11 @@
 <?php
+namespace Blesta\Pricing;
+
+use Blesta\Pricing\Collection\ItemPriceCollection;
+use Blesta\Pricing\Modifier\DiscountPrice;
+use Blesta\Pricing\Modifier\TaxPrice;
+use Blesta\Pricing\Type\ItemPrice;
+use Blesta\Pricing\Type\UnitPrice;
 
 /**
  * Pricing Factory for fetching newly-instantiated pricing objects

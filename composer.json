@@ -21,6 +21,13 @@
         "squizlabs/php_codesniffer": "~2.3"
     },
     "autoload": {
-        "classmap": ["src/"]
+        "psr-4": {
+            "Blesta\\Pricing\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Blesta\\Pricing\\Tests\\": "tests/"
+        }
     }
 }

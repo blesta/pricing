@@ -1,23 +1,30 @@
 <?php
+namespace Blesta\Pricing\Tests\Unit\Type;
+
+use Blesta\Pricing\Type\ItemPrice;
+use Blesta\Pricing\Modifier\DiscountPrice;
+use Blesta\Pricing\Modifier\TaxPrice;
+use PHPUnit_Framework_TestCase;
+use stdClass;
 
 /**
- * @coversDefaultClass ItemPrice
+ * @coversDefaultClass Blesta\Pricing\Type\ItemPrice
  */
 class ItemPriceTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @covers ::__construct
      * @covers ::resetDiscountSubtotal
-     * @uses ItemPrice::subtotal
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
      */
     public function testConstruct()
     {
-        $this->assertInstanceOf('ItemPrice', new ItemPrice(5.00, 1, 'id'));
+        $this->assertInstanceOf('Blesta\Pricing\Type\ItemPrice', new ItemPrice(5.00, 1, 'id'));
     }
 
     /**
@@ -80,16 +87,16 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::setTax
-     * @uses ItemPrice::__construct
-     * @uses ItemPrice::resetDiscountSubtotal
-     * @uses ItemPrice::subtotal
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
-     * @uses TaxPrice::__construct
-     * @uses AbstractPriceModifier::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::__construct
      * @expectedException InvalidArgumentException
      */
     public function testSetTaxInvalidException()
@@ -101,16 +108,16 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::setTax
-     * @uses ItemPrice::__construct
-     * @uses ItemPrice::resetDiscountSubtotal
-     * @uses ItemPrice::subtotal
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
-     * @uses TaxPrice::__construct
-     * @uses AbstractPriceModifier::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::__construct
      * @expectedException InvalidArgumentException
      */
     public function testSetTaxMultipleException()
@@ -137,25 +144,25 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::totalAfterTax
-     * @uses ItemPrice::__construct
-     * @uses ItemPrice::resetDiscountSubtotal
-     * @uses ItemPrice::subtotal
-     * @uses ItemPrice::setTax
-     * @uses ItemPrice::taxAmount
-     * @uses ItemPrice::amountTax
-     * @uses ItemPrice::amountTaxAll
-     * @uses ItemPrice::compoundTaxAmount
-     * @uses ItemPrice::totalAfterDiscount
-     * @uses ItemPrice::discountAmount
-     * @uses ItemPrice::amountDiscount
-     * @uses ItemPrice::amountDiscountAll
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
-     * @uses TaxPrice::__construct
-     * @uses TaxPrice::on
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::setTax
+     * @uses Blesta\Pricing\Type\ItemPrice::taxAmount
+     * @uses Blesta\Pricing\Type\ItemPrice::amountTax
+     * @uses Blesta\Pricing\Type\ItemPrice::amountTaxAll
+     * @uses Blesta\Pricing\Type\ItemPrice::compoundTaxAmount
+     * @uses Blesta\Pricing\Type\ItemPrice::totalAfterDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::discountAmount
+     * @uses Blesta\Pricing\Type\ItemPrice::amountDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::amountDiscountAll
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
+     * @uses Blesta\Pricing\Modifier\TaxPrice::on
      * @dataProvider totalAfterTaxProvider
      */
     public function testTotalAfterTax($item, $taxes)
@@ -195,21 +202,21 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::totalAfterDiscount
-     * @uses ItemPrice::__construct
-     * @uses ItemPrice::resetDiscountSubtotal
-     * @uses ItemPrice::subtotal
-     * @uses ItemPrice::setDiscount
-     * @uses ItemPrice::discountAmount
-     * @uses ItemPrice::amountDiscount
-     * @uses ItemPrice::amountDiscountAll
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
-     * @uses DiscountPrice::__construct
-     * @uses DiscountPrice::on
-     * @uses DiscountPrice::off
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::setDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::discountAmount
+     * @uses Blesta\Pricing\Type\ItemPrice::amountDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::amountDiscountAll
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::__construct
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::on
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::off
      * @dataProvider totalAfterDiscountProvider
      */
     public function testTotalAfterDiscount($item, $discounts)
@@ -248,14 +255,14 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::subtotal
-     * @uses ItemPrice::__construct
-     * @uses ItemPrice::resetDiscountSubtotal
-     * @uses ItemPrice::subtotal
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
      * @dataProvider subtotalProvider
      */
     public function testSubtotal($price, $qty)
@@ -286,28 +293,28 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @covers ::discountAmount
      * @covers ::amountDiscount
      * @covers ::amountDiscountAll
-     * @uses ItemPrice::__construct
-     * @uses ItemPrice::resetDiscountSubtotal
-     * @uses ItemPrice::setTax
-     * @uses ItemPrice::setDiscount
-     * @uses ItemPrice::totalAfterTax
-     * @uses ItemPrice::totalAfterDiscount
-     * @uses ItemPrice::taxAmount
-     * @uses ItemPrice::amountTax
-     * @uses ItemPrice::amountTaxAll
-     * @uses ItemPrice::compoundTaxAmount
-     * @uses ItemPrice::subtotal
-     * @uses AbstractPriceModifier::__construct
-     * @uses TaxPrice::__construct
-     * @uses TaxPrice::on
-     * @uses DiscountPrice::__construct
-     * @uses DiscountPrice::on
-     * @uses DiscountPrice::off
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::setTax
+     * @uses Blesta\Pricing\Type\ItemPrice::setDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::totalAfterTax
+     * @uses Blesta\Pricing\Type\ItemPrice::totalAfterDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::taxAmount
+     * @uses Blesta\Pricing\Type\ItemPrice::amountTax
+     * @uses Blesta\Pricing\Type\ItemPrice::amountTaxAll
+     * @uses Blesta\Pricing\Type\ItemPrice::compoundTaxAmount
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::__construct
+     * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
+     * @uses Blesta\Pricing\Modifier\TaxPrice::on
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::__construct
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::on
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::off
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
      */
     public function testTotal()
     {
@@ -327,17 +334,17 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::discounts
-     * @uses ItemPrice::__construct
-     * @uses ItemPrice::resetDiscountSubtotal
-     * @uses ItemPrice::subtotal
-     * @uses ItemPrice::setDiscount
-     * @uses DiscountPrice::__construct
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
-     * @uses AbstractPriceModifier::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::setDiscount
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::__construct
      */
     public function testDiscounts()
     {
@@ -365,21 +372,21 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @covers ::amountTax
      * @covers ::amountTaxALl
      * @covers ::compoundTaxAmount
-     * @uses ItemPrice::setTax
-     * @uses ItemPrice::setDiscount
-     * @uses ItemPrice::totalAfterTax
-     * @uses ItemPrice::totalAfterDiscount
-     * @uses ItemPrice::discountAmount
-     * @uses ItemPrice::amountDiscount
-     * @uses ItemPrice::amountDiscountAll
-     * @uses ItemPrice::subtotal
-     * @uses TaxPrice::__construct
-     * @uses TaxPrice::on
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
+     * @uses Blesta\Pricing\Type\ItemPrice::setTax
+     * @uses Blesta\Pricing\Type\ItemPrice::setDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::totalAfterTax
+     * @uses Blesta\Pricing\Type\ItemPrice::totalAfterDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::discountAmount
+     * @uses Blesta\Pricing\Type\ItemPrice::amountDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::amountDiscountAll
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
+     * @uses Blesta\Pricing\Modifier\TaxPrice::on
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
      * @dataProvider taxAmountProvider
      */
     public function testTaxAmount($item, $tax, $expected_amount)
@@ -426,21 +433,21 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @covers ::amountTax
      * @covers ::amountTaxALl
      * @covers ::compoundTaxAmount
-     * @uses ItemPrice::setTax
-     * @uses ItemPrice::setDiscount
-     * @uses ItemPrice::totalAfterTax
-     * @uses ItemPrice::totalAfterDiscount
-     * @uses ItemPrice::discountAmount
-     * @uses ItemPrice::amountDiscount
-     * @uses ItemPrice::amountDiscountAll
-     * @uses ItemPrice::subtotal
-     * @uses TaxPrice::__construct
-     * @uses TaxPrice::on
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
+     * @uses Blesta\Pricing\Type\ItemPrice::setTax
+     * @uses Blesta\Pricing\Type\ItemPrice::setDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::totalAfterTax
+     * @uses Blesta\Pricing\Type\ItemPrice::totalAfterDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::discountAmount
+     * @uses Blesta\Pricing\Type\ItemPrice::amountDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::amountDiscountAll
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
+     * @uses Blesta\Pricing\Modifier\TaxPrice::on
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
      * @dataProvider taxAmountCompoundProvider
      */
     public function testTaxAmountCompound($item, array $taxes, array $expected_tax_amounts)
@@ -501,13 +508,13 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @covers ::discountAmount
      * @covers ::amountDiscount
      * @covers ::amountDiscountAll
-     * @uses ItemPrice::setDiscount
-     * @uses ItemPrice::subtotal
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
+     * @uses Blesta\Pricing\Type\ItemPrice::setDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
      * @dataProvider discountAmountProvider
      */
     public function testDiscountAmount($item, array $discounts, $expected_amount)
@@ -542,7 +549,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     protected function discountPriceMock($value)
     {
-        $dp = $this->getMockBuilder('DiscountPrice')
+        $dp = $this->getMockBuilder('Blesta\Pricing\Modifier\DiscountPrice')
             ->disableOriginalConstructor()
             ->getMock();
         $dp->method('on')
@@ -621,19 +628,19 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @covers ::amountDiscount
      * @covers ::amountDiscountAll
      * @covers ::resetDiscounts
-     * @uses ItemPrice::__construct
-     * @uses ItemPrice::resetDiscountSubtotal
-     * @uses ItemPrice::subtotal
-     * @uses ItemPrice::setDiscount
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
-     * @uses DiscountPrice::__construct
-     * @uses DiscountPrice::on
-     * @uses DiscountPrice::off
-     * @uses DiscountPrice::reset
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::setDiscount
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::__construct
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::on
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::off
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::reset
      * @dataProvider discountAmountsProvider
      */
     public function testDiscountAmounts($item, array $discounts, array $expected_amounts)
@@ -721,19 +728,19 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     /**
      * @covers ::resetDiscounts
      * @covers ::resetDiscountSubtotal
-     * @uses ItemPrice::__construct
-     * @uses ItemPrice::resetDiscountSubtotal
-     * @uses ItemPrice::subtotal
-     * @uses ItemPrice::setDiscount
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::setDiscount
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
      */
     public function testResetDiscounts()
     {
-        $discountMock = $this->getMockBuilder('DiscountPrice')
+        $discountMock = $this->getMockBuilder('Blesta\Pricing\Modifier\DiscountPrice')
             ->disableOriginalConstructor()
             ->getMock();
         $discountMock->expects($this->once())
@@ -746,17 +753,17 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::taxes
-     * @uses ItemPrice::setTax
-     * @uses ItemPrice::__construct
-     * @uses ItemPrice::resetDiscountSubtotal
-     * @uses ItemPrice::subtotal
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
-     * @uses UnitPrice::total
-     * @uses TaxPrice::__construct
-     * @uses AbstractPriceModifier::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::setTax
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::__construct
      * @dataProvider taxesProvider
      */
     public function testTaxes($unique, $taxes, $expected_count, $expected_total)

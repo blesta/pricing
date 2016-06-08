@@ -1,4 +1,7 @@
 <?php
+namespace Blesta\Pricing\Description;
+
+use Blesta\Pricing\Description\PriceDescriptionInterface;
 
 /**
  * Abstract Price Description for setting a price description

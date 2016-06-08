@@ -1,4 +1,8 @@
 <?php
+namespace Blesta\Pricing\Type;
+
+use Blesta\Pricing\Description\AbstractPriceDescription;
+use Blesta\Pricing\Type\PriceInterface;
 
 /**
  * Builds a unit price

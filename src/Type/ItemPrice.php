@@ -1,4 +1,11 @@
 <?php
+namespace Blesta\Pricing\Type;
+
+use Blesta\Pricing\Modifier\DiscountPrice;
+use Blesta\Pricing\Modifier\TaxPrice;
+use Blesta\Pricing\Type\UnitPrice;
+use Blesta\Pricing\Total\PriceTotalInterface;
+use InvalidArgumentException;
 
 /**
  * Determine pricing for a single item considering discounts and taxes

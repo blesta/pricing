@@ -1,4 +1,5 @@
 <?php
+namespace Blesta\Pricing\Type;
 
 /**
  * Interface for pricing

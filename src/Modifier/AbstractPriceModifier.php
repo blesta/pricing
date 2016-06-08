@@ -1,4 +1,8 @@
 <?php
+namespace Blesta\Pricing\Modifier;
+
+use Blesta\Pricing\Description\AbstractPriceDescription;
+use Blesta\Pricing\Modifier\PriceModifierInterface;
 
 /**
  * Abstract Price Modifier for setting a price amount and type
