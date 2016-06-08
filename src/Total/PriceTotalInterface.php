@@ -1,4 +1,8 @@
 <?php
+namespace Blesta\Pricing\Total;
+
+use Blesta\Pricing\Modifier\DiscountPrice;
+use Blesta\Pricing\Modifier\TaxPrice;
 
 /**
  * Interface for calculating totals

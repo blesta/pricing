@@ -1,7 +1,10 @@
 <?php
+namespace Blesta\Pricing\Tests\Unit\Description;
+
+use PHPUnit_Framework_TestCase;
 
 /**
- * @coversDefaultClass AbstractPriceDescription
+ * @coversDefaultClass Blesta\Pricing\Description\AbstractPriceDescription
  */
 class AbstractPriceDescriptionTest extends PHPUnit_Framework_TestCase
 {
@@ -13,12 +16,12 @@ class AbstractPriceDescriptionTest extends PHPUnit_Framework_TestCase
     {
         // Initially null
         $description = null;
-        $stub = $this->getMockForAbstractClass('AbstractPriceDescription');
+        $stub = $this->getMockForAbstractClass('Blesta\Pricing\Description\AbstractPriceDescription');
         $this->assertSame($description, $stub->getDescription());
 
         // Set my own description
         $description = '100x Product 1 - Limited Time Offer';
-        $stub = $this->getMockForAbstractClass('AbstractPriceDescription');
+        $stub = $this->getMockForAbstractClass('Blesta\Pricing\Description\AbstractPriceDescription');
         $stub->setDescription($description);
         $this->assertSame($description, $stub->getDescription());
     }

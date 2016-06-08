@@ -1,25 +1,29 @@
 <?php
+namespace Blesta\Pricing\Tests\Unit\Modifier;
+
+use Blesta\Pricing\Modifier\DiscountPrice;
+use PHPUnit_Framework_TestCase;
 
 /**
- * @coversDefaultClass DiscountPrice
+ * @coversDefaultClass Blesta\Pricing\Modifier\DiscountPrice
  */
 class DiscountPriceTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @covers ::__construct
-     * @uses AbstractPriceModifier::__construct
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::__construct
      */
     public function testConstruct()
     {
-        $this->assertInstanceOf('DiscountPrice', new DiscountPrice(5.00, 'percent'));
-        $this->assertInstanceOf('DiscountPrice', new DiscountPrice(5.00, 'amount'));
+        $this->assertInstanceOf('Blesta\Pricing\Modifier\DiscountPrice', new DiscountPrice(5.00, 'percent'));
+        $this->assertInstanceOf('Blesta\Pricing\Modifier\DiscountPrice', new DiscountPrice(5.00, 'amount'));
     }
 
     /**
      * Test InvalidArgumentException is thrown
      *
      * @covers ::__construct
-     * @uses AbstractPriceModifier::__construct
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::__construct
      * @expectedException InvalidArgumentException
      */
     public function testConstructException()
@@ -30,7 +34,7 @@ class DiscountPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::off
-     * @uses DiscountPrice::on
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::on
      * @dataProvider offProvider
      */
     public function testOff($discount, $price, $price_after)
@@ -73,7 +77,7 @@ class DiscountPriceTest extends PHPUnit_Framework_TestCase
      * change with each price the discount is applied to
      *
      * @covers ::off
-     * @uses DiscountPrice::on
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::on
      * @dataProvider offMultipleProvider
      */
     public function testOffMultiple($discount, $prices, $price_after_all)
@@ -145,10 +149,10 @@ class DiscountPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::reset
-     * @uses DiscountPrice::__construct
-     * @uses AbstractPriceModifier::__construct
-     * @uses DiscountPrice::off
-     * @uses DiscountPrice::on
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::__construct
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::__construct
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::off
+     * @uses Blesta\Pricing\Modifier\DiscountPrice::on
      */
     public function testReset()
     {

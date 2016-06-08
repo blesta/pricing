@@ -1,4 +1,7 @@
 <?php
+namespace Blesta\Pricing\Modifier;
+
+use Blesta\Pricing\Type\ItemPrice;
 
 /**
  * Item Comparator Interface for ItemPrices

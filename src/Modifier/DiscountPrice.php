@@ -1,4 +1,7 @@
 <?php
+namespace Blesta\Pricing\Modifier;
+
+use InvalidArgumentException;
 
 /**
  * Determine discounts from prices

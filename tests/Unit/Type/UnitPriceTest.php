@@ -1,24 +1,31 @@
 <?php
+namespace Blesta\Pricing\Tests\Unit\Type;
 
+use Blesta\Pricing\Type\UnitPrice;
+use PHPUnit_Framework_TestCase;
+
+/**
+ * @coversDefaultClass Blesta\Pricing\Type\UnitPrice
+ */
 class UnitPriceTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @covers UnitPrice::__construct
-     * @covers UnitPrice::setPrice
-     * @covers UnitPrice::setQty
-     * @covers UnitPrice::setKey
+     * @covers ::__construct
+     * @covers ::setPrice
+     * @covers ::setQty
+     * @covers ::setKey
      */
     public function testConstruct()
     {
-        $this->assertInstanceOf('UnitPrice', new UnitPrice(5.00, 1, 'id'));
+        $this->assertInstanceOf('Blesta\Pricing\Type\UnitPrice', new UnitPrice(5.00, 1, 'id'));
     }
 
     /**
-     * @covers UnitPrice::price
-     * @covers UnitPrice::setPrice
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
+     * @covers ::price
+     * @covers ::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
      */
     public function testPrice()
     {
@@ -33,11 +40,11 @@ class UnitPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers UnitPrice::qty
-     * @covers UnitPrice::setQty
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setKey
+     * @covers ::qty
+     * @covers ::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
      */
     public function testQty()
     {
@@ -52,11 +59,11 @@ class UnitPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers UnitPrice::key
-     * @covers UnitPrice::setKey
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
+     * @covers ::key
+     * @covers ::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
      */
     public function testKey()
     {
@@ -72,11 +79,11 @@ class UnitPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers UnitPrice::total
-     * @uses UnitPrice::__construct
-     * @uses UnitPrice::setPrice
-     * @uses UnitPrice::setQty
-     * @uses UnitPrice::setKey
+     * @covers ::total
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
      */
     public function testTotal()
     {
