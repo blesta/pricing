@@ -20,7 +20,7 @@ A library for handling pricing. Supports:
 Install via composer:
 
 ```sh
-composer require blesta/pricing:~1.0
+composer require blesta/pricing
 ```
 
 ## Basic Usage
@@ -209,7 +209,6 @@ foreach ($item_collection as $item) {
 Using the PricingFactory can streamline usage. Assume you have the following:
 
 ```php
-
 $products = array(
     array('desc' => 'Apples', 'amount' => 0.5, 'qty' => 3),
     array('desc' => 'Oranges', 'amount' => 0.75, 'qty' => 10)
