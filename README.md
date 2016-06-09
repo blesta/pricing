@@ -20,7 +20,7 @@ A library for handling pricing. Supports:
 Install via composer:
 
 ```sh
-composer require blesta/pricing:~1.0
+composer require blesta/pricing
 ```
 
 ## Basic Usage
@@ -28,6 +28,8 @@ composer require blesta/pricing:~1.0
 ### UnitPrice
 
 ```php
+use Blesta\Pricing\Type\UnitPrice;
+
 $price = new UnitPrice(5.00, 2, "id");
 $price->setDescription("2 X 5.00");
 $unit_price = $price->price(); // 5.00
@@ -44,6 +46,8 @@ $price->setKey('id2');
 ### DiscountPrice
 
 ```php
+use Blesta\Pricing\Modifier\DiscountPrice;
+
 $discount = new DiscountPrice(25.00, "percent");
 $discount->setDescription("25% off");
 $price_after_discount = $discount->off(100.00); // 75.00
@@ -55,6 +59,8 @@ $discount_price = $discount->on(100.00); // 25.00
 Exclusive tax (price does not include tax):
 
 ```php
+use Blesta\Pricing\Modifier\TaxPrice;
+
 $tax = new TaxPrice(10.00, "exclusive");
 $tax->setDescription("10 % tax");
 $tax->on(100.00); // 10.00
@@ -65,6 +71,8 @@ $tax->including(100.00); // 110.00
 Inclusive tax (price already includes tax):
 
 ```php
+use Blesta\Pricing\Modifier\TaxPrice;
+
 $tax = new TaxPrice(25.00, "inclusive");
 $tax->setDescription("25 % tax");
 $tax->on(100.00); // 25.00
@@ -75,6 +83,9 @@ $tax->including(100.00); // 100.00
 Cascading tax (tax on a tax):
 
 ```php
+use Blesta\Pricing\Modifier\TaxPrice;
+use Blesta\Pricing\Type\UnitPrice;
+
 $price = new UnitPrice(10.00);
 $tax1 = new TaxPrice(10.00, "exclusive");
 $tax2 = new TaxPrice(5.00, "exclusive");
@@ -89,6 +100,8 @@ $tax2->on(
 ### ItemPrice
 
 ```php
+use Blesta\Pricing\Type\ItemPrice;
+
 $item_price = new ItemPrice(10.00, 3);
 $item_price->total(); // 30.00
 ```
@@ -96,6 +109,8 @@ $item_price->total(); // 30.00
 With discount applied:
 
 ```php
+use Blesta\Pricing\Modifier\DiscountPrice;
+
 $discount = new DiscountPrice(5.00, "percent");
 
 // call setDiscount() as many times as needed to apply discounts
@@ -106,6 +121,8 @@ $item_price->totalAfterDiscount(); // 28.50
 Amount applied for a specific discount:
 
 ```php
+use Blesta\Pricing\Modifier\DiscountPrice;
+
 $discount1 = new DiscountPrice(5.00, "percent");
 $discount2 = new DiscountPrice(25.00, "percent");
 
@@ -120,6 +137,8 @@ $item_price->discountAmount($discount2); // 7.125 ((30.00 - 1.50) * 0.25)
 With tax applied:
 
 ```php
+use Blesta\Pricing\Modifier\TaxPrice;
+
 $tax = new TaxPrice(10.00, "exclusive");
 
 // call setTax() as many times as needed to apply multiple levels of taxes
@@ -138,6 +157,8 @@ $item_price->total(); // 31.35
 Amount applied for a specific tax:
 
 ```php
+use Blesta\Pricing\Modifier\TaxPrice;
+
 $tax1 = new TaxPrice(10.00, "exclusive");
 $tax2 = new TaxPrice(5.00, "exclusive");
 
@@ -152,6 +173,8 @@ $item_price->taxAmount($tax2); // 1.50
 Cascading tax:
 
 ```php
+use Blesta\Pricing\Modifier\TaxPrice;
+
 $tax1 = new TaxPrice(10.00, "exclusive");
 $tax2 = new TaxPrice(5.00, "exclusive");
 $tax3 = new TaxPrice(2.50, "exclusive");
@@ -165,6 +188,9 @@ $item_price->taxAmount($tax3); //  (((30.00 * 0.10) + 30.00) * 0.05) + 30.00 * 0
 ### ItemPriceCollection
 
 ```php
+use Blesta\Pricing\Collection\ItemPriceCollection;
+use Blesta\Pricing\Type\ItemPrice;
+
 $item_collection = new ItemPriceCollection();
 
 $item1 = new ItemPrice(10.00, 3);
@@ -183,7 +209,6 @@ foreach ($item_collection as $item) {
 Using the PricingFactory can streamline usage. Assume you have the following:
 
 ```php
-
 $products = array(
     array('desc' => 'Apples', 'amount' => 0.5, 'qty' => 3),
     array('desc' => 'Oranges', 'amount' => 0.75, 'qty' => 10)
@@ -193,6 +218,8 @@ $products = array(
 So we initialize our PricingFactory, and let it create our DiscountPrice and TaxPrice objects for use.
 
 ```php
+use Blesta\Pricing\PricingFactory;
+
 $pricing_factory = new PricingFactory();
 
 // Some coupon
