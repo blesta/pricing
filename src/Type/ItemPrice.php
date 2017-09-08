@@ -115,7 +115,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     public function totalAfterTax($tax_type = null)
     {
-        return $this->subtotal() + $this->taxAmount($tax_type);
+        return $this->subtotal() + $this->taxAmount(null, $tax_type);
     }
 
     /**
@@ -152,7 +152,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
 
         // Include tax without taking the discount off again, and reset the flag
         $this->cache_discount_amounts = false;
-        $total += $this->taxAmount($tax_type);
+        $total += $this->taxAmount(null, $tax_type);
         $this->discount_amounts = [];
 
         return $total;
