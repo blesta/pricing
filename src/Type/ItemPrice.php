@@ -110,10 +110,12 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
 
     /**
      * Retrieves the total item price amount considering all taxes without discounts
+     *
+     * @param string $tax_type Type of taxes to include (optional)
      */
-    public function totalAfterTax()
+    public function totalAfterTax($tax_type = null)
     {
-        return $this->subtotal() + $this->taxAmount();
+        return $this->subtotal() + $this->taxAmount($tax_type);
     }
 
     /**
@@ -137,9 +139,10 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     /**
      * Retrieves the total item price amount considering all discounts and taxes
      *
+     * @param string $tax_type Type of taxes to include (optional)
      * @return float The total item price
      */
-    public function total()
+    public function total($tax_type = null)
     {
         // discountAmount() is called twice: once by totalAfterDiscount, and once by taxAmount
         // The discount must be removed only once, so flag it to be ignored the second time
@@ -149,7 +152,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
 
         // Include tax without taking the discount off again, and reset the flag
         $this->cache_discount_amounts = false;
-        $total += $this->taxAmount();
+        $total += $this->taxAmount($tax_type);
         $this->discount_amounts = [];
 
         return $total;
@@ -159,16 +162,17 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      * Retrieves the total tax amount considering all item taxes, or just the given tax
      *
      * @param TaxPrice $tax A specific tax price whose tax to calculate for this item (optional, default null)
+     * @param string $type Type of taxes to include (optional)
      * @return float The total tax amount for all taxes set for this item, or the total tax amount
      *  for the given tax price if given
      */
-    public function taxAmount(TaxPrice $tax = null)
+    public function taxAmount(TaxPrice $tax = null, $type = null)
     {
         // Determine the tax set on this item's price
         if ($tax) {
-            $tax_amount = $this->amountTax($tax);
+            $tax_amount = $this->amountTax($tax, $type);
         } else {
-            $tax_amount = $this->amountTaxAll();
+            $tax_amount = $this->amountTaxAll($type);
         }
 
         return $tax_amount;
@@ -178,9 +182,10 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      * Retrieves the tax amount for the given TaxPrice
      *
      * @param TaxPrice $tax A specific tax price whose tax to calculate for this item
+     * @param string $type Type of taxes to include (optional)
      * @return float The total tax amount for the given TaxPrice
      */
-    private function amountTax(TaxPrice $tax)
+    private function amountTax(TaxPrice $tax, $type = null)
     {
         $taxable_price = $this->totalAfterDiscount();
         $tax_amount = 0;
@@ -188,7 +193,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
         foreach ($this->taxes as $tax_group) {
             // Only calculate the tax amount if the tax exists in a tax group
             if (in_array($tax, $tax_group, true)) {
-                $tax_amount = $this->compoundTaxAmount($tax_group, $taxable_price, $tax);
+                $tax_amount = $this->compoundTaxAmount($tax_group, $taxable_price, $tax, $type);
             }
         }
 
@@ -198,9 +203,10 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     /**
      * Retrieves the total tax amount considering all item taxes
      *
+     * @param string $type Type of taxes to include (optional)
      * @return float The total tax amount for all taxes set for this item
      */
-    private function amountTaxAll()
+    private function amountTaxAll($type = null)
     {
         $taxable_price = $this->totalAfterDiscount();
         $tax_amount = 0;
@@ -208,7 +214,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
         // Determine all taxes set on this item's price, compounded accordingly
         foreach ($this->taxes as $tax_group) {
             // Sum all taxes
-            $tax_amount += $this->compoundTaxAmount($tax_group, $taxable_price);
+            $tax_amount += $this->compoundTaxAmount($tax_group, $taxable_price, null, $type);
         }
 
         return $tax_amount;
@@ -220,21 +226,24 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      * @param array $tax_group A subset of the taxes array
      * @param float $taxable_price The total amount from which to calculate tax
      * @param TaxPrice $tax A specific tax from the group whose tax amount to retrieve (optional)
+     * @param string $type Type of taxes to include (optional)
      * @return float The total tax amount for all taxes set for this item in this group, or
      *  the tax amount for the given TaxPrice
      */
-    private function compoundTaxAmount(array $tax_group, $taxable_price, TaxPrice $tax = null)
+    private function compoundTaxAmount(array $tax_group, $taxable_price, TaxPrice $tax = null, $type = null)
     {
         $compound_tax = 0;
 
         foreach ($tax_group as $tax_price) {
-            // Calculate the compound tax
-            $tax_amount = $tax_price->on($taxable_price + $compound_tax);
-            $compound_tax += $tax_amount;
+            if ($type == null || $type == $tax_price->type()) {
+                // Calculate the compound tax
+                $tax_amount = $tax_price->on($taxable_price + $compound_tax);
+                $compound_tax += $tax_amount;
 
-            // Ignore any other group taxes, and only return the tax amount for the given TaxPrice
-            if ($tax && $tax === $tax_price) {
-                return $tax_amount;
+                // Ignore any other group taxes, and only return the tax amount for the given TaxPrice
+                if ($tax && $tax === $tax_price) {
+                    return $tax_amount;
+                }
             }
         }
 
