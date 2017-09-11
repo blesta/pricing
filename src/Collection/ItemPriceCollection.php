@@ -66,14 +66,13 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     /**
      * Retrieves the total price of all items within the collection including taxes without discounts
      *
-     * @param string $tax_type Type of taxes to include (optional)
      * @return float The total price including taxes without including discounts
      */
-    public function totalAfterTax($tax_type = null)
+    public function totalAfterTax()
     {
         $total = 0;
         foreach ($this->collection as $item) {
-            $total += $item->totalAfterTax($tax_type);
+            $total += $item->totalAfterTax();
         }
 
         // Reset any discount amounts or exluded tax types back
@@ -121,15 +120,14 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     /**
      * Retrieves the total of all items within the collection
      *
-     * @param string $tax_type Type of taxes to include (optional)
      * @return float The total of all items in the collection
      */
-    public function total($tax_type = null)
+    public function total()
     {
         // Sum the totals of each ItemPrice
         $total = 0;
         foreach ($this->collection as $item_price) {
-            $total += $item_price->total($tax_type);
+            $total += $item_price->total();
         }
 
         // Reset any discount amounts or exluded tax types back
@@ -144,13 +142,12 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *
      * @param TaxPrice $tax A TaxPrice to apply to all ItemPrice's in the collection, ignoring
      *  any TaxPrice's that may already be set on the items within the collection (optional)
-     * @param string $tax_type Type of taxes to include (optional)
      */
-    public function taxAmount(TaxPrice $tax = null, $tax_type = null)
+    public function taxAmount(TaxPrice $tax = null)
     {
         $total = 0;
         foreach ($this->collection as $item_price) {
-            $total += $item_price->taxAmount($tax, $tax_type);
+            $total += $item_price->taxAmount($tax);
         }
 
         // Reset any discount amounts or exluded tax types back
