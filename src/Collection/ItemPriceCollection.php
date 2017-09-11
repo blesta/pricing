@@ -76,8 +76,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
             $total += $item->totalAfterTax($tax_type);
         }
 
-        // Reset any discount amounts back
+        // Reset any discount amounts or exluded tax types back
         $this->resetDiscounts();
+        $this->resetExcludedTaxes();
 
         return $total;
     }
@@ -94,8 +95,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
             $total += $item->totalAfterDiscount();
         }
 
-        // Reset any discount amounts back
+        // Reset any discount amounts or exluded tax types back
         $this->resetDiscounts();
+        $this->resetExcludedTaxes();
 
         return $total;
     }
@@ -130,8 +132,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
             $total += $item_price->total($tax_type);
         }
 
-        // Reset any discount amounts back
+        // Reset any discount amounts or exluded tax types back
         $this->resetDiscounts();
+        $this->resetExcludedTaxes();
 
         return $total;
     }
@@ -150,8 +153,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
             $total += $item_price->taxAmount($tax, $tax_type);
         }
 
-        // Reset any discount amounts back
+        // Reset any discount amounts or exluded tax types back
         $this->resetDiscounts();
+        $this->resetExcludedTaxes();
 
         return $total;
     }
@@ -172,8 +176,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
             $total += $item_price->discountAmount($discount);
         }
 
-        // Reset any discount amounts back
+        // Reset any discount amounts or exluded tax types back
         $this->resetDiscounts();
+        $this->resetExcludedTaxes();
 
         return $total;
     }
@@ -328,5 +333,32 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     public function valid()
     {
         return array_key_exists($this->position, $this->collection);
+    }
+
+    /**
+     * Adds the given tax type to a list of types to exclude from totals returned all ItemPrice's in the collection
+     *
+     * @param string $tax_type The type of tax to exclude
+     * @return \Blesta\Pricing\Collection\ItemPriceCollection
+     */
+    public function excludeTax($tax_type)
+    {
+        foreach ($this->collection as $item_price) {
+            $item_price->excludeTax($tax_type);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Resets the list of exluded tax types for all ItemPrice's in the collection
+     *
+     * @return \Blesta\Pricing\Collection\ItemPriceCollection
+     */
+    public function resetExcludedTaxes()
+    {
+        foreach ($this->collection as $item_price) {
+            $item_price->resetExcludedTaxes();
+        }
     }
 }

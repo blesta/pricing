@@ -608,4 +608,69 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         $collection->next();
         $this->assertFalse($collection->valid());
     }
+
+    /**
+     * @covers ::resetExcludedTaxes
+     * @uses Blesta\Pricing\Type\ItemPrice
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
+     */
+    public function testResetExcludedTaxes()
+    {
+        $item = new ItemPrice(10);
+
+        $collection = new ItemPriceCollection();
+        $collection->append($item);
+
+        $collection->excludeTax('exclusive');
+        $collection->resetExcludedTaxes();
+        $this->assertEquals($collection->current()->excludedTaxTypes(), []);
+    }
+
+    /**
+     * @covers ::excludeTax
+     * @covers ::excludedTaxTypes
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @dataProvider excludeTaxProvider
+     */
+    public function testExcludeTax(array $excluded_types, array $expected_types)
+    {
+        $item = new ItemPrice(10);
+
+        $collection = new ItemPriceCollection();
+        $collection->append($item);
+
+        foreach ($excluded_types as $excluded_type) {
+            $collection->excludeTax($excluded_type);
+        }
+        $this->assertEquals($collection->current()->excludedTaxTypes(), $expected_types);
+    }
+
+    /**
+     * Tax data provider
+     *
+     * @return array
+     */
+    public function excludeTaxProvider()
+    {
+        return [
+            [[], []],
+            [['exclusive'], ['exclusive']],
+            [['inclusive'], ['inclusive']],
+            [['inclusive', 'exclusive'], ['inclusive', 'exclusive']],
+            [['inclusive', 'exclusive', 'inclusive', 'exclusive'], ['inclusive','exclusive']],
+        ];
+    }
 }
