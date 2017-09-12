@@ -77,7 +77,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
 
         // Reset any discount amounts or exluded tax types back
         $this->resetDiscounts();
-        $this->resetExcludedTaxes();
+        $this->resetTaxInclusions();
 
         return $total;
     }
@@ -96,7 +96,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
 
         // Reset any discount amounts or exluded tax types back
         $this->resetDiscounts();
-        $this->resetExcludedTaxes();
+        $this->resetTaxInclusions();
 
         return $total;
     }
@@ -132,7 +132,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
 
         // Reset any discount amounts or exluded tax types back
         $this->resetDiscounts();
-        $this->resetExcludedTaxes();
+        $this->resetTaxInclusions();
 
         return $total;
     }
@@ -152,7 +152,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
 
         // Reset any discount amounts or exluded tax types back
         $this->resetDiscounts();
-        $this->resetExcludedTaxes();
+        $this->resetTaxInclusions();
 
         return $total;
     }
@@ -175,7 +175,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
 
         // Reset any discount amounts or exluded tax types back
         $this->resetDiscounts();
-        $this->resetExcludedTaxes();
+        $this->resetTaxInclusions();
 
         return $total;
     }
@@ -333,7 +333,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     }
 
     /**
-     * Adds the given tax type to a list of types to exclude from totals returned all ItemPrice's in the collection
+     * Marks the given tax type as excluded from totals returned by all ItemPrices in the collection
      *
      * @param string $tax_type The type of tax to exclude
      * @return \Blesta\Pricing\Collection\ItemPriceCollection
@@ -348,14 +348,14 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     }
 
     /**
-     * Resets the list of exluded tax types for all ItemPrice's in the collection
+     * Resets the list of included tax types for all ItemPrices in the collection
      *
      * @return \Blesta\Pricing\Collection\ItemPriceCollection
      */
-    public function resetExcludedTaxes()
+    public function resetTaxInclusions()
     {
         foreach ($this->collection as $item_price) {
-            $item_price->resetExcludedTaxes();
+            $item_price->resetTaxInclusions();
         }
     }
 }

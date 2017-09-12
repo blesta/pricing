@@ -610,7 +610,8 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::resetExcludedTaxes
+     * @covers ::resetTaxInclusions
+     * @covers ::taxTypeInclusions
      * @uses Blesta\Pricing\Type\ItemPrice
      * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
@@ -620,7 +621,7 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\UnitPrice::setKey
      * @uses Blesta\Pricing\Type\UnitPrice::total
      */
-    public function testResetExcludedTaxes()
+    public function testResetTaxInclusions()
     {
         $item = new ItemPrice(10);
 
@@ -628,13 +629,16 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         $collection->append($item);
 
         $collection->excludeTax('exclusive');
-        $collection->resetExcludedTaxes();
-        $this->assertEquals($collection->current()->excludedTaxTypes(), []);
+        $collection->resetTaxInclusions();
+        $this->assertEquals(
+            $collection->current()->taxTypeInclusions(),
+            [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true]
+        );
     }
 
     /**
      * @covers ::excludeTax
-     * @covers ::excludedTaxTypes
+     * @covers ::taxTypeInclusions
      * @uses Blesta\Pricing\Type\ItemPrice::__construct
      * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
@@ -655,7 +659,7 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         foreach ($excluded_types as $excluded_type) {
             $collection->excludeTax($excluded_type);
         }
-        $this->assertEquals($collection->current()->excludedTaxTypes(), $expected_types);
+        $this->assertEquals($collection->current()->taxTypeInclusions(), $expected_types);
     }
 
     /**
@@ -666,11 +670,14 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     public function excludeTaxProvider()
     {
         return [
-            [[], []],
-            [['exclusive'], ['exclusive']],
-            [['inclusive'], ['inclusive']],
-            [['inclusive', 'exclusive'], ['inclusive', 'exclusive']],
-            [['inclusive', 'exclusive', 'inclusive', 'exclusive'], ['inclusive','exclusive']],
+            [[], [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true]],
+            [[TaxPrice::EXCLUSIVE], [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => false]],
+            [[TaxPrice::INCLUSIVE], [TaxPrice::INCLUSIVE => false, TaxPrice::EXCLUSIVE => true]],
+            [[TaxPrice::INCLUSIVE, TaxPrice::EXCLUSIVE], [TaxPrice::INCLUSIVE => false, TaxPrice::EXCLUSIVE => false]],
+            [
+                [TaxPrice::INCLUSIVE, TaxPrice::EXCLUSIVE, TaxPrice::INCLUSIVE, TaxPrice::EXCLUSIVE],
+                [TaxPrice::INCLUSIVE => false, TaxPrice::EXCLUSIVE => false]
+            ],
         ];
     }
 }

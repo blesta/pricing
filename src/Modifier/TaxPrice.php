@@ -8,6 +8,10 @@ use InvalidArgumentException;
  */
 class TaxPrice extends AbstractPriceModifier
 {
+    // Tax types
+    const INCLUSIVE = 'inclusive';
+    const EXCLUSIVE = 'exclusive';
+
     /**
      * Sets tax information
      *

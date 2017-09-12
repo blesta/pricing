@@ -33,9 +33,9 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     protected $taxes = [];
     /**
-     * @var array A numerically-indexed array containing an array of tax types to be excluded from totals
+     * @var array A list of tax type/inclusion status pairs
      */
-    protected $excluded_tax_types = [];
+    protected $tax_type_inclusions = [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true];
 
     /**
      * Initialize the item price
@@ -233,7 +233,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
 
         foreach ($tax_group as $tax_price) {
             // Skip taxes of an excluded type
-            if (in_array($tax_price->type(), $this->excluded_tax_types)) {
+            if (!$this->tax_type_inclusions[$tax_price->type()]) {
                 // Return 0 if the given tax is excluded
                 if ($tax && $tax === $tax_price) {
                     return 0;
@@ -404,32 +404,34 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     public function excludeTax($tax_type)
     {
-        if (!in_array($tax_type, $this->excluded_tax_types)) {
-            $this->excluded_tax_types[] = $tax_type;
+        if (array_key_exists($tax_type, $this->tax_type_inclusions)) {
+            $this->tax_type_inclusions[$tax_type] = false;
         }
 
         return $this;
     }
 
     /**
-     * Resets the list of exluded tax types for this object
+     * Resets the list of included tax types for this object
      *
      * @return \Blesta\Pricing\Type\ItemPrice
      */
-    public function resetExcludedTaxes()
+    public function resetTaxInclusions()
     {
-        $this->excluded_tax_types = [];
+        foreach ($this->tax_type_inclusions as $type => $value) {
+            $this->tax_type_inclusions[$type] = true;
+        }
 
         return $this;
     }
 
     /**
-     * Returns the list of exluded tax types for this object
+     * Returns the list of included tax types for this object
      *
-     * @return array A list of exluded tax types
+     * @return array A list of tax types and their inclusion status
      */
-    public function excludedTaxTypes()
+    public function taxTypeInclusions()
     {
-        return $this->excluded_tax_types;
+        return $this->tax_type_inclusions;
     }
 }
