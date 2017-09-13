@@ -161,6 +161,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\UnitPrice::setQty
      * @uses Blesta\Pricing\Type\UnitPrice::setKey
      * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
      * @uses Blesta\Pricing\Modifier\TaxPrice::on
      * @dataProvider totalAfterTaxProvider
@@ -305,6 +306,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\ItemPrice::compoundTaxAmount
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
      * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::__construct
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
      * @uses Blesta\Pricing\Modifier\TaxPrice::on
      * @uses Blesta\Pricing\Modifier\DiscountPrice::__construct
@@ -381,6 +383,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\ItemPrice::amountDiscountAll
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
      * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
      * @uses Blesta\Pricing\Modifier\TaxPrice::on
      * @uses Blesta\Pricing\Modifier\TaxPrice::type
@@ -451,7 +454,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\ItemPrice::discountAmount
      * @uses Blesta\Pricing\Type\ItemPrice::amountDiscount
      * @uses Blesta\Pricing\Type\ItemPrice::amountDiscountAll
+     * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
      * @uses Blesta\Pricing\Modifier\TaxPrice::on
      * @uses Blesta\Pricing\Type\UnitPrice::__construct
@@ -896,12 +901,14 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @covers ::taxTypeInclusions
      * @uses Blesta\Pricing\Type\ItemPrice::__construct
      * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
      * @uses Blesta\Pricing\Type\UnitPrice::__construct
      * @uses Blesta\Pricing\Type\UnitPrice::setPrice
      * @uses Blesta\Pricing\Type\UnitPrice::setQty
      * @uses Blesta\Pricing\Type\UnitPrice::setKey
      * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      */
     public function testResetIncludedTaxes()
     {
@@ -922,6 +929,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\UnitPrice::setQty
      * @uses Blesta\Pricing\Type\UnitPrice::setKey
      * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      * @dataProvider excludeTaxProvider
      */
     public function testExcludeTax(array $excluded_types, array $expected_types)
