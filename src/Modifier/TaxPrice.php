@@ -42,7 +42,7 @@ class TaxPrice extends AbstractPriceModifier
      */
     public function off($price)
     {
-        if ('inclusive' == $this->type) {
+        if (TaxPrice::INCLUSIVE == $this->type) {
             return $price - $this->on($price);
         }
         return $price;
@@ -67,7 +67,7 @@ class TaxPrice extends AbstractPriceModifier
      */
     public function including($price)
     {
-        if ('exclusive' == $this->type) {
+        if (TaxPrice::EXCLUSIVE == $this->type) {
             return $price + $this->on($price);
         }
         return $price;

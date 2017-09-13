@@ -33,9 +33,9 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     protected $taxes = [];
     /**
-     * @var array A list of tax type/inclusion status pairs
+     * @var array A list of tax types and whether or not they are shown in totals returned by this object
      */
-    protected $tax_type_inclusions = [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true];
+    protected $tax_types = [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true];
 
     /**
      * Initialize the item price
@@ -230,21 +230,20 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     private function compoundTaxAmount(array $tax_group, $taxable_price, TaxPrice $tax = null)
     {
         $compound_tax = 0;
+        $tax_total = 0;
 
         foreach ($tax_group as $tax_price) {
-            // Skip taxes of an excluded type
-            if (!$this->tax_type_inclusions[$tax_price->type()]) {
-                // Return 0 if the given tax is excluded
-                if ($tax && $tax === $tax_price) {
-                    return 0;
-                }
-
-                continue;
-            }
-
             // Calculate the compound tax
             $tax_amount = $tax_price->on($taxable_price + $compound_tax);
             $compound_tax += $tax_amount;
+
+            // comment
+            if ($this->tax_types[$tax_price->type()]) {
+                $tax_total += $tax_amount;
+            } elseif ($tax && $tax === $tax_price) {
+                return 0;
+            }
+
 
             // Ignore any other group taxes, and only return the tax amount for the given TaxPrice
             if ($tax && $tax === $tax_price) {
@@ -252,7 +251,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
             }
         }
 
-        return $compound_tax;
+        return $tax_total;
     }
 
     /**
@@ -397,41 +396,27 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     }
 
     /**
-     * Adds the given tax type to a list of types to exclude from totals returned by this object
+     * Marks the given tax type as not shown in totals returned by this object
      *
      * @param string $tax_type The type of tax to exclude
-     * @return \Blesta\Pricing\Type\ItemPrice
+     * @return A reference to this object
      */
     public function excludeTax($tax_type)
     {
-        if (array_key_exists($tax_type, $this->tax_type_inclusions)) {
-            $this->tax_type_inclusions[$tax_type] = false;
+        if (array_key_exists($tax_type, $this->tax_types)) {
+            $this->tax_types[$tax_type] = false;
         }
 
         return $this;
     }
 
     /**
-     * Resets the list of included tax types for this object
-     *
-     * @return \Blesta\Pricing\Type\ItemPrice
+     * Resets the list of tax types to show in totals returned by this object
      */
-    public function resetTaxInclusions()
+    public function resetTaxes()
     {
-        foreach ($this->tax_type_inclusions as $type => $value) {
-            $this->tax_type_inclusions[$type] = true;
+        foreach ($this->tax_types as $type => $value) {
+            $this->tax_types[$type] = true;
         }
-
-        return $this;
-    }
-
-    /**
-     * Returns the list of included tax types for this object
-     *
-     * @return array A list of tax types and their inclusion status
-     */
-    public function taxTypeInclusions()
-    {
-        return $this->tax_type_inclusions;
     }
 }

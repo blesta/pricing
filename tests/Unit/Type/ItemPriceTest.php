@@ -124,7 +124,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     {
         // Invalid argument: Multiple TaxPrice's of the same instance
         $item = new ItemPrice(10);
-        $tax_price = new TaxPrice(10, 'exclusive');
+        $tax_price = new TaxPrice(10, TaxPrice::EXCLUSIVE);
         $item->setTax($tax_price, $tax_price);
     }
 
@@ -136,9 +136,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     public function taxProvider()
     {
         return [
-            [new ItemPrice(10, 0), [new TaxPrice(10, 'exclusive')]],
-            [new ItemPrice(10), [new TaxPrice(10, 'exclusive')]],
-            [new ItemPrice(10, 1), [new TaxPrice(10, 'exclusive'), new TaxPrice(10, 'exclusive')]],
+            [new ItemPrice(10, 0), [new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
+            [new ItemPrice(10), [new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
+            [new ItemPrice(10, 1), [new TaxPrice(10, TaxPrice::EXCLUSIVE), new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
         ];
     }
 
@@ -192,12 +192,12 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     public function totalAfterTaxProvider()
     {
         return [
-            [new ItemPrice(100.00, 2), [new TaxPrice(10, 'exclusive')]],
-            [new ItemPrice(0.00, 2), [new TaxPrice(10, 'exclusive')]],
-            [new ItemPrice(-100.00, 2), [new TaxPrice(10, 'exclusive')]],
+            [new ItemPrice(100.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
+            [new ItemPrice(0.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
+            [new ItemPrice(-100.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
 
-            [new ItemPrice(100.00, 2), [new TaxPrice(10, 'exclusive'), new TaxPrice(10, 'exclusive')]],
-            [new ItemPrice(-100.00, 2), [new TaxPrice(10, 'exclusive'), new TaxPrice(20, 'exclusive')]],
+            [new ItemPrice(100.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE), new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
+            [new ItemPrice(-100.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE), new TaxPrice(20, TaxPrice::EXCLUSIVE)]],
         ];
     }
 
@@ -326,7 +326,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($item->subtotal(), $item->total());
 
         // Total is the total after tax when no discount exists
-        $item->setTax(new TaxPrice(5.25, 'exclusive'));
+        $item->setTax(new TaxPrice(5.25, TaxPrice::EXCLUSIVE));
         $this->assertEquals($item->totalAfterTax(), $item->total());
 
         // Total is the total after discount and tax
@@ -355,8 +355,8 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         $this->assertEmpty($item->discounts());
 
         $discounts = [
-            new DiscountPrice(10, 'exclusive'),
-            new DiscountPrice(5.00, 'exclusive')
+            new DiscountPrice(10, TaxPrice::EXCLUSIVE),
+            new DiscountPrice(5.00, TaxPrice::EXCLUSIVE)
         ];
 
         foreach ($discounts as $discount) {
@@ -433,12 +433,12 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     public function taxAmountProvider()
     {
         return [
-            [new ItemPrice(100, 2), new TaxPrice(10, 'exclusive'), 20, []],
-            [new ItemPrice(0, 2), new TaxPrice(10, 'exclusive'), 0, []],
-            [new ItemPrice(-100, 2), new TaxPrice(10, 'exclusive'), -20, []],
-            [new ItemPrice(100, 2), new TaxPrice(10, 'exclusive'), 0, ['exclusive']],
-            [new ItemPrice(100, 2), new TaxPrice(10, 'exclusive'), 20, ['inclusive']],
-            [new ItemPrice(100, 2), new TaxPrice(10, 'inclusive'), 0, ['inclusive']]
+            [new ItemPrice(100, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), 20, []],
+            [new ItemPrice(0, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), 0, []],
+            [new ItemPrice(-100, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), -20, []],
+            [new ItemPrice(100, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), 0, [TaxPrice::EXCLUSIVE]],
+            [new ItemPrice(100, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), 20, [TaxPrice::INCLUSIVE]],
+            [new ItemPrice(100, 2), new TaxPrice(10, TaxPrice::INCLUSIVE), 0, [TaxPrice::INCLUSIVE]]
         ];
     }
 
@@ -501,8 +501,8 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [
                 new ItemPrice(100, 2),
                 [
-                    new TaxPrice(10, 'exclusive'),
-                    new TaxPrice(7.75, 'exclusive')
+                    new TaxPrice(10, TaxPrice::EXCLUSIVE),
+                    new TaxPrice(7.75, TaxPrice::EXCLUSIVE)
                 ],
                 [
                     20,
@@ -513,9 +513,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [
                 new ItemPrice(10, 3),
                 [
-                    new TaxPrice(10, 'exclusive'),
-                    new TaxPrice(5, 'exclusive'),
-                    new TaxPrice(2.5, 'exclusive')
+                    new TaxPrice(10, TaxPrice::EXCLUSIVE),
+                    new TaxPrice(5, TaxPrice::EXCLUSIVE),
+                    new TaxPrice(2.5, TaxPrice::EXCLUSIVE)
                 ],
                 [
                     3,
@@ -527,30 +527,68 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [
                 new ItemPrice(10, 3),
                 [
-                    new TaxPrice(10, 'exclusive'),
-                    new TaxPrice(5, 'exclusive'),
-                    new TaxPrice(2.5, 'exclusive')
+                    new TaxPrice(10, TaxPrice::EXCLUSIVE),
+                    new TaxPrice(5, TaxPrice::EXCLUSIVE),
+                    new TaxPrice(2.5, TaxPrice::EXCLUSIVE)
                 ],
                 [
                     0,
                     0,
                     0
                 ],
-                ['exclusive']
+                [TaxPrice::EXCLUSIVE]
             ],
             [
                 new ItemPrice(10, 3),
                 [
-                    new TaxPrice(10, 'inclusive'),
-                    new TaxPrice(5, 'inclusive'),
-                    new TaxPrice(2.5, 'exclusive')
+                    new TaxPrice(10, TaxPrice::INCLUSIVE),
+                    new TaxPrice(5, TaxPrice::INCLUSIVE),
+                    new TaxPrice(2.5, TaxPrice::EXCLUSIVE)
                 ],
                 [
                     3,
                     1.65,
                     0
                 ],
-                ['exclusive']
+                [TaxPrice::EXCLUSIVE]
+            ],
+            [
+                new ItemPrice(10, 3),
+                [
+                    new TaxPrice(10, TaxPrice::INCLUSIVE),
+                    new TaxPrice(5, TaxPrice::INCLUSIVE),
+                    new TaxPrice(2.5, TaxPrice::EXCLUSIVE)
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [TaxPrice::INCLUSIVE, TaxPrice::EXCLUSIVE]
+            ],
+            [
+                new ItemPrice(10, 3),
+                [
+                    new TaxPrice(10, TaxPrice::INCLUSIVE),
+                    new TaxPrice(5, TaxPrice::INCLUSIVE),
+                    new TaxPrice(2.5, TaxPrice::EXCLUSIVE)
+                ],
+                [
+                    0,
+                    0,
+                    0.86625
+                ],
+                [TaxPrice::INCLUSIVE]
+            ],
+            [
+                new ItemPrice(10, 3),
+                [
+                    new TaxPrice(2.5, TaxPrice::EXCLUSIVE)
+                ],
+                [
+                    0.75
+                ],
+                [TaxPrice::INCLUSIVE]
             ]
         ];
     }
@@ -841,7 +879,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function taxesProvider()
     {
-        $tax = new TaxPrice(50, 'exclusive');
+        $tax = new TaxPrice(50, TaxPrice::EXCLUSIVE);
 
         return [
             [
@@ -853,7 +891,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [
                 true,
                 [
-                    [new TaxPrice(10, 'exclusive')]
+                    [new TaxPrice(10, TaxPrice::EXCLUSIVE)]
                 ],
                 1,
                 1
@@ -861,8 +899,8 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [
                 true,
                 [
-                    [new TaxPrice(100, 'exclusive'), new TaxPrice(20, 'exclusive')],
-                    [new TaxPrice(10, 'exclusive')]
+                    [new TaxPrice(100, TaxPrice::EXCLUSIVE), new TaxPrice(20, TaxPrice::EXCLUSIVE)],
+                    [new TaxPrice(10, TaxPrice::EXCLUSIVE)]
                 ],
                 3,
                 3
@@ -870,7 +908,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [
                 true,
                 [
-                    [$tax, new TaxPrice(15, 'exclusive')],
+                    [$tax, new TaxPrice(15, TaxPrice::EXCLUSIVE)],
                     [$tax]
                 ],
                 2,
@@ -887,8 +925,8 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [
                 false,
                 [
-                    [new TaxPrice(10, 'exclusive'), new TaxPrice(15, 'exclusive')],
-                    [new TaxPrice(25, 'exclusive')]
+                    [new TaxPrice(10, TaxPrice::EXCLUSIVE), new TaxPrice(15, TaxPrice::EXCLUSIVE)],
+                    [new TaxPrice(25, TaxPrice::EXCLUSIVE)]
                 ],
                 2,
                 3
@@ -897,8 +935,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::resetTaxInclusions
-     * @covers ::taxTypeInclusions
+     * @covers ::resetTaxes
      * @uses Blesta\Pricing\Type\ItemPrice::__construct
      * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
      * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
@@ -910,17 +947,18 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\UnitPrice::total
      * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      */
-    public function testResetIncludedTaxes()
+    public function testResetTaxes()
     {
         $item = new ItemPrice(10);
+        $temp_item = new ItemPrice(10);
+
         $item->excludeTax(TaxPrice::EXCLUSIVE);
-        $item->resetTaxInclusions();
-        $this->assertEquals($item->taxTypeInclusions(), [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true]);
+        $item->resetTaxes();
+        $this->assertEquals($item, $temp_item);
     }
 
     /**
      * @covers ::excludeTax
-     * @covers ::taxTypeInclusions
      * @uses Blesta\Pricing\Type\ItemPrice::__construct
      * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
@@ -930,34 +968,18 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\UnitPrice::setKey
      * @uses Blesta\Pricing\Type\UnitPrice::total
      * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
-     * @dataProvider excludeTaxProvider
      */
-    public function testExcludeTax(array $excluded_types, array $expected_types)
+    public function testExcludeTax()
     {
         $item = new ItemPrice(10);
+        $temp_item = clone $item;
 
-        foreach ($excluded_types as $excluded_type) {
-            $item->excludeTax($excluded_type);
-        }
-        $this->assertEquals($item->taxTypeInclusions(), $expected_types);
-    }
+        $item->excludeTax('invalid_tax_type');
+        $this->assertEquals($temp_item, $item);
 
-    /**
-     * Tax data provider
-     *
-     * @return array
-     */
-    public function excludeTaxProvider()
-    {
-        return [
-            [[], [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true]],
-            [[TaxPrice::EXCLUSIVE], [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => false]],
-            [[TaxPrice::INCLUSIVE], [TaxPrice::INCLUSIVE => false, TaxPrice::EXCLUSIVE => true]],
-            [[TaxPrice::INCLUSIVE, TaxPrice::EXCLUSIVE], [TaxPrice::INCLUSIVE => false, TaxPrice::EXCLUSIVE => false]],
-            [
-                [TaxPrice::INCLUSIVE, TaxPrice::EXCLUSIVE, TaxPrice::INCLUSIVE, TaxPrice::EXCLUSIVE],
-                [TaxPrice::INCLUSIVE => false, TaxPrice::EXCLUSIVE => false]
-            ],
-        ];
+        $item->excludeTax(TaxPrice::EXCLUSIVE);
+        $this->assertNotEquals($temp_item, $item);
+
+        $this->assertInstanceOf('Blesta\Pricing\Type\ItemPrice', $item->excludeTax(TaxPrice::INCLUSIVE));
     }
 }

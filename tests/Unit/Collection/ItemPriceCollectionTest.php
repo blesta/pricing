@@ -235,7 +235,7 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     public function totalProvider()
     {
         // Items with discounts and tax
-        $tax_price = new TaxPrice(10, 'exclusive');
+        $tax_price = new TaxPrice(10, TaxPrice::EXCLUSIVE);
         $item1 = new ItemPrice(10, 2);
         $item1->setDiscount(new DiscountPrice(20, 'percent'));
         $item1->setDiscount(new DiscountPrice(1, 'amount'));
@@ -247,7 +247,7 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
 
         // Item with tax
         $item2 = new ItemPrice(6, 4);
-        $item2->setTax(new TaxPrice(5, 'exclusive'));
+        $item2->setTax(new TaxPrice(5, TaxPrice::EXCLUSIVE));
         $item3 = new ItemPrice(5, 5);
 
         $item5 = new ItemPrice(5.25, 3);
@@ -256,7 +256,7 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         // Item with compound tax and discount
         $item6 = new ItemPrice(100.00, 1);
         $item6->setDiscount(new DiscountPrice(1.50, 'amount'));
-        $item6->setTax(new TaxPrice(8, 'exclusive'), new TaxPrice(5, 'exclusive'));
+        $item6->setTax(new TaxPrice(8, TaxPrice::EXCLUSIVE), new TaxPrice(5, TaxPrice::EXCLUSIVE));
 
         // Set collections of the items
         $collection1 = new ItemPriceCollection();
@@ -380,12 +380,12 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $collection->count());
 
         $discount3 = new DiscountPrice(50, 'amount');
-        $tax = new TaxPrice(20, 'exclusive');
+        $tax = new TaxPrice(20, TaxPrice::EXCLUSIVE);
 
         $item3 = new ItemPrice(10, 1);
         $item3->setDiscount(new DiscountPrice(10, 'percent'));
         $item3->setDiscount($discount3);
-        $item3->setTax(new TaxPrice(10, 'exclusive'));
+        $item3->setTax(new TaxPrice(10, TaxPrice::EXCLUSIVE));
         $item3->setTax($tax);
 
         $item4 = new ItemPrice(1000, 2);
@@ -614,13 +614,12 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::resetTaxInclusions
+     * @covers ::resetTaxes
      * @uses Blesta\Pricing\Collection\ItemPriceCollection::excludeTax
      * @uses Blesta\Pricing\Collection\ItemPriceCollection::append
      * @uses Blesta\Pricing\Collection\ItemPriceCollection::valid
      * @uses Blesta\Pricing\Collection\ItemPriceCollection::current
      * @uses Blesta\Pricing\Type\ItemPrice
-     * @uses Blesta\Pricing\Type\ItemPrice::taxTypeInclusions
      * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
      * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
@@ -631,19 +630,19 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\UnitPrice::total
      * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      */
-    public function testResetTaxInclusions()
+    public function testResetTaxes()
     {
-        $item = new ItemPrice(10);
+        $item1 = new ItemPrice(10);
+        $item2 = new ItemPrice(10);
 
         $collection = new ItemPriceCollection();
-        $collection->append($item);
+        $temp_collection = clone $collection;
+        $collection->append($item1);
+        $temp_collection->append($item2);
 
-        $collection->excludeTax('exclusive');
-        $collection->resetTaxInclusions();
-        $this->assertEquals(
-            $collection->current()->taxTypeInclusions(),
-            [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true]
-        );
+        $collection->excludeTax(TaxPrice::EXCLUSIVE);
+        $collection->resetTaxes();
+        $this->assertEquals($collection, $temp_collection);
     }
 
     /**
@@ -652,7 +651,6 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Collection\ItemPriceCollection::valid
      * @uses Blesta\Pricing\Collection\ItemPriceCollection::current
      * @uses Blesta\Pricing\Type\ItemPrice::__construct
-     * @uses Blesta\Pricing\Type\ItemPrice::taxTypeInclusions
      * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
      * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
@@ -662,37 +660,26 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\UnitPrice::setKey
      * @uses Blesta\Pricing\Type\UnitPrice::total
      * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
-     * @dataProvider excludeTaxProvider
      */
-    public function testExcludeTax(array $excluded_types, array $expected_types)
+    public function testExcludeTax()
     {
-        $item = new ItemPrice(10);
+        $item1 = new ItemPrice(10);
+        $item2 = new ItemPrice(10);
 
         $collection = new ItemPriceCollection();
-        $collection->append($item);
+        $temp_collection = clone $collection;
+        $collection->append($item1);
+        $temp_collection->append($item2);
 
-        foreach ($excluded_types as $excluded_type) {
-            $collection->excludeTax($excluded_type);
-        }
-        $this->assertEquals($collection->current()->taxTypeInclusions(), $expected_types);
-    }
+        $collection->excludeTax('invalid_tax_type');
+        $this->assertEquals($temp_collection, $collection);
 
-    /**
-     * Tax data provider
-     *
-     * @return array
-     */
-    public function excludeTaxProvider()
-    {
-        return [
-            [[], [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true]],
-            [[TaxPrice::EXCLUSIVE], [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => false]],
-            [[TaxPrice::INCLUSIVE], [TaxPrice::INCLUSIVE => false, TaxPrice::EXCLUSIVE => true]],
-            [[TaxPrice::INCLUSIVE, TaxPrice::EXCLUSIVE], [TaxPrice::INCLUSIVE => false, TaxPrice::EXCLUSIVE => false]],
-            [
-                [TaxPrice::INCLUSIVE, TaxPrice::EXCLUSIVE, TaxPrice::INCLUSIVE, TaxPrice::EXCLUSIVE],
-                [TaxPrice::INCLUSIVE => false, TaxPrice::EXCLUSIVE => false]
-            ],
-        ];
+        $collection->excludeTax(TaxPrice::EXCLUSIVE);
+        $this->assertNotEquals($temp_collection, $collection);
+
+        $this->assertInstanceOf(
+            'Blesta\Pricing\Collection\ItemPriceCollection',
+            $collection->excludeTax(TaxPrice::INCLUSIVE)
+        );
     }
 }
