@@ -401,6 +401,78 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2350.8, $collection->total());
     }
 
+    /**
+     * @covers ::resetTaxes
+     * @uses Blesta\Pricing\Collection\ItemPriceCollection::excludeTax
+     * @uses Blesta\Pricing\Collection\ItemPriceCollection::append
+     * @uses Blesta\Pricing\Collection\ItemPriceCollection::valid
+     * @uses Blesta\Pricing\Collection\ItemPriceCollection::current
+     * @uses Blesta\Pricing\Type\ItemPrice
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
+     */
+    public function testResetTaxes()
+    {
+        $item1 = new ItemPrice(10);
+        $item2 = new ItemPrice(10);
+
+        $collection = new ItemPriceCollection();
+        $temp_collection = clone $collection;
+        $collection->append($item1);
+        $temp_collection->append($item2);
+
+        $collection->excludeTax(TaxPrice::EXCLUSIVE);
+        $this->assertNotEquals($temp_collection, $collection);
+
+        $collection->resetTaxes();
+        $this->assertEquals($collection, $temp_collection);
+    }
+
+    /**
+     * @covers ::excludeTax
+     * @uses Blesta\Pricing\Collection\ItemPriceCollection::append
+     * @uses Blesta\Pricing\Collection\ItemPriceCollection::valid
+     * @uses Blesta\Pricing\Collection\ItemPriceCollection::current
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
+     */
+    public function testExcludeTax()
+    {
+        $item1 = new ItemPrice(10);
+        $item2 = new ItemPrice(10);
+
+        $collection = new ItemPriceCollection();
+        $temp_collection = clone $collection;
+        $collection->append($item1);
+        $temp_collection->append($item2);
+
+        $collection->excludeTax('invalid_tax_type');
+        $this->assertEquals($temp_collection, $collection);
+
+        $collection->excludeTax(TaxPrice::EXCLUSIVE);
+        $this->assertNotEquals($temp_collection, $collection);
+
+        $this->assertInstanceOf(
+            'Blesta\Pricing\Collection\ItemPriceCollection',
+            $collection->excludeTax(TaxPrice::INCLUSIVE)
+        );
+    }
+
 
     /**
      * @covers ::merge
@@ -611,75 +683,5 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         // No item exists in the next position
         $collection->next();
         $this->assertFalse($collection->valid());
-    }
-
-    /**
-     * @covers ::resetTaxes
-     * @uses Blesta\Pricing\Collection\ItemPriceCollection::excludeTax
-     * @uses Blesta\Pricing\Collection\ItemPriceCollection::append
-     * @uses Blesta\Pricing\Collection\ItemPriceCollection::valid
-     * @uses Blesta\Pricing\Collection\ItemPriceCollection::current
-     * @uses Blesta\Pricing\Type\ItemPrice
-     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
-     * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
-     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
-     * @uses Blesta\Pricing\Type\UnitPrice::__construct
-     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
-     * @uses Blesta\Pricing\Type\UnitPrice::setQty
-     * @uses Blesta\Pricing\Type\UnitPrice::setKey
-     * @uses Blesta\Pricing\Type\UnitPrice::total
-     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
-     */
-    public function testResetTaxes()
-    {
-        $item1 = new ItemPrice(10);
-        $item2 = new ItemPrice(10);
-
-        $collection = new ItemPriceCollection();
-        $temp_collection = clone $collection;
-        $collection->append($item1);
-        $temp_collection->append($item2);
-
-        $collection->excludeTax(TaxPrice::EXCLUSIVE);
-        $collection->resetTaxes();
-        $this->assertEquals($collection, $temp_collection);
-    }
-
-    /**
-     * @covers ::excludeTax
-     * @uses Blesta\Pricing\Collection\ItemPriceCollection::append
-     * @uses Blesta\Pricing\Collection\ItemPriceCollection::valid
-     * @uses Blesta\Pricing\Collection\ItemPriceCollection::current
-     * @uses Blesta\Pricing\Type\ItemPrice::__construct
-     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
-     * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
-     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
-     * @uses Blesta\Pricing\Type\UnitPrice::__construct
-     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
-     * @uses Blesta\Pricing\Type\UnitPrice::setQty
-     * @uses Blesta\Pricing\Type\UnitPrice::setKey
-     * @uses Blesta\Pricing\Type\UnitPrice::total
-     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
-     */
-    public function testExcludeTax()
-    {
-        $item1 = new ItemPrice(10);
-        $item2 = new ItemPrice(10);
-
-        $collection = new ItemPriceCollection();
-        $temp_collection = clone $collection;
-        $collection->append($item1);
-        $temp_collection->append($item2);
-
-        $collection->excludeTax('invalid_tax_type');
-        $this->assertEquals($temp_collection, $collection);
-
-        $collection->excludeTax(TaxPrice::EXCLUSIVE);
-        $this->assertNotEquals($temp_collection, $collection);
-
-        $this->assertInstanceOf(
-            'Blesta\Pricing\Collection\ItemPriceCollection',
-            $collection->excludeTax(TaxPrice::INCLUSIVE)
-        );
     }
 }

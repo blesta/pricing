@@ -181,7 +181,7 @@ $tax2 = new TaxPrice(5.00, "inclusive");
 $item_price->setTax($tax1);
 $item_price->setTax($tax2);
 
-$item_price->excludeTax('inclusive')->totalAfterTax(); // 30.30
+$item_price->excludeTax('inclusive')->totalAfterTax(); // 33.00
 ```
 
 Cascading tax:

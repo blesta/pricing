@@ -231,6 +231,31 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     }
 
     /**
+     * Marks the given tax type as not shown in totals returned by all ItemPrices in the collection
+     *
+     * @param string $tax_type The type of tax to exclude
+     * @return A reference to this object
+     */
+    public function excludeTax($tax_type)
+    {
+        foreach ($this->collection as $item_price) {
+            $item_price->excludeTax($tax_type);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Resets the list of tax types for all ItemPrices in the collection
+     */
+    public function resetTaxes()
+    {
+        foreach ($this->collection as $item_price) {
+            $item_price->resetTaxes();
+        }
+    }
+
+    /**
      * Merges this ItemPriceCollection with the given ItemPriceCollection to produce
      * a new ItemPriceCollection for ItemPrices that share a key.
      *
@@ -330,30 +355,5 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     public function valid()
     {
         return array_key_exists($this->position, $this->collection);
-    }
-
-    /**
-     * Marks the given tax type as not shown in totals returned by all ItemPrices in the collection
-     *
-     * @param string $tax_type The type of tax to exclude
-     * @return A reference to this object
-     */
-    public function excludeTax($tax_type)
-    {
-        foreach ($this->collection as $item_price) {
-            $item_price->excludeTax($tax_type);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Resets the list of tax types for all ItemPrices in the collection
-     */
-    public function resetTaxes()
-    {
-        foreach ($this->collection as $item_price) {
-            $item_price->resetTaxes();
-        }
     }
 }

@@ -950,11 +950,12 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     public function testResetTaxes()
     {
         $item = new ItemPrice(10);
-        $temp_item = new ItemPrice(10);
 
         $item->excludeTax(TaxPrice::EXCLUSIVE);
+        $this->assertAttributeEquals([TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => false], 'tax_types', $item);
+
         $item->resetTaxes();
-        $this->assertEquals($item, $temp_item);
+        $this->assertAttributeEquals([TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true], 'tax_types', $item);
     }
 
     /**
@@ -972,13 +973,15 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     public function testExcludeTax()
     {
         $item = new ItemPrice(10);
-        $temp_item = clone $item;
 
         $item->excludeTax('invalid_tax_type');
-        $this->assertEquals($temp_item, $item);
+        $this->assertAttributeEquals([TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true], 'tax_types', $item);
 
         $item->excludeTax(TaxPrice::EXCLUSIVE);
-        $this->assertNotEquals($temp_item, $item);
+        $this->assertAttributeEquals([TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => false], 'tax_types', $item);
+
+        $item->excludeTax(TaxPrice::INCLUSIVE);
+        $this->assertAttributeEquals([TaxPrice::INCLUSIVE => false, TaxPrice::EXCLUSIVE => false], 'tax_types', $item);
 
         $this->assertInstanceOf('Blesta\Pricing\Type\ItemPrice', $item->excludeTax(TaxPrice::INCLUSIVE));
     }

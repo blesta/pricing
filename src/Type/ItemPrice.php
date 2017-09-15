@@ -237,13 +237,13 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
             $tax_amount = $tax_price->on($taxable_price + $compound_tax);
             $compound_tax += $tax_amount;
 
-            // comment
-            if ($this->tax_types[$tax_price->type()]) {
+            if (isset($this->tax_types[$tax_price->type()]) && $this->tax_types[$tax_price->type()]) {
+                // Only return taxes of types that are set to be shown
                 $tax_total += $tax_amount;
             } elseif ($tax && $tax === $tax_price) {
+                // Return a total of zero if we were given a tax, but it is of an excluded tax type
                 return 0;
             }
-
 
             // Ignore any other group taxes, and only return the tax amount for the given TaxPrice
             if ($tax && $tax === $tax_price) {
