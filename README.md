@@ -170,6 +170,20 @@ $item_price->taxAmount($tax1); // 3.00
 $item_price->taxAmount($tax2); // 1.50
 ```
 
+With taxes applied but excluded:
+
+```php
+use Blesta\Pricing\Modifier\TaxPrice;
+
+$tax1 = new TaxPrice(10.00, "exclusive");
+$tax2 = new TaxPrice(5.00, "inclusive");
+
+$item_price->setTax($tax1);
+$item_price->setTax($tax2);
+
+$item_price->excludeTax('inclusive')->totalAfterTax(); // 33.00
+```
+
 Cascading tax:
 
 ```php

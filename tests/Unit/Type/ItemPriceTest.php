@@ -124,7 +124,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     {
         // Invalid argument: Multiple TaxPrice's of the same instance
         $item = new ItemPrice(10);
-        $tax_price = new TaxPrice(10, 'exclusive');
+        $tax_price = new TaxPrice(10, TaxPrice::EXCLUSIVE);
         $item->setTax($tax_price, $tax_price);
     }
 
@@ -136,9 +136,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     public function taxProvider()
     {
         return [
-            [new ItemPrice(10, 0), [new TaxPrice(10, 'exclusive')]],
-            [new ItemPrice(10), [new TaxPrice(10, 'exclusive')]],
-            [new ItemPrice(10, 1), [new TaxPrice(10, 'exclusive'), new TaxPrice(10, 'exclusive')]],
+            [new ItemPrice(10, 0), [new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
+            [new ItemPrice(10), [new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
+            [new ItemPrice(10, 1), [new TaxPrice(10, TaxPrice::EXCLUSIVE), new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
         ];
     }
 
@@ -161,6 +161,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\UnitPrice::setQty
      * @uses Blesta\Pricing\Type\UnitPrice::setKey
      * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
      * @uses Blesta\Pricing\Modifier\TaxPrice::on
      * @dataProvider totalAfterTaxProvider
@@ -191,12 +192,12 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     public function totalAfterTaxProvider()
     {
         return [
-            [new ItemPrice(100.00, 2), [new TaxPrice(10, 'exclusive')]],
-            [new ItemPrice(0.00, 2), [new TaxPrice(10, 'exclusive')]],
-            [new ItemPrice(-100.00, 2), [new TaxPrice(10, 'exclusive')]],
+            [new ItemPrice(100.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
+            [new ItemPrice(0.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
+            [new ItemPrice(-100.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
 
-            [new ItemPrice(100.00, 2), [new TaxPrice(10, 'exclusive'), new TaxPrice(10, 'exclusive')]],
-            [new ItemPrice(-100.00, 2), [new TaxPrice(10, 'exclusive'), new TaxPrice(20, 'exclusive')]],
+            [new ItemPrice(100.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE), new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
+            [new ItemPrice(-100.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE), new TaxPrice(20, TaxPrice::EXCLUSIVE)]],
         ];
     }
 
@@ -305,6 +306,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\ItemPrice::compoundTaxAmount
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
      * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::__construct
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
      * @uses Blesta\Pricing\Modifier\TaxPrice::on
      * @uses Blesta\Pricing\Modifier\DiscountPrice::__construct
@@ -324,7 +326,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($item->subtotal(), $item->total());
 
         // Total is the total after tax when no discount exists
-        $item->setTax(new TaxPrice(5.25, 'exclusive'));
+        $item->setTax(new TaxPrice(5.25, TaxPrice::EXCLUSIVE));
         $this->assertEquals($item->totalAfterTax(), $item->total());
 
         // Total is the total after discount and tax
@@ -353,8 +355,8 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         $this->assertEmpty($item->discounts());
 
         $discounts = [
-            new DiscountPrice(10, 'exclusive'),
-            new DiscountPrice(5.00, 'exclusive')
+            new DiscountPrice(10, TaxPrice::EXCLUSIVE),
+            new DiscountPrice(5.00, TaxPrice::EXCLUSIVE)
         ];
 
         foreach ($discounts as $discount) {
@@ -380,8 +382,11 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\ItemPrice::amountDiscount
      * @uses Blesta\Pricing\Type\ItemPrice::amountDiscountAll
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
      * @uses Blesta\Pricing\Modifier\TaxPrice::on
+     * @uses Blesta\Pricing\Modifier\TaxPrice::type
      * @uses Blesta\Pricing\Type\UnitPrice::__construct
      * @uses Blesta\Pricing\Type\UnitPrice::setPrice
      * @uses Blesta\Pricing\Type\UnitPrice::setQty
@@ -389,7 +394,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\UnitPrice::total
      * @dataProvider taxAmountProvider
      */
-    public function testTaxAmount($item, $tax, $expected_amount)
+    public function testTaxAmount($item, $tax, $expected_amount, array $excluded_tax_types)
     {
         // No taxes set. No tax amount
         $subtotal = $item->subtotal();
@@ -398,8 +403,14 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         // Set tax price
         $item->setTax($tax);
 
+        // Exclude the given tax types from calculation
+        foreach ($excluded_tax_types as $excluded_tax_type) {
+            $item->excludeTax($excluded_tax_type);
+        }
+
+        $tax_price = in_array($tax->type(), $excluded_tax_types) ? 0 : $tax->on($subtotal);
         // Test the tax amount
-        $this->assertEquals($tax->on($subtotal), $item->taxAmount($tax));
+        $this->assertEquals($tax_price, $item->taxAmount($tax));
 
         // Test with all taxes applied
         $tax_amount = $item->taxAmount();
@@ -411,7 +422,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
         // The given expected amount should be the end result with all taxes applied
         $this->assertEquals($expected_amount, $item->taxAmount());
-        $this->assertEquals($tax->on($subtotal), $item->taxAmount());
+        $this->assertEquals($tax_price, $item->taxAmount());
     }
 
     /**
@@ -422,9 +433,12 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
     public function taxAmountProvider()
     {
         return [
-            [new ItemPrice(100, 2), new TaxPrice(10, 'exclusive'), 20],
-            [new ItemPrice(0, 2), new TaxPrice(10, 'exclusive'), 0],
-            [new ItemPrice(-100, 2), new TaxPrice(10, 'exclusive'), -20],
+            [new ItemPrice(100, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), 20, []],
+            [new ItemPrice(0, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), 0, []],
+            [new ItemPrice(-100, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), -20, []],
+            [new ItemPrice(100, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), 0, [TaxPrice::EXCLUSIVE]],
+            [new ItemPrice(100, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), 20, [TaxPrice::INCLUSIVE]],
+            [new ItemPrice(100, 2), new TaxPrice(10, TaxPrice::INCLUSIVE), 0, [TaxPrice::INCLUSIVE]]
         ];
     }
 
@@ -440,7 +454,9 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\ItemPrice::discountAmount
      * @uses Blesta\Pricing\Type\ItemPrice::amountDiscount
      * @uses Blesta\Pricing\Type\ItemPrice::amountDiscountAll
+     * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
      * @uses Blesta\Pricing\Modifier\TaxPrice::on
      * @uses Blesta\Pricing\Type\UnitPrice::__construct
@@ -450,10 +466,15 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\UnitPrice::total
      * @dataProvider taxAmountCompoundProvider
      */
-    public function testTaxAmountCompound($item, array $taxes, array $expected_tax_amounts)
+    public function testTaxAmountCompound($item, array $taxes, array $expected_tax_amounts, array $excluded_tax_types)
     {
         // Set all taxes
         call_user_func_array([$item, 'setTax'], $taxes);
+
+        // Exclude the given tax types from calculation
+        foreach ($excluded_tax_types as $excluded_tax_type) {
+            $item->excludeTax($excluded_tax_type);
+        }
 
         // The tax amounts should be compounded, and only return the componud amount for that tax
         foreach ($taxes as $index => $tax) {
@@ -480,27 +501,95 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [
                 new ItemPrice(100, 2),
                 [
-                    new TaxPrice(10, 'exclusive'),
-                    new TaxPrice(7.75, 'exclusive')
+                    new TaxPrice(10, TaxPrice::EXCLUSIVE),
+                    new TaxPrice(7.75, TaxPrice::EXCLUSIVE)
                 ],
                 [
                     20,
                     17.05
-                ]
+                ],
+                []
             ],
             [
                 new ItemPrice(10, 3),
                 [
-                    new TaxPrice(10, 'exclusive'),
-                    new TaxPrice(5, 'exclusive'),
-                    new TaxPrice(2.5, 'exclusive')
+                    new TaxPrice(10, TaxPrice::EXCLUSIVE),
+                    new TaxPrice(5, TaxPrice::EXCLUSIVE),
+                    new TaxPrice(2.5, TaxPrice::EXCLUSIVE)
                 ],
                 [
                     3,
                     1.65,
                     0.86625
-                ]
+                ],
+                []
             ],
+            [
+                new ItemPrice(10, 3),
+                [
+                    new TaxPrice(10, TaxPrice::EXCLUSIVE),
+                    new TaxPrice(5, TaxPrice::EXCLUSIVE),
+                    new TaxPrice(2.5, TaxPrice::EXCLUSIVE)
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [TaxPrice::EXCLUSIVE]
+            ],
+            [
+                new ItemPrice(10, 3),
+                [
+                    new TaxPrice(10, TaxPrice::INCLUSIVE),
+                    new TaxPrice(5, TaxPrice::INCLUSIVE),
+                    new TaxPrice(2.5, TaxPrice::EXCLUSIVE)
+                ],
+                [
+                    3,
+                    1.65,
+                    0
+                ],
+                [TaxPrice::EXCLUSIVE]
+            ],
+            [
+                new ItemPrice(10, 3),
+                [
+                    new TaxPrice(10, TaxPrice::INCLUSIVE),
+                    new TaxPrice(5, TaxPrice::INCLUSIVE),
+                    new TaxPrice(2.5, TaxPrice::EXCLUSIVE)
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [TaxPrice::INCLUSIVE, TaxPrice::EXCLUSIVE]
+            ],
+            [
+                new ItemPrice(10, 3),
+                [
+                    new TaxPrice(10, TaxPrice::INCLUSIVE),
+                    new TaxPrice(5, TaxPrice::INCLUSIVE),
+                    new TaxPrice(2.5, TaxPrice::EXCLUSIVE)
+                ],
+                [
+                    0,
+                    0,
+                    0.86625
+                ],
+                [TaxPrice::INCLUSIVE]
+            ],
+            [
+                new ItemPrice(10, 3),
+                [
+                    new TaxPrice(2.5, TaxPrice::EXCLUSIVE)
+                ],
+                [
+                    0.75
+                ],
+                [TaxPrice::INCLUSIVE]
+            ]
         ];
     }
 
@@ -790,7 +879,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      */
     public function taxesProvider()
     {
-        $tax = new TaxPrice(50, 'exclusive');
+        $tax = new TaxPrice(50, TaxPrice::EXCLUSIVE);
 
         return [
             [
@@ -802,7 +891,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [
                 true,
                 [
-                    [new TaxPrice(10, 'exclusive')]
+                    [new TaxPrice(10, TaxPrice::EXCLUSIVE)]
                 ],
                 1,
                 1
@@ -810,8 +899,8 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [
                 true,
                 [
-                    [new TaxPrice(100, 'exclusive'), new TaxPrice(20, 'exclusive')],
-                    [new TaxPrice(10, 'exclusive')]
+                    [new TaxPrice(100, TaxPrice::EXCLUSIVE), new TaxPrice(20, TaxPrice::EXCLUSIVE)],
+                    [new TaxPrice(10, TaxPrice::EXCLUSIVE)]
                 ],
                 3,
                 3
@@ -819,7 +908,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [
                 true,
                 [
-                    [$tax, new TaxPrice(15, 'exclusive')],
+                    [$tax, new TaxPrice(15, TaxPrice::EXCLUSIVE)],
                     [$tax]
                 ],
                 2,
@@ -836,12 +925,64 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [
                 false,
                 [
-                    [new TaxPrice(10, 'exclusive'), new TaxPrice(15, 'exclusive')],
-                    [new TaxPrice(25, 'exclusive')]
+                    [new TaxPrice(10, TaxPrice::EXCLUSIVE), new TaxPrice(15, TaxPrice::EXCLUSIVE)],
+                    [new TaxPrice(25, TaxPrice::EXCLUSIVE)]
                 ],
                 2,
                 3
             ]
         ];
+    }
+
+    /**
+     * @covers ::resetTaxes
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
+     */
+    public function testResetTaxes()
+    {
+        $item = new ItemPrice(10);
+
+        $item->excludeTax(TaxPrice::EXCLUSIVE);
+        $this->assertAttributeEquals([TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => false], 'tax_types', $item);
+
+        $item->resetTaxes();
+        $this->assertAttributeEquals([TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true], 'tax_types', $item);
+    }
+
+    /**
+     * @covers ::excludeTax
+     * @uses Blesta\Pricing\Type\ItemPrice::__construct
+     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\UnitPrice::__construct
+     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
+     * @uses Blesta\Pricing\Type\UnitPrice::setQty
+     * @uses Blesta\Pricing\Type\UnitPrice::setKey
+     * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
+     */
+    public function testExcludeTax()
+    {
+        $item = new ItemPrice(10);
+
+        $item->excludeTax('invalid_tax_type');
+        $this->assertAttributeEquals([TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true], 'tax_types', $item);
+
+        $item->excludeTax(TaxPrice::EXCLUSIVE);
+        $this->assertAttributeEquals([TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => false], 'tax_types', $item);
+
+        $item->excludeTax(TaxPrice::INCLUSIVE);
+        $this->assertAttributeEquals([TaxPrice::INCLUSIVE => false, TaxPrice::EXCLUSIVE => false], 'tax_types', $item);
+
+        $this->assertInstanceOf('Blesta\Pricing\Type\ItemPrice', $item->excludeTax(TaxPrice::INCLUSIVE));
     }
 }

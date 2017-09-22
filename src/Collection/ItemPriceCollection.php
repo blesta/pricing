@@ -75,8 +75,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
             $total += $item->totalAfterTax();
         }
 
-        // Reset any discount amounts back
+        // Reset any discount amounts or excluded tax types back
         $this->resetDiscounts();
+        $this->resetTaxes();
 
         return $total;
     }
@@ -93,8 +94,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
             $total += $item->totalAfterDiscount();
         }
 
-        // Reset any discount amounts back
+        // Reset any discount amounts or excluded tax types back
         $this->resetDiscounts();
+        $this->resetTaxes();
 
         return $total;
     }
@@ -128,8 +130,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
             $total += $item_price->total();
         }
 
-        // Reset any discount amounts back
+        // Reset any discount amounts or excluded tax types back
         $this->resetDiscounts();
+        $this->resetTaxes();
 
         return $total;
     }
@@ -147,8 +150,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
             $total += $item_price->taxAmount($tax);
         }
 
-        // Reset any discount amounts back
+        // Reset any discount amounts or excluded tax types back
         $this->resetDiscounts();
+        $this->resetTaxes();
 
         return $total;
     }
@@ -169,8 +173,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
             $total += $item_price->discountAmount($discount);
         }
 
-        // Reset any discount amounts back
+        // Reset any discount amounts or excluded tax types back
         $this->resetDiscounts();
+        $this->resetTaxes();
 
         return $total;
     }
@@ -222,6 +227,31 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     {
         foreach ($this->collection as $item_price) {
             $item_price->resetDiscounts();
+        }
+    }
+
+    /**
+     * Marks the given tax type as not shown in totals returned by all ItemPrices in the collection
+     *
+     * @param string $tax_type The type of tax to exclude
+     * @return A reference to this object
+     */
+    public function excludeTax($tax_type)
+    {
+        foreach ($this->collection as $item_price) {
+            $item_price->excludeTax($tax_type);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Resets the list of tax types for all ItemPrices in the collection
+     */
+    public function resetTaxes()
+    {
+        foreach ($this->collection as $item_price) {
+            $item_price->resetTaxes();
         }
     }
 

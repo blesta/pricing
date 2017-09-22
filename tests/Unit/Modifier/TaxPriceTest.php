@@ -15,7 +15,7 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
      */
     public function testConstruct()
     {
-        $this->assertInstanceOf('Blesta\Pricing\Modifier\TaxPrice', new TaxPrice(10.00, 'exclusive'));
+        $this->assertInstanceOf('Blesta\Pricing\Modifier\TaxPrice', new TaxPrice(10.00, TaxPrice::EXCLUSIVE));
     }
 
     /**
@@ -25,7 +25,7 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
     public function testConstructException()
     {
         // Amount must be non-negative
-        $tax = new TaxPrice(-10, 'exclusive');
+        $tax = new TaxPrice(-10, TaxPrice::EXCLUSIVE);
     }
 
     /**
@@ -46,19 +46,19 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
     public function offProvider()
     {
         return [
-            [new TaxPrice(0, 'exclusive'), 10.00, 10.00],
-            [new TaxPrice(50, 'exclusive'), 10.00, 10.00],
-            [new TaxPrice(100, 'exclusive'), 10.00, 10.00],
-            [new TaxPrice(0, 'exclusive'), -10.00, -10.00],
-            [new TaxPrice(50, 'exclusive'), -10.00, -10.00],
-            [new TaxPrice(100, 'exclusive'), -10.00, -10.00],
+            [new TaxPrice(0, TaxPrice::EXCLUSIVE), 10.00, 10.00],
+            [new TaxPrice(50, TaxPrice::EXCLUSIVE), 10.00, 10.00],
+            [new TaxPrice(100, TaxPrice::EXCLUSIVE), 10.00, 10.00],
+            [new TaxPrice(0, TaxPrice::EXCLUSIVE), -10.00, -10.00],
+            [new TaxPrice(50, TaxPrice::EXCLUSIVE), -10.00, -10.00],
+            [new TaxPrice(100, TaxPrice::EXCLUSIVE), -10.00, -10.00],
 
-            [new TaxPrice(0, 'inclusive'), 10.00, 10.00],
-            [new TaxPrice(50, 'inclusive'), 10.00, 5.00],
-            [new TaxPrice(100, 'inclusive'), 10.00, 0.00],
-            [new TaxPrice(0, 'inclusive'), -10.00, -10.00],
-            [new TaxPrice(50, 'inclusive'), -10.00, -5.00],
-            [new TaxPrice(100, 'inclusive'), -10.00, 0.00],
+            [new TaxPrice(0, TaxPrice::INCLUSIVE), 10.00, 10.00],
+            [new TaxPrice(50, TaxPrice::INCLUSIVE), 10.00, 5.00],
+            [new TaxPrice(100, TaxPrice::INCLUSIVE), 10.00, 0.00],
+            [new TaxPrice(0, TaxPrice::INCLUSIVE), -10.00, -10.00],
+            [new TaxPrice(50, TaxPrice::INCLUSIVE), -10.00, -5.00],
+            [new TaxPrice(100, TaxPrice::INCLUSIVE), -10.00, 0.00],
         ];
     }
 
@@ -79,19 +79,19 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
     public function onProvider()
     {
         return [
-            [new TaxPrice(0, 'exclusive'), 10.00, 0.00],
-            [new TaxPrice(50, 'exclusive'), 10.00, 5.00],
-            [new TaxPrice(100, 'exclusive'), 10.00, 10.00],
-            [new TaxPrice(0, 'exclusive'), -10.00, 0.00],
-            [new TaxPrice(50, 'exclusive'), -10.00, -5.00],
-            [new TaxPrice(100, 'exclusive'), -10.00, -10.00],
+            [new TaxPrice(0, TaxPrice::EXCLUSIVE), 10.00, 0.00],
+            [new TaxPrice(50, TaxPrice::EXCLUSIVE), 10.00, 5.00],
+            [new TaxPrice(100, TaxPrice::EXCLUSIVE), 10.00, 10.00],
+            [new TaxPrice(0, TaxPrice::EXCLUSIVE), -10.00, 0.00],
+            [new TaxPrice(50, TaxPrice::EXCLUSIVE), -10.00, -5.00],
+            [new TaxPrice(100, TaxPrice::EXCLUSIVE), -10.00, -10.00],
 
-            [new TaxPrice(0, 'inclusive'), 10.00, 0.00],
-            [new TaxPrice(50, 'inclusive'), 10.00, 5.00],
-            [new TaxPrice(100, 'inclusive'), 10.00, 10.00],
-            [new TaxPrice(0, 'inclusive'), -10.00, 0.00],
-            [new TaxPrice(50, 'inclusive'), -10.00, -5.00],
-            [new TaxPrice(100, 'inclusive'), -10.00, -10.00],
+            [new TaxPrice(0, TaxPrice::INCLUSIVE), 10.00, 0.00],
+            [new TaxPrice(50, TaxPrice::INCLUSIVE), 10.00, 5.00],
+            [new TaxPrice(100, TaxPrice::INCLUSIVE), 10.00, 10.00],
+            [new TaxPrice(0, TaxPrice::INCLUSIVE), -10.00, 0.00],
+            [new TaxPrice(50, TaxPrice::INCLUSIVE), -10.00, -5.00],
+            [new TaxPrice(100, TaxPrice::INCLUSIVE), -10.00, -10.00],
         ];
     }
 
@@ -113,19 +113,19 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
     public function includingProvider()
     {
         return [
-            [new TaxPrice(0, 'exclusive'), 10.00, 10.00],
-            [new TaxPrice(50, 'exclusive'), 10.00, 15.00],
-            [new TaxPrice(100, 'exclusive'), 10.00, 20.00],
-            [new TaxPrice(0, 'exclusive'), -10.00, -10.00],
-            [new TaxPrice(50, 'exclusive'), -10.00, -15.00],
-            [new TaxPrice(100, 'exclusive'), -10.00, -20.00],
+            [new TaxPrice(0, TaxPrice::EXCLUSIVE), 10.00, 10.00],
+            [new TaxPrice(50, TaxPrice::EXCLUSIVE), 10.00, 15.00],
+            [new TaxPrice(100, TaxPrice::EXCLUSIVE), 10.00, 20.00],
+            [new TaxPrice(0, TaxPrice::EXCLUSIVE), -10.00, -10.00],
+            [new TaxPrice(50, TaxPrice::EXCLUSIVE), -10.00, -15.00],
+            [new TaxPrice(100, TaxPrice::EXCLUSIVE), -10.00, -20.00],
 
-            [new TaxPrice(0, 'inclusive'), 10.00, 10.00],
-            [new TaxPrice(50, 'inclusive'), 10.00, 10.00],
-            [new TaxPrice(100, 'inclusive'), 10.00, 10.00],
-            [new TaxPrice(0, 'inclusive'), -10.00, -10.00],
-            [new TaxPrice(50, 'inclusive'), -10.00, -10.00],
-            [new TaxPrice(100, 'inclusive'), -10.00, -10.00],
+            [new TaxPrice(0, TaxPrice::INCLUSIVE), 10.00, 10.00],
+            [new TaxPrice(50, TaxPrice::INCLUSIVE), 10.00, 10.00],
+            [new TaxPrice(100, TaxPrice::INCLUSIVE), 10.00, 10.00],
+            [new TaxPrice(0, TaxPrice::INCLUSIVE), -10.00, -10.00],
+            [new TaxPrice(50, TaxPrice::INCLUSIVE), -10.00, -10.00],
+            [new TaxPrice(100, TaxPrice::INCLUSIVE), -10.00, -10.00],
         ];
     }
 }

@@ -32,6 +32,10 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      * @var array A numerically-indexed array containing an array of TaxPrice objects
      */
     protected $taxes = [];
+    /**
+     * @var array A list of tax types and whether or not they are shown in totals returned by this object
+     */
+    protected $tax_types = [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true];
 
     /**
      * Initialize the item price
@@ -226,11 +230,20 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     private function compoundTaxAmount(array $tax_group, $taxable_price, TaxPrice $tax = null)
     {
         $compound_tax = 0;
+        $tax_total = 0;
 
         foreach ($tax_group as $tax_price) {
             // Calculate the compound tax
             $tax_amount = $tax_price->on($taxable_price + $compound_tax);
             $compound_tax += $tax_amount;
+
+            if (isset($this->tax_types[$tax_price->type()]) && $this->tax_types[$tax_price->type()]) {
+                // Only return taxes of types that are set to be shown
+                $tax_total += $tax_amount;
+            } elseif ($tax && $tax === $tax_price) {
+                // Return a total of zero if we were given a tax, but it is of an excluded tax type
+                return 0;
+            }
 
             // Ignore any other group taxes, and only return the tax amount for the given TaxPrice
             if ($tax && $tax === $tax_price) {
@@ -238,7 +251,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
             }
         }
 
-        return $compound_tax;
+        return $tax_total;
     }
 
     /**
@@ -380,5 +393,30 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     private function resetDiscountSubtotal()
     {
         $this->discounted_subtotal = $this->subtotal();
+    }
+
+    /**
+     * Marks the given tax type as not shown in totals returned by this object
+     *
+     * @param string $tax_type The type of tax to exclude
+     * @return A reference to this object
+     */
+    public function excludeTax($tax_type)
+    {
+        if (array_key_exists($tax_type, $this->tax_types)) {
+            $this->tax_types[$tax_type] = false;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Resets the list of tax types to show in totals returned by this object
+     */
+    public function resetTaxes()
+    {
+        foreach ($this->tax_types as $type => $value) {
+            $this->tax_types[$type] = true;
+        }
     }
 }
