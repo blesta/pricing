@@ -63,7 +63,7 @@ Exclusive tax (price does not include tax):
 ```php
 use Blesta\Pricing\Modifier\TaxPrice;
 
-$tax = new TaxPrice(10.00, "exclusive");
+$tax = new TaxPrice(10.00, TaxPrice::EXCLUSIVE);
 $tax->setDescription("10 % tax");
 $tax->on(100.00); // 10.00
 $tax->off(100.00); // 100.00 (price on exclusive tax doesn't include tax, so nothing to take off)
@@ -75,7 +75,7 @@ Inclusive tax (price already includes tax):
 ```php
 use Blesta\Pricing\Modifier\TaxPrice;
 
-$tax = new TaxPrice(25.00, "inclusive");
+$tax = new TaxPrice(25.00, TaxPrice::INCLUSIVE);
 $tax->setDescription("25 % tax");
 $tax->on(100.00); // 25.00
 $tax->off(100.00); // 75.00
@@ -89,14 +89,14 @@ use Blesta\Pricing\Modifier\TaxPrice;
 use Blesta\Pricing\Type\UnitPrice;
 
 $price = new UnitPrice(10.00);
-$tax1 = new TaxPrice(10.00, "exclusive");
-$tax2 = new TaxPrice(5.00, "exclusive");
+$tax1 = new TaxPrice(10.00, TaxPrice::EXCLUSIVE);
+$tax2 = new TaxPrice(5.00, TaxPrice::EXCLUSIVE);
 $tax2->on(
     $tax1->on(
         $price->total()
     )
     + $price->total()
-); // ((10.00 * 0.10) + 10.00) * 0.05 -> 0.55
+); // 0.55 = [((10.00 * 0.10) + 10.00) * 0.05]
 ```
 
 ### ItemPrice
@@ -125,6 +125,8 @@ Amount applied for a specific discount:
 ```php
 use Blesta\Pricing\Modifier\DiscountPrice;
 
+$item_price = new ItemPrice(10.00, 3);
+
 $discount1 = new DiscountPrice(5.00, "percent");
 $discount2 = new DiscountPrice(25.00, "percent");
 
@@ -141,19 +143,32 @@ With tax applied:
 ```php
 use Blesta\Pricing\Modifier\TaxPrice;
 
-$tax = new TaxPrice(10.00, "exclusive");
+$tax = new TaxPrice(10.00, TaxPrice::EXCLUSIVE);
 
 // call setTax() as many times as needed to apply multiple levels of taxes
 $item_price->setTax($tax);
-// pass as many TaxPrice obects to setTax as you want to compound tax
+// pass as many TaxPrice objects to setTax as you want to compound tax
 // ex. $item_price->setTax($tax1, $tax2, ...);
-$item_price->totalAfterTax(); // 30.30
+$item_price->totalAfterTax(); // 32.1375 = (subtotal + ([subtotal - discounts] * taxes)) = (30 + [30 - (1.50 + 7.125)] * 0.10)
 ```
 
 With tax and discount:
 
 ```php
-$item_price->total(); // 31.35
+$item_price->total(); // 23.5125 = (subtotal - discounts + ([subtotal - discounts] * taxes)) = (30 - (1.50 + 7.125) + [30 - (1.50 + 7.125)] * 0.10)
+```
+
+Without taxes of the 'exclusive' type:
+
+```php
+$item_price->excludeTax(TaxPrice::EXCLUSIVE)->totalAfterTax(); // 30.00 = (30 + [30 - (1.50 + 7.125)] * 0)
+$item_price->total(); // 21.375 = (30 - (1.50 + 7.125) + [30 - (1.50 + 7.125)] * 0)
+
+// Be sure to reset the excluded taxes before attempting to fetch totals that should include them again!
+$item_price->resetTaxes();
+$item_price->total(); // 23.5125 = (subtotal - discounts + ([subtotal - discounts] * taxes)) = (30 - (1.50 + 7.125) + [30 - (1.50 + 7.125)] * 0.10)
+$item_price->excludeTax(TaxPrice::EXCLUSIVE)->total(); // 21.375 = (30 - (1.50 + 7.125) + [30 - (1.50 + 7.125)] * 0)
+$item_price->resetTaxes();
 ```
 
 Amount applied for a specific tax:
@@ -161,44 +176,49 @@ Amount applied for a specific tax:
 ```php
 use Blesta\Pricing\Modifier\TaxPrice;
 
-$tax1 = new TaxPrice(10.00, "exclusive");
-$tax2 = new TaxPrice(5.00, "exclusive");
+$tax1 = new TaxPrice(10.00, TaxPrice::EXCLUSIVE);
+$tax2 = new TaxPrice(5.00, TaxPrice::INCLUSIVE);
 
 // NOTE: order *DOES NOT* matter
 $item_price->setTax($tax1);
 $item_price->setTax($tax2);
 
-$item_price->taxAmount($tax1); // 3.00
-$item_price->taxAmount($tax2); // 1.50
+$item_price->taxAmount($tax1); // 2.1375 = ([subtotal - discounts] * taxes) = ([30 - (1.50 + 7.125)] * 0.10)
+$item_price->taxAmount($tax2); // 1.06875 = ([subtotal - discounts] * taxes) = ([30 - (1.50 + 7.125)] * 0.05)
 ```
 
-With taxes applied but excluded:
+Without taxes of the 'exclusive' type:
 
 ```php
-use Blesta\Pricing\Modifier\TaxPrice;
-
-$tax1 = new TaxPrice(10.00, "exclusive");
-$tax2 = new TaxPrice(5.00, "inclusive");
-
-$item_price->setTax($tax1);
-$item_price->setTax($tax2);
-
-$item_price->excludeTax('inclusive')->totalAfterTax(); // 33.00
+$item_price->excludeTax(TaxPrice::EXCLUSIVE)->totalAfterTax(); // 31.06875 = (subtotal + ([subtotal - discounts] * taxes)) = (30 + [30 - (1.50 + 7.125)] * 0.05)
+$item_price->resetTaxes();
 ```
 
 Cascading tax:
 
 ```php
 use Blesta\Pricing\Modifier\TaxPrice;
+use Blesta\Pricing\Type\ItemPrice;
 
-$tax1 = new TaxPrice(10.00, "exclusive");
-$tax2 = new TaxPrice(5.00, "exclusive");
-$tax3 = new TaxPrice(2.50, "exclusive");
+$item_price = new ItemPrice(10.00, 3);
+
+$tax1 = new TaxPrice(10.00, TaxPrice::EXCLUSIVE);
+$tax2 = new TaxPrice(5.00, TaxPrice::INCLUSIVE);
+$tax3 = new TaxPrice(2.50, TaxPrice::EXCLUSIVE);
 
 $item_price->setTax($tax1, $tax2, $tax3);
-$item_price->taxAmount($tax1); // 3.00
-$item_price->taxAmount($tax2); //  ((30.00 * 0.10) + 30.00) * 0.05 -> 1.65
-$item_price->taxAmount($tax3); //  (((30.00 * 0.10) + 30.00) * 0.05) + 30.00 * 0.025 -> 0.86625
+$item_price->taxAmount($tax1); // 3.00 = ([subtotal - discounts] * taxes) = ([30 - 0] * 0.10)
+$item_price->taxAmount($tax2); // 1.65 = ([subtotal - discounts + previous-taxes] * 0.05) = ([30.00 - 0 + 3.00] * 0.05)
+$item_price->taxAmount($tax3); // 0.86625 = ([subtotal - discounts + previous-taxes] * 0.025) = ([30.00 - 0 + 3.00 + 1.65] * 0.025)
+$item_price->taxAmount(); // 5.51625
+
+// Exclude taxes of the 'inclusive' type
+$item_price->excludeTax(TaxPrice::INCLUSIVE);
+$item_price->taxAmount($tax1); // 3.00 = ([subtotal - discounts] * taxes) = ([30 - 0] * 0.10)
+$item_price->taxAmount($tax2); // 0 = ([subtotal - discounts + previous-taxes] * 0) = ([30.00 - 0 + 3.00] * 0)
+$item_price->taxAmount($tax3); // 0.86625 = ([subtotal - discounts + previous-taxes] * 0.025) = ([30.00 - 0 + 3.00 + 1.65] * 0.025)
+$item_price->taxAmount(); // 3.86625
+$item_price->resetTaxes();
 ```
 
 ### ItemPriceCollection
@@ -239,12 +259,12 @@ use Blesta\Pricing\PricingFactory;
 $pricing_factory = new PricingFactory();
 
 // Some coupon
-$discount = $pricing_factory->discountPrice(50.00, "percent")
-    ->setDescription('Super-Saver Coupon');
+$discount = $pricing_factory->discountPrice(50.00, "percent");
+$discount->setDescription('Super-Saver Coupon');
 
 // Typical local sales tax
-$tax = $pricing_factory->taxPrice(10.00, "exclusive")
-    ->setDescription("Sales tax");
+$tax = $pricing_factory->taxPrice(10.00, TaxPrice::EXCLUSIVE);
+$tax->setDescription("Sales tax");
 ```
 
 Then we let the PricingFactory initialize our ItemPriceCollection, and each ItemPrice over our data set.
@@ -253,9 +273,9 @@ Then we let the PricingFactory initialize our ItemPriceCollection, and each Item
 $item_collection = $pricing_factory->itemPriceCollection();
 
 foreach ($products as $product) {
-    $item = $item_collection->itemPrice($product['amount'], $product['qty'])
-        ->setDescription($product['desc'])
-        ->setTax($tax);
+    $item = $pricing_factory->itemPrice($product['amount'], $product['qty']);
+    $item->setDescription($product['desc']);
+    $item->setTax($tax);
 
     if ('Apples' === $product['desc']) {
         $item->setDiscount($discount);
@@ -264,9 +284,18 @@ foreach ($products as $product) {
 }
 
 $item_collection->discountAmount($discount); // 0.75
-$item_collection->taxAmount($tax); // 0.90
+$item_collection->taxAmount($tax); // 0.825
 $item_collection->subtotal(); // 9.00
-$item_collection->totalAfterTax(); // 9.90
+$item_collection->totalAfterTax(); // 9.825
 $item_collection->totalAfterDiscount(); // 8.25
 $item_collection->total(); // 9.075
+```
+
+You may also exclude specific taxes by their type when calculating totals:
+
+```php
+$item_collection->excludeTax(TaxPrice::EXCLUSIVE)->taxAmount($tax); // 0.00
+$item_collection->excludeTax(TaxPrice::EXCLUSIVE)->totalAfterTax(); // 9.00
+$item_collection->excludeTax(TaxPrice::EXCLUSIVE)->total(); // 8.25
+$item_collection->total(); // 9.075 (item tax exclusions in the collection are reset after each call to a ::total..., the ::taxAmount, or ::discountAmount)
 ```
