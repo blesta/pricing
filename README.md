@@ -1,5 +1,7 @@
 # blesta/pricing
 
+[![Build Status](https://travis-ci.org/blesta/pricing.svg?branch=master)](https://travis-ci.org/blesta/pricing) [![Coverage Status](https://coveralls.io/repos/github/blesta/pricing/badge.svg?branch=master)](https://coveralls.io/github/blesta/pricing?branch=master)
+
 A library for handling pricing. Supports:
 
 - Unit Prices
