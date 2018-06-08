@@ -249,8 +249,8 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [new ItemPrice(0, 1), [new DiscountPrice(10, 'percent')]],
             [new ItemPrice(10, 2), [new DiscountPrice(10, 'percent'), new DiscountPrice(10, 'percent')]],
             [new ItemPrice(-10, 2), [new DiscountPrice(10, 'percent')]],
-            [new itemPrice(10, 2), [new DiscountPrice(3, 'amount')]],
-            [new itemPrice(-10, 2), [new DiscountPrice(5, 'amount')]],
+            [new ItemPrice(10, 2), [new DiscountPrice(3, 'amount')]],
+            [new ItemPrice(-10, 2), [new DiscountPrice(5, 'amount')]],
         ];
     }
 

@@ -47,14 +47,10 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      * @param float $price The unit price
      * @param int $qty The quantity of unit prices (optional, default 1)
      * @param string $key A unique identifier (optional, default null)
-     * @param bool $discount_taxes Whether to apply discounts before calculating tax (optional, default true)
      */
-    public function __construct($price, $qty = 1, $key = null, $discount_taxes = true)
+    public function __construct($price, $qty = 1, $key = null)
     {
         parent::__construct($price, $qty, $key);
-
-        // Set whether to apply discounts before calculating tax
-        $this->discount_taxes = $discount_taxes;
 
         // Reset the internal discount subtotal
         $this->resetDiscountSubtotal();
@@ -118,6 +114,16 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
         }
 
         $this->taxes[] = array_values($taxes);
+    }
+
+    /**
+     * Sets whether to calculate tax before or after discounts are applied
+     *
+     * @param $discount_taxes True to calculate taxes after discounts are applied, false otherwise
+     */
+    public function setDiscountTaxes($discount_taxes)
+    {
+        $this->discount_taxes = $discount_taxes;
     }
 
     /**
