@@ -152,8 +152,6 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\UnitPrice::setQty
      * @uses Blesta\Pricing\Type\UnitPrice::setKey
      * @uses Blesta\Pricing\Type\UnitPrice::total
-     * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
-     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::__construct
      */
     public function testSetDiscountTaxes()
     {
@@ -406,6 +404,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\ItemPrice::amountDiscountAll
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
      * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
+     * @uses Blesta\Pricing\Type\ItemPrice::setDiscountTaxes
      * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
      * @uses Blesta\Pricing\Modifier\TaxPrice::on
@@ -501,6 +500,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\ItemPrice::amountDiscountAll
      * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
+     * @uses Blesta\Pricing\Type\ItemPrice::setDiscountTaxes
      * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
      * @uses Blesta\Pricing\Modifier\TaxPrice::on
