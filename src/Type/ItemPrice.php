@@ -36,6 +36,10 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      * @var array A list of tax types and whether or not they are shown in totals returned by this object
      */
     protected $tax_types = [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true];
+    /**
+     * @var bool Whether to apply discounts before calculating tax
+     */
+    protected $discount_taxes = true;
 
     /**
      * Initialize the item price
@@ -43,10 +47,14 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      * @param float $price The unit price
      * @param int $qty The quantity of unit prices (optional, default 1)
      * @param string $key A unique identifier (optional, default null)
+     * @param bool $discount_taxes Whether to apply discounts before calculating tax (optional, default true)
      */
-    public function __construct($price, $qty = 1, $key = null)
+    public function __construct($price, $qty = 1, $key = null, $discount_taxes = true)
     {
         parent::__construct($price, $qty, $key);
+
+        // Set whether to apply discounts before calculating tax
+        $this->discount_taxes = $discount_taxes;
 
         // Reset the internal discount subtotal
         $this->resetDiscountSubtotal();
@@ -186,7 +194,8 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     private function amountTax(TaxPrice $tax)
     {
-        $taxable_price = $this->totalAfterDiscount();
+        // Apply tax either before or after the discount
+        $taxable_price = $this->discount_taxes ? $this->totalAfterDiscount() : $this->subtotal();
         $tax_amount = 0;
 
         foreach ($this->taxes as $tax_group) {
@@ -206,7 +215,8 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     private function amountTaxAll()
     {
-        $taxable_price = $this->totalAfterDiscount();
+        // Apply tax either before or after the discount
+        $taxable_price = $this->discount_taxes ? $this->totalAfterDiscount() : $this->subtotal();
         $tax_amount = 0;
 
         // Determine all taxes set on this item's price, compounded accordingly
