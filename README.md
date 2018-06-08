@@ -161,7 +161,7 @@ $item_price->total(); // 23.5125 = (subtotal - discounts + ([subtotal - discount
 With tax before discount:
 
 ```php
-$item_price->setDicountTaxes(false);
+$item_price->setDiscountTaxes(false);
 $item_price->total(); // 24.375 = (subtotal - discounts + ([subtotal] * taxes)) = (30 - (1.50 + 7.125) + ([30] * 0.10))
 ```
 
