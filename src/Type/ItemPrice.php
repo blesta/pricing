@@ -119,7 +119,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     /**
      * Sets whether to calculate tax before or after discounts are applied
      *
-     * @param $discount_taxes True to calculate taxes after discounts are applied, false otherwise
+     * @param bool $discount_taxes True to calculate taxes after discounts are applied, false otherwise
      */
     public function setDiscountTaxes($discount_taxes)
     {
