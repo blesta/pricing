@@ -144,19 +144,119 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::setDiscountTaxes
-     * @uses Blesta\Pricing\Type\ItemPrice::__construct
-     * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
-     * @uses Blesta\Pricing\Type\ItemPrice::subtotal
-     * @uses Blesta\Pricing\Type\UnitPrice::__construct
-     * @uses Blesta\Pricing\Type\UnitPrice::setPrice
-     * @uses Blesta\Pricing\Type\UnitPrice::setQty
-     * @uses Blesta\Pricing\Type\UnitPrice::setKey
-     * @uses Blesta\Pricing\Type\UnitPrice::total
+     * @covers ::discountAmount
+     * @covers ::taxAmount
+     * @covers ::amountTax
+     * @covers ::amountTaxAll
+     * @covers ::totalAfterDiscount
+     * @covers ::totalAfterTax
+     * @covers ::total
+     * @uses Blesta\Pricing\Type\ItemPrice
+     * @uses Blesta\Pricing\Type\UnitPrice
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier
+     * @uses Blesta\Pricing\Modifier\DiscountPrice
+     * @uses Blesta\Pricing\Modifier\TaxPrice
+     * @dataProvider taxingDiscountsProvider
      */
-    public function testSetDiscountTaxes()
+    public function testTaxingDiscounts(
+        $discount_taxes,
+        $item,
+        array $discounts,
+        array $taxes,
+        $discount_amount,
+        $tax_amount,
+        $total_after_discount,
+        $total_after_tax,
+        $total
+    ) {
+        // Set whether taxes may be discounted
+        $item->setDiscountTaxes($discount_taxes);
+
+        // Apply the taxes and discounts to the item
+        foreach ($discounts as $discount) {
+            $item->setDiscount($discount);
+        }
+
+        foreach ($taxes as $tax) {
+            $item->setTax($tax);
+        }
+
+        $this->assertEquals($discount_amount, $item->discountAmount());
+
+        // Reset taxes so totals can include exclusive taxes again
+        $item->resetTaxes();
+
+        $this->assertEquals($tax_amount, $item->taxAmount());
+
+        // Reset taxes so totals can include exclusive taxes again
+        $item->resetTaxes();
+
+        $this->assertEquals($total_after_discount, $item->totalAfterDiscount());
+
+        // Reset taxes so totals can include exclusive taxes again
+        $item->resetTaxes();
+
+        $this->assertEquals($total_after_tax, $item->totalAfterTax());
+
+        // Reset taxes so totals can include exclusive taxes again
+        $item->resetTaxes();
+
+        $this->assertEquals($total, $item->total());
+    }
+
+    /**
+     * Data provider for testing whether discounts apply before or after tax
+     *
+     * @return array
+     */
+    public function taxingDiscountsProvider()
     {
-        $item = new ItemPrice(10);
-        $item->setDiscountTaxes(true);
+        return [
+            [
+                true, // discount taxes
+                new ItemPrice(10, 1),
+                [new DiscountPrice(10, 'percent')],
+                [new TaxPrice(50, TaxPrice::EXCLUSIVE)],
+                1.00, // discount amount (10 * 0.1)
+                4.50, // tax amount [10 * (1 - 0.1)] * (0.5)
+                9.00, // total after discount [10 - (10 * 0.1)]
+                14.50, // total after tax ([)10 + 4.50)
+                13.50 // grand total (9 + 4.50)
+            ],
+            [
+                false, // do not discount taxes
+                new ItemPrice(10, 1),
+                [new DiscountPrice(10, 'percent')],
+                [new TaxPrice(50, TaxPrice::EXCLUSIVE)],
+                1.00, // discount amount (10 * 0.1)
+                5.00, // tax amount (10 * 0.5)
+                9.00, // total after discount [10 - (10 * 0.1)]
+                15.00, // total after tax (10 + 5)
+                14.00 // grand total (9 + 5)
+            ],
+            [
+                true, // discount taxes
+                new ItemPrice(10, 1),
+                [new DiscountPrice(100, 'percent')],
+                [new TaxPrice(50, TaxPrice::EXCLUSIVE)],
+                10.00, // discount amount (10 * 1)
+                0.00, // tax amount [10 * (1 - 1)] * (0.5)
+                0.00, // total after discount [10 - (10 * 1)]
+                10.00, // total after tax (10 + 0)
+                0.00 // grand total (0 + 0)
+            ],
+            [
+                false, // do not discount taxes
+                new ItemPrice(10, 1),
+                [new DiscountPrice(100, 'percent')],
+                [new TaxPrice(50, TaxPrice::EXCLUSIVE)],
+                10.00, // discount amount (10 * 1)
+                5.00, // tax amount (10 * 0.5)
+                0.00, // total after discount [10 - (10 * 1)]
+                15.00, // total after tax (10 + 5)
+                5.00 // grand total (0 + 5)
+            ],
+        ];
     }
 
     /**
@@ -315,6 +415,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\ItemPrice::resetDiscountSubtotal
      * @uses Blesta\Pricing\Type\ItemPrice::setTax
      * @uses Blesta\Pricing\Type\ItemPrice::setDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::setDiscountTaxes
      * @uses Blesta\Pricing\Type\ItemPrice::totalAfterTax
      * @uses Blesta\Pricing\Type\ItemPrice::totalAfterDiscount
      * @uses Blesta\Pricing\Type\ItemPrice::taxAmount
@@ -397,6 +498,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @covers ::compoundTaxAmount
      * @uses Blesta\Pricing\Type\ItemPrice::setTax
      * @uses Blesta\Pricing\Type\ItemPrice::setDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::setDiscountTaxes
      * @uses Blesta\Pricing\Type\ItemPrice::totalAfterTax
      * @uses Blesta\Pricing\Type\ItemPrice::totalAfterDiscount
      * @uses Blesta\Pricing\Type\ItemPrice::discountAmount
@@ -404,7 +506,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\ItemPrice::amountDiscountAll
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
      * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
-     * @uses Blesta\Pricing\Type\ItemPrice::setDiscountTaxes
+     * @uses Blesta\Pricing\Modifier\DiscountPrice
      * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
      * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
      * @uses Blesta\Pricing\Modifier\TaxPrice::on
@@ -416,8 +518,14 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\UnitPrice::total
      * @dataProvider taxAmountProvider
      */
-    public function testTaxAmount($item, $tax, $expected_amount, array $excluded_tax_types, $discount = null)
-    {
+    public function testTaxAmount(
+        $item,
+        $tax,
+        $expected_amount,
+        array $excluded_tax_types,
+        $discount = null,
+        $discount_amount = 0
+    ) {
         // No taxes set. No tax amount
         $subtotal = $item->subtotal();
         $this->assertEquals(0, $item->taxAmount());
@@ -449,14 +557,12 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
         // Test that discounts are properly applied to taxes
         if ($discount) {
             $item->setDiscount($discount);
-            // Get the tax based on the discounted total
-            $discounted_tax = $tax_price * (1 - ($discount->amount() / 100));
 
             // The item tax should be equal to the tax applied to the discounted amount
-            $this->assertEquals($discounted_tax, $item->taxAmount());
+            $this->assertEquals($discount_amount, $item->taxAmount());
 
-            // Now set it so that discounts are not applied to taxes, now the tax amount should be the tax
-            // applied to the subtotal before discount
+            // When discounts do not apply to taxes, the tax amount should be the tax applied to the
+            // subtotal before discount
             $item->setDiscountTaxes(false);
             $this->assertEquals($tax_price, $item->taxAmount());
         }
@@ -481,7 +587,16 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
                 new TaxPrice(10, TaxPrice::EXCLUSIVE),
                 20,
                 [TaxPrice::INCLUSIVE],
-                new DiscountPrice(10, 'percent')
+                new DiscountPrice(10, 'percent'),
+                18 // [(100 * 2) * 0.1] * (1 - 0.1)
+            ],
+            [
+                new ItemPrice(100, 2),
+                new TaxPrice(10, TaxPrice::EXCLUSIVE),
+                20,
+                [TaxPrice::INCLUSIVE],
+                new DiscountPrice(100, 'percent'),
+                0 // [(100 * 2) * 1] * (1 - 1)
             ]
         ];
     }
@@ -493,6 +608,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @covers ::compoundTaxAmount
      * @uses Blesta\Pricing\Type\ItemPrice::setTax
      * @uses Blesta\Pricing\Type\ItemPrice::setDiscount
+     * @uses Blesta\Pricing\Type\ItemPrice::setDiscountTaxes
      * @uses Blesta\Pricing\Type\ItemPrice::totalAfterTax
      * @uses Blesta\Pricing\Type\ItemPrice::totalAfterDiscount
      * @uses Blesta\Pricing\Type\ItemPrice::discountAmount
@@ -500,8 +616,8 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
      * @uses Blesta\Pricing\Type\ItemPrice::amountDiscountAll
      * @uses Blesta\Pricing\Type\ItemPrice::excludeTax
      * @uses Blesta\Pricing\Type\ItemPrice::subtotal
-     * @uses Blesta\Pricing\Type\ItemPrice::setDiscountTaxes
-     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier::type
+     * @uses Blesta\Pricing\Modifier\DiscountPrice
+     * @uses Blesta\Pricing\Modifier\AbstractPriceModifier
      * @uses Blesta\Pricing\Modifier\TaxPrice::__construct
      * @uses Blesta\Pricing\Modifier\TaxPrice::on
      * @uses Blesta\Pricing\Type\UnitPrice::__construct
