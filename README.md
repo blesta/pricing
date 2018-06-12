@@ -158,9 +158,17 @@ With tax and discount:
 $item_price->total(); // 23.5125 = (subtotal - discounts + ([subtotal - discounts] * taxes)) = (30 - (1.50 + 7.125) + [30 - (1.50 + 7.125)] * 0.10)
 ```
 
+With tax and discount where the discount does *not* apply to the taxes:
+
+```php
+$item_price->setDiscountTaxes(false);
+$item_price->total(); // 24.375 = (subtotal - discounts + ([subtotal] * taxes)) = (30 - (1.50 + 7.125) + ([30] * 0.10))
+```
+
 Without taxes of the 'exclusive' type:
 
 ```php
+$item_price->setDiscountTaxes(true);
 $item_price->excludeTax(TaxPrice::EXCLUSIVE)->totalAfterTax(); // 30.00 = (30 + [30 - (1.50 + 7.125)] * 0)
 $item_price->total(); // 21.375 = (30 - (1.50 + 7.125) + [30 - (1.50 + 7.125)] * 0)
 

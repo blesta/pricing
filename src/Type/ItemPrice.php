@@ -36,6 +36,10 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      * @var array A list of tax types and whether or not they are shown in totals returned by this object
      */
     protected $tax_types = [TaxPrice::INCLUSIVE => true, TaxPrice::EXCLUSIVE => true];
+    /**
+     * @var bool Whether to apply discounts before calculating tax
+     */
+    protected $discount_taxes = true;
 
     /**
      * Initialize the item price
@@ -113,6 +117,16 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     }
 
     /**
+     * Sets whether to calculate tax before or after discounts are applied
+     *
+     * @param bool $discount_taxes True to calculate taxes after discounts are applied, false otherwise
+     */
+    public function setDiscountTaxes($discount_taxes)
+    {
+        $this->discount_taxes = $discount_taxes;
+    }
+
+    /**
      * Retrieves the total item price amount considering all taxes without discounts
      */
     public function totalAfterTax()
@@ -186,7 +200,8 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     private function amountTax(TaxPrice $tax)
     {
-        $taxable_price = $this->totalAfterDiscount();
+        // Apply tax either before or after the discount
+        $taxable_price = $this->discount_taxes ? $this->totalAfterDiscount() : $this->subtotal();
         $tax_amount = 0;
 
         foreach ($this->taxes as $tax_group) {
@@ -206,7 +221,8 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     private function amountTaxAll()
     {
-        $taxable_price = $this->totalAfterDiscount();
+        // Apply tax either before or after the discount
+        $taxable_price = $this->discount_taxes ? $this->totalAfterDiscount() : $this->subtotal();
         $tax_amount = 0;
 
         // Determine all taxes set on this item's price, compounded accordingly

@@ -234,45 +234,59 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
      */
     public function totalProvider()
     {
-        // Items with discounts and tax
-        $tax_price = new TaxPrice(10, TaxPrice::EXCLUSIVE);
-        $item1 = new ItemPrice(10, 2);
-        $item1->setDiscount(new DiscountPrice(20, 'percent'));
-        $item1->setDiscount(new DiscountPrice(1, 'amount'));
-        $item1->setTax($tax_price);
+        $testCases = [];
 
-        $item4 = new ItemPrice(10, 2);
-        $item4->setDiscount(new DiscountPrice(10, 'percent'));
-        $item4->setTax($tax_price);
+        for ($i = 0; $i < 2; $i++) {
+            // Items with discounts and tax
+            $tax_price = new TaxPrice(10, TaxPrice::EXCLUSIVE);
+            $item1 = new ItemPrice(10, 2);
+            $item1->setDiscount(new DiscountPrice(20, 'percent'));
+            $item1->setDiscount(new DiscountPrice(1, 'amount'));
+            $item1->setTax($tax_price);
 
-        // Item with tax
-        $item2 = new ItemPrice(6, 4);
-        $item2->setTax(new TaxPrice(5, TaxPrice::EXCLUSIVE));
-        $item3 = new ItemPrice(5, 5);
+            $item4 = new ItemPrice(10, 2);
+            $item4->setDiscount(new DiscountPrice(10, 'percent'));
+            $item4->setTax($tax_price);
 
-        $item5 = new ItemPrice(5.25, 3);
-        $item5->setTax($tax_price);
+            // Item with tax
+            $item2 = new ItemPrice(6, 4);
+            $item2->setTax(new TaxPrice(5, TaxPrice::EXCLUSIVE));
+            $item3 = new ItemPrice(5, 5);
 
-        // Item with compound tax and discount
-        $item6 = new ItemPrice(100.00, 1);
-        $item6->setDiscount(new DiscountPrice(1.50, 'amount'));
-        $item6->setTax(new TaxPrice(8, TaxPrice::EXCLUSIVE), new TaxPrice(5, TaxPrice::EXCLUSIVE));
+            $item5 = new ItemPrice(5.25, 3);
+            $item5->setTax($tax_price);
 
-        // Set collections of the items
-        $collection1 = new ItemPriceCollection();
-        $collection1->append($item1);
+            // Item with compound tax and discount
+            $item6 = new ItemPrice(100.00, 1);
+            $item6->setDiscount(new DiscountPrice(1.50, 'amount'));
+            $item6->setTax(new TaxPrice(8, TaxPrice::EXCLUSIVE), new TaxPrice(5, TaxPrice::EXCLUSIVE));
 
-        $collection2 = new ItemPriceCollection();
-        $collection2->append($item2)->append($item3);
+            // For the second test case, test discounts that do not apply to taxes
+            if ($i === 1) {
+                $item1->setDiscountTaxes(false);
+                $item2->setDiscountTaxes(false);
+                $item3->setDiscountTaxes(false);
+                $item4->setDiscountTaxes(false);
+                $item5->setDiscountTaxes(false);
+                $item6->setDiscountTaxes(false);
+            }
 
-        $collection3 = new ItemPriceCollection();
-        $collection3->append($item4)->append($item5)->append($item6);
+            // Set collections of the items
+            $collection1 = new ItemPriceCollection();
+            $collection1->append($item1);
 
-        return [
-            [$collection1, $this->getItemTotals($item1)],
-            [$collection2, $this->getItemTotals($item2, $item3)],
-            [$collection3, $this->getItemTotals($item4, $item5, $item6)],
-        ];
+            $collection2 = new ItemPriceCollection();
+            $collection2->append($item2)->append($item3);
+
+            $collection3 = new ItemPriceCollection();
+            $collection3->append($item4)->append($item5)->append($item6);
+
+            $testCases[] = [$collection1, $this->getItemTotals($item1)];
+            $testCases[] = [$collection2, $this->getItemTotals($item2, $item3)];
+            $testCases[] = [$collection3, $this->getItemTotals($item4, $item5, $item6)];
+        }
+
+        return $testCases;
     }
 
     /**
