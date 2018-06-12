@@ -183,24 +183,20 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($discount_amount, $item->discountAmount());
 
-        // Reset taxes so totals can include exclusive taxes again
-        $item->resetTaxes();
-
+        // Reset discount amounts that were applied so that we can use them again to calculate the next total
+        $item->resetDiscounts();
         $this->assertEquals($tax_amount, $item->taxAmount());
 
-        // Reset taxes so totals can include exclusive taxes again
-        $item->resetTaxes();
-
+        // Reset discount amounts that were applied so that we can use them again to calculate the next total
+        $item->resetDiscounts();
         $this->assertEquals($total_after_discount, $item->totalAfterDiscount());
 
-        // Reset taxes so totals can include exclusive taxes again
-        $item->resetTaxes();
-
+        // Reset discount amounts that were applied so that we can use them again to calculate the next total
+        $item->resetDiscounts();
         $this->assertEquals($total_after_tax, $item->totalAfterTax());
 
-        // Reset taxes so totals can include exclusive taxes again
-        $item->resetTaxes();
-
+        // Reset discount amounts that were applied so that we can use them again to calculate the next total
+        $item->resetDiscounts();
         $this->assertEquals($total, $item->total());
     }
 
@@ -256,6 +252,50 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
                 15.00, // total after tax (10 + 5)
                 5.00 // grand total (0 + 5)
             ],
+            [
+                true, // discount taxes
+                new ItemPrice(10, 1),
+                [new DiscountPrice(10, 'percent'), new DiscountPrice(100, 'amount')],
+                [new TaxPrice(50, TaxPrice::EXCLUSIVE), new TaxPrice(10, TaxPrice::INCLUSIVE)],
+                10.00, // discount amount (10)
+                0.00, // tax amount (0 * 0.5) + (0 * 0.1)
+                0.00, // total after discount (10 - 10)
+                10.00, // total after tax (10 + 0)
+                0.00 // grand total (0 + 0)
+            ],
+            [
+                false, // discount taxes
+                new ItemPrice(10, 1),
+                [new DiscountPrice(10, 'percent'), new DiscountPrice(100, 'amount')],
+                [new TaxPrice(50, TaxPrice::EXCLUSIVE), new TaxPrice(10, TaxPrice::INCLUSIVE)],
+                10.00, // discount amount (10)
+                6.00, // tax amount (10 * 0.5) + (10 * 0.1)
+                0.00, // total after discount (10 - 10)
+                16.00, // total after tax (10 + 6)
+                6.00 // grand total (0 + 6)
+            ],
+            [
+                true, // discount taxes
+                new ItemPrice(10, 1),
+                [new DiscountPrice(10, 'percent'), new DiscountPrice(5, 'amount')],
+                [new TaxPrice(50, TaxPrice::EXCLUSIVE), new TaxPrice(10, TaxPrice::INCLUSIVE)],
+                6.00, // discount amount (10 * 0.1) - 5
+                2.40, // tax amount [(10 - 6) * 0.5)] + [(10 - 6) * 0.1)]
+                4.00, // total after discount (10 - 6)
+                12.40, // total after tax (10 + 2.40)
+                6.40 // grand total (4 + 2.40)
+            ],
+            [
+                false, // discount taxes
+                new ItemPrice(10, 1),
+                [new DiscountPrice(10, 'percent'), new DiscountPrice(5, 'amount')],
+                [new TaxPrice(50, TaxPrice::EXCLUSIVE), new TaxPrice(10, TaxPrice::INCLUSIVE)],
+                6.00, // discount amount (10 * 0.1) - 5
+                6.00, // tax amount (10 * 0.5) + (10 * 0.1)
+                4.00, // total after discount (10 - 6)
+                16.00, // total after tax (10 + 6)
+                10.00 // grand total (4 + 6)
+            ]
         ];
     }
 
