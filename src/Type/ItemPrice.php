@@ -36,9 +36,9 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      * @var array A list of tax types and whether or not they are shown in totals returned by this object
      */
     protected $tax_types = [
-        TaxPrice::INCLUSIVE_CALCULATED => true,
         TaxPrice::INCLUSIVE => true,
-        TaxPrice::EXCLUSIVE => true
+        TaxPrice::EXCLUSIVE => true,
+        TaxPrice::INCLUSIVE_CALCULATED => true,
     ];
     /**
      * @var bool Whether to apply discounts before calculating tax
