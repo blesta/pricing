@@ -35,7 +35,7 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
      */
     public function testOff($tax, $price, $price_after)
     {
-        $this->assertEquals($price_after, $tax->off($price));
+        $this->assertEquals($price_after, round($tax->off($price), 2));
     }
 
     /**
@@ -59,6 +59,13 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
             [new TaxPrice(0, TaxPrice::INCLUSIVE), -10.00, -10.00],
             [new TaxPrice(50, TaxPrice::INCLUSIVE), -10.00, -5.00],
             [new TaxPrice(100, TaxPrice::INCLUSIVE), -10.00, 0.00],
+
+            [new TaxPrice(0, TaxPrice::INCLUSIVE_CALCULATED), 10.00, 10.00],
+            [new TaxPrice(50, TaxPrice::INCLUSIVE_CALCULATED), 10.00, 6.67],
+            [new TaxPrice(100, TaxPrice::INCLUSIVE_CALCULATED), 10.00, 5.00],
+            [new TaxPrice(0, TaxPrice::INCLUSIVE_CALCULATED), -10.00, -10.00],
+            [new TaxPrice(50, TaxPrice::INCLUSIVE_CALCULATED), -10.00, -6.67],
+            [new TaxPrice(100, TaxPrice::INCLUSIVE_CALCULATED), -10.00, -5.00],
         ];
     }
 
@@ -68,7 +75,7 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
      */
     public function testOn($tax, $price, $tax_amount)
     {
-        $this->assertEquals($tax_amount, $tax->on($price));
+        $this->assertEquals($tax_amount, round($tax->on($price), 2));
     }
 
     /**
@@ -92,6 +99,13 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
             [new TaxPrice(0, TaxPrice::INCLUSIVE), -10.00, 0.00],
             [new TaxPrice(50, TaxPrice::INCLUSIVE), -10.00, -5.00],
             [new TaxPrice(100, TaxPrice::INCLUSIVE), -10.00, -10.00],
+
+            [new TaxPrice(0, TaxPrice::INCLUSIVE_CALCULATED), 10.00, 0.00],
+            [new TaxPrice(50, TaxPrice::INCLUSIVE_CALCULATED), 10.00, 3.33],
+            [new TaxPrice(100, TaxPrice::INCLUSIVE_CALCULATED), 10.00, 5.00],
+            [new TaxPrice(0, TaxPrice::INCLUSIVE_CALCULATED), -10.00, 0.00],
+            [new TaxPrice(50, TaxPrice::INCLUSIVE_CALCULATED), -10.00, -3.33],
+            [new TaxPrice(100, TaxPrice::INCLUSIVE_CALCULATED), -10.00, -5.00],
         ];
     }
 
@@ -126,6 +140,13 @@ class TaxPriceTest extends PHPUnit_Framework_TestCase
             [new TaxPrice(0, TaxPrice::INCLUSIVE), -10.00, -10.00],
             [new TaxPrice(50, TaxPrice::INCLUSIVE), -10.00, -10.00],
             [new TaxPrice(100, TaxPrice::INCLUSIVE), -10.00, -10.00],
+
+            [new TaxPrice(0, TaxPrice::INCLUSIVE_CALCULATED), 10.00, 10.00],
+            [new TaxPrice(50, TaxPrice::INCLUSIVE_CALCULATED), 10.00, 10.00],
+            [new TaxPrice(100, TaxPrice::INCLUSIVE_CALCULATED), 10.00, 10.00],
+            [new TaxPrice(0, TaxPrice::INCLUSIVE_CALCULATED), -10.00, -10.00],
+            [new TaxPrice(50, TaxPrice::INCLUSIVE_CALCULATED), -10.00, -10.00],
+            [new TaxPrice(100, TaxPrice::INCLUSIVE_CALCULATED), -10.00, -10.00],
         ];
     }
 }

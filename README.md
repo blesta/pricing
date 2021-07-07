@@ -10,9 +10,10 @@ A library for handling pricing. Supports:
 - Discounts
     - Percentages
     - Fixed amounts
-- Taxes (inclusive, exclusive)
+- Taxes (inclusive_calculated, inclusive, exclusive)
     - Inclusive and Exclusive
     - Applied in sequence or compounded
+    - Inclusive calculated is meant to be subtracted from the item price
 - Item Collection
     - Iterate over Item Prices
     - Aggregate totals over Item Prices
@@ -79,6 +80,18 @@ $tax = new TaxPrice(25.00, TaxPrice::INCLUSIVE);
 $tax->setDescription("25 % tax");
 $tax->on(100.00); // 25.00
 $tax->off(100.00); // 75.00
+$tax->including(100.00); // 100.00
+```
+
+Inclusive tax (price already includes tax) calculated based on the price minus tax:
+
+```php
+use Blesta\Pricing\Modifier\TaxPrice;
+
+$tax = new TaxPrice(25.00, TaxPrice::INCLUSIVE_CALCULATED);
+$tax->setDescription("25 % tax");
+$tax->on(100.00); // 20.00
+$tax->off(100.00); // 80.00
 $tax->including(100.00); // 100.00
 ```
 

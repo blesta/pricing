@@ -9,6 +9,7 @@ use InvalidArgumentException;
 class TaxPrice extends AbstractPriceModifier
 {
     // Tax types
+    const INCLUSIVE_CALCULATED = 'inclusive_calculated';
     const INCLUSIVE = 'inclusive';
     const EXCLUSIVE = 'exclusive';
 
@@ -19,6 +20,7 @@ class TaxPrice extends AbstractPriceModifier
      *
      * @param float $amount The positive tax amount as a percentage
      * @param string $type The type of tax the $amount represents. One of:
+     *  - inclusive_calculated Taxes are subtracted from the item price
      *  - inclusive Prices include tax
      *  - exclusive Prices do not include tax
      */
@@ -42,7 +44,7 @@ class TaxPrice extends AbstractPriceModifier
      */
     public function off($price)
     {
-        if (TaxPrice::INCLUSIVE == $this->type) {
+        if (TaxPrice::INCLUSIVE == $this->type || TaxPrice::INCLUSIVE_CALCULATED == $this->type) {
             return $price - $this->on($price);
         }
         return $price;
@@ -56,7 +58,11 @@ class TaxPrice extends AbstractPriceModifier
      */
     public function on($price)
     {
-        return max(0, $this->amount / 100) * $price;
+        if (TaxPrice::INCLUSIVE_CALCULATED == $this->type) {
+            return ( $price / ( 100 + $this->amount ) ) * $this->amount;
+        } else {
+            return max(0, $this->amount / 100) * $price;
+        }
     }
 
     /**
