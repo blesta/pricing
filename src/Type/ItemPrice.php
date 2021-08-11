@@ -257,21 +257,33 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
 
         foreach ($tax_group as $tax_price) {
             // If a tax type is specified, skip taxes that don't match it
-            if ($type && $tax_price->type() !== $type) {
+            $tax_type = $tax_price->type();
+            if ($type && $tax_type !== $type) {
                 continue;
             }
 
             // Calculate the compound tax
             $tax_amount = $tax_price->on($taxable_price + $compound_tax);
-            if ($tax_price->type() === TaxPrice::INCLUSIVE_CALCULATED) {
+
+            // Subtracted or inclusive_calculated taxes should be deducted from the compound tax
+            if ($tax_price->subtract || $tax_type === TaxPrice::INCLUSIVE_CALCULATED) {
                 $compound_tax -= $tax_amount;
             } else {
                 $compound_tax += $tax_amount;
             }
 
-            if (isset($this->tax_types[$tax_price->type()]) && $this->tax_types[$tax_price->type()]) {
-                // Only return taxes of types that are set to be shown
-                $tax_total += $tax_amount;
+            if (isset($this->tax_types[$tax_type]) && $this->tax_types[$tax_type]) {
+                if ($tax_price->subtract) {
+                    // Subtract the tax amount instead of adding
+                    $tax_total -= $tax_amount;
+                } elseif ($tax_type === TaxPrice::INCLUSIVE_CALCULATED && $type !== TaxPrice::INCLUSIVE_CALCULATED) {
+                    // Don't add inclusive_calculated taxes to the total unless specifically
+                    // fetching the total for that tax type
+                    $tax_total += 0;
+                } else {
+                    // Add tax normally
+                    $tax_total += $tax_amount;
+                }
             } elseif ($tax && $tax === $tax_price) {
                 // Return a total of zero if we were given a tax, but it is of an excluded tax type
                 return 0;

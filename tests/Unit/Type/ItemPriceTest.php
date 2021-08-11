@@ -302,10 +302,10 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
                 [new DiscountPrice(10, 'percent'), new DiscountPrice(5, 'amount')],
                 [new TaxPrice(50, TaxPrice::EXCLUSIVE), new TaxPrice(10, TaxPrice::INCLUSIVE_CALCULATED)],
                 6.00, // discount amount (10 * 0.1) + 5
-                2.36, // tax amount [(10 - 6) * 0.5)] + [( (10 - 6) / ( 100 + 10 ) ) * 10]
+                2.00, // tax amount [(10 - 6) * 0.5)]
                 4.00, // total after discount (10 - 6)
-                12.36, // total after tax (10 + 2.36)
-                6.36 // grand total (4 + 2.36)
+                12.00, // total after tax (10 + 2.00)
+                6.00 // grand total (4 + 2.00)
             ],
             [
                 false, // discount taxes
@@ -313,10 +313,10 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
                 [new DiscountPrice(10, 'percent'), new DiscountPrice(5, 'amount')],
                 [new TaxPrice(50, TaxPrice::EXCLUSIVE), new TaxPrice(10, TaxPrice::INCLUSIVE_CALCULATED)],
                 6.00, // discount amount (10 * 0.1) + 5
-                5.91, // tax amount (10 * 0.5) + [( 10 / ( 100 + 10 ) ) * 10]
+                5.00, // tax amount (10 * 0.5)
                 4.00, // total after discount (10 - 6)
-                15.91, // total after tax (10 + 5.91)
-                9.91 // grand total (4 + 5.91)
+                15.00, // total after tax (10 + 5.00)
+                9.00 // grand total (4 + 5.00)
             ]
         ];
     }
