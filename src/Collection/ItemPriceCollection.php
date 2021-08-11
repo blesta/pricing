@@ -111,8 +111,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
         // Sum the subtotals of each ItemPrice
         $total = 0;
         foreach ($this->collection as $item_price) {
-            $total += $item_price->subtotal() - abs($item_price->taxAmount(null, TaxPrice::INCLUSIVE_CALCULATED));
+            $total += $item_price->subtotal();
         }
+        $this->resetDiscounts();
 
         return $total;
     }

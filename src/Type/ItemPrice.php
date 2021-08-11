@@ -135,7 +135,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     public function totalAfterTax()
     {
-        return $this->subtotal() + $this->taxAmount();
+        return $this->subtotal(false) + $this->taxAmount();
     }
 
     /**
@@ -143,7 +143,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     public function totalAfterDiscount()
     {
-        return $this->subtotal() - $this->discountAmount();
+        return $this->subtotal(false) - $this->discountAmount();
     }
 
     /**
@@ -151,9 +151,10 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      *
      * @return float The item subtotal
      */
-    public function subtotal()
+    public function subtotal($external_call = true)
     {
-        return parent::total();
+        // inclusive_calculated taxes should be subtracted from the
+        return parent::total() - ($external_call ? abs($this->taxAmount(null, TaxPrice::INCLUSIVE_CALCULATED)) : 0);
     }
 
     /**
@@ -206,7 +207,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     private function amountTax(TaxPrice $tax)
     {
         // Apply tax either before or after the discount
-        $taxable_price = $this->discount_taxes ? $this->totalAfterDiscount() : $this->subtotal();
+        $taxable_price = $this->discount_taxes ? $this->totalAfterDiscount() : $this->subtotal(false);
         $tax_amount = 0;
 
         foreach ($this->taxes as $tax_group) {
@@ -228,7 +229,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     private function amountTaxAll($type = null)
     {
         // Apply tax either before or after the discount
-        $taxable_price = $this->discount_taxes ? $this->totalAfterDiscount() : $this->subtotal();
+        $taxable_price = $this->discount_taxes ? $this->totalAfterDiscount() : $this->subtotal(false);
         $tax_amount = 0;
 
         // Determine all taxes set on this item's price, compounded accordingly
@@ -309,7 +310,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     public function discountAmount(DiscountPrice $discount = null)
     {
         $total_discount = 0;
-        $subtotal = $this->subtotal();
+        $subtotal = $this->subtotal(false);
 
         // Determine the discount set on this item's price
         if ($discount) {
@@ -356,7 +357,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     private function amountDiscountAll()
     {
-        $subtotal = $this->subtotal();
+        $subtotal = $this->subtotal(false);
         $total_discount = 0;
 
         // Determine all the discounts set on this item's price
@@ -436,7 +437,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     private function resetDiscountSubtotal()
     {
-        $this->discounted_subtotal = $this->subtotal();
+        $this->discounted_subtotal = $this->subtotal(false);
     }
 
     /**
