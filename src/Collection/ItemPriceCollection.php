@@ -113,6 +113,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
         foreach ($this->collection as $item_price) {
             $total += $item_price->subtotal();
         }
+        $this->resetDiscounts();
 
         return $total;
     }
@@ -142,12 +143,13 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *
      * @param TaxPrice $tax A TaxPrice to apply to all ItemPrice's in the collection, ignoring
      *  any TaxPrice's that may already be set on the items within the collection (optional)
+     * @param string $type The type of tax for which to retrieve amounts (optional)
      */
-    public function taxAmount(TaxPrice $tax = null)
+    public function taxAmount(TaxPrice $tax = null, $type = null)
     {
         $total = 0;
         foreach ($this->collection as $item_price) {
-            $total += $item_price->taxAmount($tax);
+            $total += $item_price->taxAmount($tax, $type);
         }
 
         // Reset any discount amounts or excluded tax types back

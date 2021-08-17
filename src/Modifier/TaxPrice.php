@@ -14,6 +14,11 @@ class TaxPrice extends AbstractPriceModifier
     const EXCLUSIVE = 'exclusive';
 
     /**
+     * @var bool Whether this tax should be subtracted instead of added
+     */
+    public $subtract = false;
+
+    /**
      * Sets tax information
      *
      * @throws InvalidArgumentException If $amount is negative
@@ -23,8 +28,9 @@ class TaxPrice extends AbstractPriceModifier
      *  - inclusive_calculated Taxes are subtracted from the item price
      *  - inclusive Prices include tax
      *  - exclusive Prices do not include tax
+     * @param bool $subtract Whether this tax should be subtracted instead of added
      */
-    public function __construct($amount, $type)
+    public function __construct($amount, $type, $subtract = false)
     {
         // Amount must be non-negative
         if (!is_numeric($amount) || $amount < 0) {
@@ -32,6 +38,7 @@ class TaxPrice extends AbstractPriceModifier
                 'TaxPrice must be instantiated with a positive amount.'
             ));
         }
+        $this->subtract = $subtract;
 
         parent::__construct($amount, $type);
     }

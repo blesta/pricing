@@ -314,6 +314,7 @@ class ItemPriceCollectionTest extends PHPUnit_Framework_TestCase
         $args = func_get_args();
         foreach ($args as $item) {
             $totals['subtotal'] += $item->subtotal();
+            $item->resetDiscounts();
             $totals['total'] += $item->total();
             $item->resetDiscounts();
             $totals['total_with_tax'] += $item->totalAfterTax();

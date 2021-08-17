@@ -135,7 +135,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     public function totalAfterTax()
     {
-        return $this->subtotal() + $this->taxAmount();
+        return parent::total() + $this->taxAmount();
     }
 
     /**
@@ -143,7 +143,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     public function totalAfterDiscount()
     {
-        return $this->subtotal() - $this->discountAmount();
+        return parent::total() - $this->discountAmount();
     }
 
     /**
@@ -153,7 +153,8 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     public function subtotal()
     {
-        return parent::total();
+        // inclusive_calculated taxes should be subtracted from the
+        return parent::total() - abs($this->taxAmount(null, TaxPrice::INCLUSIVE_CALCULATED));
     }
 
     /**
@@ -206,7 +207,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     private function amountTax(TaxPrice $tax)
     {
         // Apply tax either before or after the discount
-        $taxable_price = $this->discount_taxes ? $this->totalAfterDiscount() : $this->subtotal();
+        $taxable_price = $this->discount_taxes ? $this->totalAfterDiscount() : parent::total();
         $tax_amount = 0;
 
         foreach ($this->taxes as $tax_group) {
@@ -228,7 +229,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     private function amountTaxAll($type = null)
     {
         // Apply tax either before or after the discount
-        $taxable_price = $this->discount_taxes ? $this->totalAfterDiscount() : $this->subtotal();
+        $taxable_price = $this->discount_taxes ? $this->totalAfterDiscount() : parent::total();
         $tax_amount = 0;
 
         // Determine all taxes set on this item's price, compounded accordingly
@@ -257,21 +258,33 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
 
         foreach ($tax_group as $tax_price) {
             // If a tax type is specified, skip taxes that don't match it
-            if ($type && $tax_price->type() !== $type) {
+            $tax_type = $tax_price->type();
+            if ($type && $tax_type !== $type) {
                 continue;
             }
 
             // Calculate the compound tax
             $tax_amount = $tax_price->on($taxable_price + $compound_tax);
-            if ($tax_price->type() === TaxPrice::INCLUSIVE_CALCULATED) {
+
+            // Subtracted or inclusive_calculated taxes should be deducted from the compound tax
+            if ($tax_price->subtract || $tax_type === TaxPrice::INCLUSIVE_CALCULATED) {
                 $compound_tax -= $tax_amount;
             } else {
                 $compound_tax += $tax_amount;
             }
 
-            if (isset($this->tax_types[$tax_price->type()]) && $this->tax_types[$tax_price->type()]) {
-                // Only return taxes of types that are set to be shown
-                $tax_total += $tax_amount;
+            if (isset($this->tax_types[$tax_type]) && $this->tax_types[$tax_type]) {
+                if ($tax_price->subtract) {
+                    // Subtract the tax amount instead of adding
+                    $tax_total -= $tax_amount;
+                } elseif ($tax_type === TaxPrice::INCLUSIVE_CALCULATED && $type !== TaxPrice::INCLUSIVE_CALCULATED) {
+                    // Don't add inclusive_calculated taxes to the total unless specifically
+                    // fetching the total for that tax type
+                    $tax_total += 0;
+                } else {
+                    // Add tax normally
+                    $tax_total += $tax_amount;
+                }
             } elseif ($tax && $tax === $tax_price) {
                 // Return a total of zero if we were given a tax, but it is of an excluded tax type
                 return 0;
@@ -297,7 +310,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     public function discountAmount(DiscountPrice $discount = null)
     {
         $total_discount = 0;
-        $subtotal = $this->subtotal();
+        $subtotal = parent::total();
 
         // Determine the discount set on this item's price
         if ($discount) {
@@ -344,7 +357,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     private function amountDiscountAll()
     {
-        $subtotal = $this->subtotal();
+        $subtotal = parent::total();
         $total_discount = 0;
 
         // Determine all the discounts set on this item's price
@@ -424,7 +437,7 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
      */
     private function resetDiscountSubtotal()
     {
-        $this->discounted_subtotal = $this->subtotal();
+        $this->discounted_subtotal = parent::total();
     }
 
     /**
