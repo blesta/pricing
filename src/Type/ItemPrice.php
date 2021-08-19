@@ -259,9 +259,6 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
         foreach ($tax_group as $tax_price) {
             // If a tax type is specified, skip taxes that don't match it
             $tax_type = $tax_price->type();
-            if ($type && $tax_type !== $type) {
-                continue;
-            }
 
             // Calculate the compound tax
             $tax_amount = $tax_price->on($taxable_price + $compound_tax);
@@ -271,6 +268,10 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
                 $compound_tax -= $tax_amount;
             } else {
                 $compound_tax += $tax_amount;
+            }
+
+            if ($type && $tax_type !== $type) {
+                continue;
             }
 
             if (isset($this->tax_types[$tax_type]) && $this->tax_types[$tax_type]) {
