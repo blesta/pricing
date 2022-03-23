@@ -154,7 +154,11 @@ class ItemPrice extends UnitPrice implements PriceTotalInterface
     public function subtotal()
     {
         // inclusive_calculated taxes should be subtracted from the
-        return parent::total() - abs($this->taxAmount(null, TaxPrice::INCLUSIVE_CALCULATED));
+        if (parent::total() < 0) {
+            return parent::total() + abs($this->taxAmount(null, TaxPrice::INCLUSIVE_CALCULATED));
+        } else {
+            return parent::total() - abs($this->taxAmount(null, TaxPrice::INCLUSIVE_CALCULATED));
+        }
     }
 
     /**
