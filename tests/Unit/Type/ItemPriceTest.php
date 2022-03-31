@@ -377,6 +377,12 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
             [new ItemPrice(100.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE), new TaxPrice(10, TaxPrice::EXCLUSIVE)]],
             [new ItemPrice(-100.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE), new TaxPrice(20, TaxPrice::EXCLUSIVE)]],
+
+            [new ItemPrice(100.00, 2), [new TaxPrice(20, TaxPrice::INCLUSIVE_CALCULATED)]],
+            [new ItemPrice(-100.00, 2), [new TaxPrice(20, TaxPrice::INCLUSIVE_CALCULATED)]],
+
+            [new ItemPrice(100.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE), new TaxPrice(20, TaxPrice::INCLUSIVE_CALCULATED)]],
+            [new ItemPrice(-100.00, 2), [new TaxPrice(10, TaxPrice::EXCLUSIVE), new TaxPrice(20, TaxPrice::INCLUSIVE_CALCULATED)]],
         ];
     }
 
@@ -614,7 +620,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
         // The given expected amount should be the end result with all taxes applied
         $this->assertEquals($expected_amount, $item->taxAmount());
-        $this->assertEquals($tax_price, $item->taxAmount());
+        $this->assertEquals($tax_price, $item->taxAmount($tax));
 
         // Test that discounts are properly applied to taxes
         if ($discount) {
@@ -626,7 +632,7 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             // When discounts do not apply to taxes, the tax amount should be the tax applied to the
             // subtotal before discount
             $item->setDiscountTaxes(false);
-            $this->assertEquals($tax_price, $item->taxAmount());
+            $this->assertEquals($tax_price, $item->taxAmount($tax));
         }
     }
 
@@ -641,9 +647,12 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
             [new ItemPrice(100, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), 20, []],
             [new ItemPrice(0, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), 0, []],
             [new ItemPrice(-100, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), -20, []],
+            [new ItemPrice(100, 2), new TaxPrice(10, TaxPrice::INCLUSIVE), 20, []],
+            [new ItemPrice(110, 2), new TaxPrice(10, TaxPrice::INCLUSIVE_CALCULATED), 0, []],
             [new ItemPrice(100, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), 0, [TaxPrice::EXCLUSIVE]],
             [new ItemPrice(100, 2), new TaxPrice(10, TaxPrice::EXCLUSIVE), 20, [TaxPrice::INCLUSIVE]],
             [new ItemPrice(100, 2), new TaxPrice(10, TaxPrice::INCLUSIVE), 0, [TaxPrice::INCLUSIVE]],
+            [new ItemPrice(110, 2), new TaxPrice(10, TaxPrice::INCLUSIVE_CALCULATED), 0, [TaxPrice::INCLUSIVE_CALCULATED]],
             [
                 new ItemPrice(100, 2),
                 new TaxPrice(10, TaxPrice::EXCLUSIVE),
@@ -656,6 +665,14 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
                 new ItemPrice(100, 2),
                 new TaxPrice(10, TaxPrice::EXCLUSIVE),
                 20,
+                [TaxPrice::INCLUSIVE],
+                new DiscountPrice(100, 'percent'),
+                0 // [(100 * 2) * 1] * (1 - 1)
+            ],
+            [
+                new ItemPrice(110, 2),
+                new TaxPrice(10, TaxPrice::INCLUSIVE_CALCULATED),
+                0,
                 [TaxPrice::INCLUSIVE],
                 new DiscountPrice(100, 'percent'),
                 0 // [(100 * 2) * 1] * (1 - 1)
@@ -712,8 +729,8 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
 
         // Total tax amount is the sum of all expected amounts
         $expected_amount = 0;
-        foreach ($expected_tax_amounts as $amount) {
-            $expected_amount += $amount;
+        foreach ($expected_tax_amounts as $index => $amount) {
+            $expected_amount += ($taxes[$index]->type() == TaxPrice::INCLUSIVE_CALCULATED ? 0 : $amount);
         }
         $this->assertEquals($expected_amount, $item->taxAmount());
 
@@ -850,7 +867,20 @@ class ItemPriceTest extends PHPUnit_Framework_TestCase
                     0.75
                 ],
                 [TaxPrice::INCLUSIVE]
-            ]
+            ],
+            [
+                new ItemPrice(100, 2),
+                [
+                    new TaxPrice(10, TaxPrice::EXCLUSIVE),
+                    new TaxPrice(10, TaxPrice::INCLUSIVE_CALCULATED)
+                ],
+                [
+                    20,
+                    20
+                ],
+                [],
+                new DiscountPrice(10, 'percent')
+            ],
         ];
     }
 
