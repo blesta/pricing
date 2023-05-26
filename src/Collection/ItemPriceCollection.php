@@ -27,8 +27,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      * Adds an ItemPrice to the collection
      *
      * @param ItemPrice $price An item to add to the collection
-     * @return reference to this
+     * @return ItemPriceCollection reference to this
      */
+    #[\ReturnTypeWillChange]
     public function append(ItemPrice $price)
     {
         $this->collection[] = $price;
@@ -39,8 +40,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      * Removes an ItemPrice from the collection
      *
      * @param ItemPrice $price An item to remove from the collection
-     * @return reference to this
+     * @return ItemPriceCollection reference to this
      */
+    #[\ReturnTypeWillChange]
     public function remove(ItemPrice $price)
     {
         // Remove all instances of the price from the collection
@@ -58,6 +60,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *
      * @return int The number of ItemPrice objects in the collection
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->collection);
@@ -68,6 +71,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *
      * @return float The total price including taxes without including discounts
      */
+    #[\ReturnTypeWillChange]
     public function totalAfterTax()
     {
         $total = 0;
@@ -87,6 +91,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *
      * @return float The total price including discounts without including taxes
      */
+    #[\ReturnTypeWillChange]
     public function totalAfterDiscount()
     {
         $total = 0;
@@ -106,6 +111,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *
      * @return float The subtotal of all items in the collection
      */
+    #[\ReturnTypeWillChange]
     public function subtotal()
     {
         // Sum the subtotals of each ItemPrice
@@ -123,6 +129,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *
      * @return float The total of all items in the collection
      */
+    #[\ReturnTypeWillChange]
     public function total()
     {
         // Sum the totals of each ItemPrice
@@ -145,6 +152,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *  any TaxPrice's that may already be set on the items within the collection (optional)
      * @param string $type The type of tax for which to retrieve amounts (optional)
      */
+    #[\ReturnTypeWillChange]
     public function taxAmount(TaxPrice $tax = null, $type = null)
     {
         $total = 0;
@@ -166,6 +174,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *  collection, ignoring any DiscountPrice's that may already be set on the items within
      *  the collection (optional)
      */
+    #[\ReturnTypeWillChange]
     public function discountAmount(DiscountPrice $discount = null)
     {
         // Apply the given discount to all items
@@ -187,6 +196,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *
      * @return array An array of TaxPrice objects
      */
+    #[\ReturnTypeWillChange]
     public function taxes()
     {
         // Include unique instances of TaxPrice
@@ -207,6 +217,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *
      * @return array An array of DiscountPrice objects
      */
+    #[\ReturnTypeWillChange]
     public function discounts()
     {
         // Include unique instances of DiscountPrice
@@ -225,6 +236,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     /**
      * Resets the applied discount amounts for all ItemPrice's in the collection
      */
+    #[\ReturnTypeWillChange]
     public function resetDiscounts()
     {
         foreach ($this->collection as $item_price) {
@@ -236,8 +248,9 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      * Marks the given tax type as not shown in totals returned by all ItemPrices in the collection
      *
      * @param string $tax_type The type of tax to exclude
-     * @return A reference to this object
+     * @return ItemPriceCollection A reference to this object
      */
+    #[\ReturnTypeWillChange]
     public function excludeTax($tax_type)
     {
         foreach ($this->collection as $item_price) {
@@ -250,6 +263,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     /**
      * Resets the list of tax types for all ItemPrices in the collection
      */
+    #[\ReturnTypeWillChange]
     public function resetTaxes()
     {
         foreach ($this->collection as $item_price) {
@@ -270,6 +284,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      * @param ItemPriceCollection $collection The collection to be merged
      * @param ItemComparatorInterface $comparator The comparator used to merge item prices
      */
+    #[\ReturnTypeWillChange]
     public function merge(ItemPriceCollection $collection, ItemComparatorInterface $comparator)
     {
         // Set a new collection for the merged results
@@ -295,6 +310,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *
      * @return mixed The ItemPrice in the collection at the current position, otherwise null
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return (
@@ -309,6 +325,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *
      * @return int The index of the position in the collection
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->position;
@@ -317,6 +334,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     /**
      * Moves the pointer to the next item in the collection
      */
+    #[\ReturnTypeWillChange]
     public function next()
     {
         // Set the next position to the position of the next item in the collection
@@ -337,6 +355,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
     /**
      * Moves the pointer to the first item in the collection
      */
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         // Reset the array pointer to the first entry in the collection
@@ -354,6 +373,7 @@ class ItemPriceCollection implements PriceTotalInterface, Iterator
      *
      * @return bool True if the pointer references a valid item in the collection, false otherwise
      */
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         return array_key_exists($this->position, $this->collection);
